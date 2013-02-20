@@ -1,0 +1,671 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+  	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+    <title>Protein-protein interaction network</title>
+    <script type="text/javascript" src="D3/d3.js"></script>
+    <script type="text/javascript" src="D3/d3.geom.js"></script>
+    <script type="text/javascript" src="D3/d3.layout.js"></script>
+    <style type="text/css">
+    	  body {
+            background-color: #EEFFEE;
+            margin-left:5%;       
+            margin-right:10%; 
+            font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+        }
+        text {
+          font: 12px Arial,Georgia,"Courier New","Times New Roman",Messenger,Geneva,sans-serif;
+          /*pointer-events: none;*/
+        }
+
+        text.shadow {
+          /*stroke: #fff;
+          stroke-width: 3px;
+          stroke-opacity: .8;*/
+        }
+        circle.node {
+          /*stroke: #fff;
+            stroke-width: 1.5px;*/
+        }
+
+        line.link {
+          /*stroke: #999;
+           stroke-opacity: .6;*/
+        } 
+        table {
+          margin-right:20px;
+          margin-bottom:10px;
+          border:2px solid gray;
+          caption-side:top;
+          border-spacing:0px;
+          width:960px;
+          border-collapse: collapse;
+        }
+        th{
+          background-color: #e6e6e6;
+          padding: 5px;
+          border:2px solid gray;
+          font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+        }
+        td{
+          padding: 5px;
+          border:2px solid gray;
+          font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+        }
+        #table_id {
+            width: 960px;
+            border-collapse: collapse;
+            clear: left;
+        }
+        #table_id2 {
+            width: 960px;
+            border-collapse: collapse;
+            clear: left;
+        }
+        #chart {
+            float: left;
+            width:960px;
+            height:500px;
+        }
+        #chartfather {
+            float: left;
+            width:960px;
+            height:500px;
+        }
+        .guide {
+            color: #000000;
+            font-size: 16px;
+            font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+        }
+        p.guide {
+            color: #0000aa;
+            font-size: 16px;
+            font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+        }
+        p.guide2 {
+            width: 960px;
+            font-size: 18px;
+            font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+        }
+        #loadButton, #exampleButton{
+            font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+            font-size: 16px;
+        }
+        #pro_id {
+            font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            color: #0000FF;
+        }
+        #inputArea,#sourceProtein,#targetProtein{
+        	  font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+            font-size: 15px;
+        }
+        .pathcell{
+            color: #0000FF;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        #proteinIntroP{
+        	  clear: left;
+        }
+        #proteinIntro{
+        	  color: #666666;
+        	  font-size: 15px;
+            font-family: Arial, "Times New Roman", Georgia, "Courier New", Messenger, Geneva, Arial, sans-serif;
+        }
+        #fixButton{
+        	  font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+            font-size: 16px;
+        }
+        #fixButtonDiv{
+        	  clear:left;
+        }
+        circle.node {
+           cursor: pointer;
+        }
+    </style>
+  </head>
+  <body>
+  	<div class="testDiv">
+  		 <p class="guide2" id=cispathintro>cisPath result (Network View)</p>
+  		 <p class="guide2"></p>
+  		 </div>
+    <div id="chartfather">
+    <div id="chart"></div>
+    </div>
+    <script type="text/javascript">
+    	  ///////////////////////////////////////////20130202
+    	  var firstGraph=0;
+    	  var nodeCharge=-200;
+    	  var showLink=1;
+    	  var firstDrag=1;
+    	  var pathLen=10;
+    	  var nodeNum=0;
+    	  function firstDragf(){
+    	  	  if(showLink==0){
+    	  	  	 return;
+    	  	  }
+    	  	  if(firstDrag!=1){
+    	  	  	 return;
+    	  	  }
+    	  	  firstDrag=0;
+    	  	  document.getElementById("fixButton").value="Release graph";
+    	  	  fixGraph(0);
+    	  	 	force.stop();
+    	  }
+    	  function timerFun2(){
+    	  	  showLink=1;
+    	  	  //alert("timerFun2");
+    	  }
+    	  function timerFun(){
+    	  	  document.getElementById("chart").style.display = "";
+    	  }
+    	  ///////////////////////////////////////////20130202
+    	  Object.clone = function(sObj){ 
+            if(typeof sObj !== "object"){ 
+               return sObj; 
+            } 
+            var s = {}; 
+            if(sObj.constructor == Array){ 
+               s = []; 
+            } 
+            for(var i in sObj){ 
+                s[i] = Object.clone(sObj[i]); 
+            } 
+            return s; 
+        }  
+        Object.extend = function(tObj,sObj){ 
+            for(var i in sObj){  
+               if(typeof sObj[i] !== "object"){ 
+                  tObj[i] = sObj[i]; 
+               }else if (sObj[i].constructor == Array){ 
+                  tObj[i] = Object.clone(sObj[i]); 
+               }else{ 
+                  tObj[i] = tObj[i] || {}; 
+                  Object.extend(tObj[i],sObj[i]); 
+               } 
+  
+            } 
+  
+        }
+        function trim(str){
+           return str.replace(/(^\s*)|(\s*$)/g, "");
+        }
+        function addNotice(obj, ProteinName){
+        	  while(obj.lastChild != null){
+        	  	    obj.removeChild(obj.lastChild);
+        	  }
+        	  var string1 = "\""+ProteinName+"\""+ " cannot be converted to Swiss-Prot accession number.";
+        	  var string11 =  "Please input Swiss-Prot accession number directly.";
+        	  var string12 =  "Please access ";
+        	  var string2 = " to search for the Swiss-Prot accession number.";
+        	  obj.appendChild(document.createTextNode(string1));
+        	  obj.appendChild(document.createElement('br'));
+        	  obj.appendChild(document.createTextNode(string11));
+        	  obj.appendChild(document.createElement('br'));
+        	  obj.appendChild(document.createTextNode(string12));
+        	  myLink = document.createElement('a');
+            myLink.href = "http://www.uniprot.org";
+            myLink.addEventListener("click", function(e){window.open(this.href,'_blank');e.preventDefault();return false;}, false);
+            myLink.appendChild(document.createTextNode("http://www.uniprot.org"));
+            obj.appendChild(myLink);
+            obj.appendChild(document.createTextNode(string2));
+        }
+        function strChange(str){
+        	  var tmp =str;
+	          var parter=/String score/g;
+	          tmp=tmp.replace(parter,"STRING score");
+	          return tmp;
+        }
+        function changeTxt(obj, newtxt){
+        	  while(obj.lastChild != null){
+        	  	    obj.removeChild(obj.lastChild);
+        	  }
+        	  obj.appendChild(document.createTextNode(newtxt));
+        }
+        function changeTxt2(newtxt){
+        	  var obj = document.getElementById('proteinIntroP');
+        	  if(obj == null){
+        	  	 return;
+        	  }
+        	  while(obj.lastChild != null){
+        	  	    obj.removeChild(obj.lastChild);
+        	  }
+        	  if(newtxt != ""){
+        	     var tmp = document.createElement('span');
+        	     tmp.id = "proteinIntro";
+        	     tmp.appendChild(document.createTextNode(newtxt));
+        	     obj.appendChild(tmp);
+        	  }else{
+        	  	 obj.appendChild(document.createElement('br'));
+        	  }
+        }
+        function addProteinLink(obj,introduction,proteinName){
+        	  while(obj.lastChild != null){
+        	  	    obj.removeChild(obj.lastChild);
+        	  }
+        	  obj.appendChild(document.createTextNode(introduction+" ("));
+        	  myLink = document.createElement('a');
+            myLink.href = "http://www.uniprot.org/uniprot/"+proteinName;
+            myLink.addEventListener("click", function(e){window.open(this.href,'_blank');e.preventDefault();return false;}, false);
+            myLink.appendChild(document.createTextNode(proteinName));
+            obj.appendChild(myLink);
+            obj.appendChild(document.createTextNode(")"));
+        }
+    	  function clickfunction(address){
+    	  	alert(address);
+    	  	window.open(address,'_blank');
+    	  	return false;
+    	  }
+    	  function getRealName(nameStr){
+    	  	  var tmp_names = nameStr.split(":");
+            var real_name = tmp_names[0];
+            var swiss_prot = real_name;
+            if(tmp_names[1]){
+               swiss_prot = tmp_names[1];
+            }
+            return real_name;
+    	  }
+    	  function getSwiss(nameStr){
+    	  	  var tmp_names = nameStr.split(":");
+            var real_name = tmp_names[0];
+            var swiss_prot = real_name;
+            if(tmp_names[1]){
+               swiss_prot = tmp_names[1];
+            }
+            return swiss_prot;
+    	  }
+    	  function  execReg(reg,str){
+           var result =  reg.exec(str);
+           return result;
+        }
+        function clearResult(){
+        	 var mydiv = document.getElementById("table_id");
+        	 mydiv.innerHTML = '';
+           d3.selectAll("line.link").remove();
+           d3.selectAll("circle").remove();
+           d3.selectAll("g").remove();
+        }
+        function drawGraph(row_id){
+        	 processJson(graphView);
+        }
+        function showAllPath(){
+        	 var mydiv = document.getElementById("table_id2");
+        	 mydiv.innerHTML = '';
+        	 var mytable = document.createElement("table_id2");
+        	 mytable.innerHTML = '';
+           var mytablebody = document.createElement("tbody");
+           var mycurrent_row = document.createElement("tr");
+           var mycurrent_cell;
+           mycurrent_cell = document.createElement("th");
+           mycurrent_cell.appendChild(document.createTextNode("Path"));
+           mycurrent_row.appendChild(mycurrent_cell);
+           mycurrent_cell = document.createElement("th");
+           mycurrent_cell.appendChild(document.createTextNode("Graph/Detail"));
+           mycurrent_row.appendChild(mycurrent_cell);
+           mytablebody.appendChild(mycurrent_row);
+           //allPaths[0]="HDAC3:O15379 -> HDAC1:Q13547 -> CTNNB1:P35222 -> PIN1:Q13526 -> RAB4A:P20338"
+        	 for(x in allPaths){
+        	 	   //alert(allPaths[x]);
+        	 	   mycurrent_row = document.createElement("tr");
+               mycurrent_cell = document.createElement("td");
+               mycurrent_cell.id = "path"+x;
+        		   var tmp_m = allPaths[x].split(" -> ");
+        		   for(y in tmp_m){
+        		   	   if(y!=0){
+        		   	   	  mycurrent_cell.appendChild(document.createTextNode(" -> "));
+        		   	   }
+        		   	   var names=tmp_m[y].split(":");
+        		   	   myLink = document.createElement("a");
+        		   	   myLink.href = "http://www.uniprot.org/uniprot/"+names[1];
+                   myLink.addEventListener("click", function(e){window.open(this.href,'_blank');e.preventDefault();return false;}, false);
+                   myLink.appendChild(document.createTextNode(names[0]));
+                   mycurrent_cell.appendChild(myLink);
+        		   }
+               mycurrent_row.appendChild(mycurrent_cell);
+               mycurrent_cell = document.createElement("td");
+               
+               
+               myLink = document.createTextNode("View Graph");
+        		   myLink.id = "link" + x + "";
+               mycurrent_cell.appendChild(myLink);
+               mycurrent_cell.className = "pathcell";
+               mycurrent_cell.id = x;
+               mycurrent_cell.name = "cellname"+x;
+               mycurrent_cell.addEventListener("click", function(e){drawGraph(this.id);}, false);
+               mycurrent_row.appendChild(mycurrent_cell);
+               mytablebody.appendChild(mycurrent_row);
+        	 }
+        	 mytable.appendChild(mytablebody);
+           mydiv.appendChild(mytable);
+        	 //alert(mydiv.innerHTML);
+        }
+        function getType(o){
+            var _t;
+               return ((_t = typeof(o)) == "object" ? o==null && "null" || Object.prototype.toString.call(o).slice(8,-1):_t).toLowerCase();
+        }
+        function extend(destination,source){
+         for(var p in source){
+            if(getType(source[p])=="array"||getType(source[p])=="object"){
+                destination[p]=getType(source[p])=="array"?[]:{};
+                arguments.callee(destination[p],source[p]);
+            }
+            else{
+                destination[p]=source[p];
+            }
+         }
+        }
+        var force;
+        function processJson(json_old){
+        	 //var json = {};
+        	 //extend(json,json_old);
+        	 //clearResult();
+        	 ////////////////////
+           if(json_old==null){
+              return;
+           }
+        	 document.getElementById("chart").style.display = "none";
+        	 setTimeout(timerFun, 800);
+        	 showLink=0;
+        	 setTimeout(timerFun2, 2000);
+        	 firstDrag=1;
+        	 fixGraph(0.1);
+           nodeNum=json_old.nodes.length;
+        	 ///////////////////
+        	 var json = {};
+        	 Object.extend(json,json_old);
+           var mydiv = document.getElementById("table_id");
+           var html_text = '';
+           var head1 = 'Pubmed IDs';
+           if((json.links[0] != null)&&(json.links[0]['pubmed'])){
+              head1 = 'Pubmed IDs';
+           }
+           var mytable = document.createElement("table");
+           var mytablebody = document.createElement("tbody");
+           var mycurrent_row = document.createElement("tr");
+           var mycurrent_cell;
+           mycurrent_cell = document.createElement("th");
+           mycurrent_cell.appendChild(document.createTextNode("Protein1"));
+           //mycurrent_cell.width = 150;
+           //mycurrent_cell.colSpan = 2;
+           mycurrent_row.appendChild(mycurrent_cell);
+           mycurrent_cell = document.createElement("th");
+           mycurrent_cell.appendChild(document.createTextNode("Protein2"));
+           //mycurrent_cell.width = 100;
+           mycurrent_row.appendChild(mycurrent_cell);
+           mycurrent_cell = document.createElement("th");
+           mycurrent_cell.appendChild(document.createTextNode("Evidence"));
+           mycurrent_row.appendChild(mycurrent_cell);
+           mycurrent_cell = document.createElement("th");
+           mycurrent_cell.appendChild(document.createTextNode(head1));
+           mycurrent_row.appendChild(mycurrent_cell);
+           mytablebody.appendChild(mycurrent_row);
+           //alert(json.links);
+           var last_row=null;
+           for(x in json.links){
+           //for(var x=json.links.length-1;x>=0;x--){
+           //for(var x=0;x<json.links.length;x++){
+           	  //break;
+           	  if(typeof(json.links[x]) == "undefined"){ 
+           	  	 alert("undined!");
+           	  	 next;
+           	  }
+              if(json.links[x]['value'] > 9){
+                 var source = json.nodes[json.links[x]['source']]['name'];
+                 var target = json.nodes[json.links[x]['target']]['name'];
+                 mycurrent_row = document.createElement("tr");
+                 mycurrent_cell = document.createElement("td");
+                 //mycurrent_cell.appendChild(document.createTextNode(getRealName(source)));
+                 myLink = document.createElement("a");
+               	 myLink.href = "http://www.uniprot.org/uniprot/"+getSwiss(target);
+               	 myLink.addEventListener("click", function(e){window.open(this.href,'_blank');e.preventDefault();return false;}, false);
+               	 myLink.appendChild(document.createTextNode(getRealName(target)));
+               	 //myLink.addEventListener("mouseover", function(e){changeTxt2(this.firstChild.data + ": "+this.href);e.preventDefault();return false;}, false);
+               	 mycurrent_cell.appendChild(myLink);
+                 
+                 mycurrent_row.appendChild(mycurrent_cell);
+                 mycurrent_cell = document.createElement("td");
+                 //mycurrent_cell.appendChild(document.createTextNode(getRealName(target)));
+                 myLink = document.createElement("a");
+               	 myLink.href = "http://www.uniprot.org/uniprot/"+getSwiss(source);
+               	 myLink.addEventListener("click", function(e){window.open(this.href,'_blank');e.preventDefault();return false;}, false);
+               	 myLink.appendChild(document.createTextNode(getRealName(source)));
+               	 //myLink.addEventListener("mouseover", function(e){changeTxt2(this.firstChild.data + ": "+this.href);e.preventDefault();return false;}, false);
+               	 mycurrent_cell.appendChild(myLink);  
+                 
+                 mycurrent_row.appendChild(mycurrent_cell);
+                 
+                 mycurrent_cell = document.createElement("td");
+                 mycurrent_cell.appendChild(document.createTextNode(strChange(json.links[x]['Evidence'])));
+                 mycurrent_cell.align = 'center';
+                 mycurrent_row.appendChild(mycurrent_cell);
+                 
+                 if((json.links[x]['pubmed'])&&(json.links[x]['pubmed'] !="")){
+                    mycurrent_cell = document.createElement("td");
+                    //mycurrent_cell.appendChild(document.createTextNode(json.links[x]['pubmed']));
+                    mycurrent_cell.className = "pubmed";
+                    mycurrent_cell.align = 'center';
+                    var tmp_m = json.links[x]['pubmed'].split(", ");
+                    var first_a = 1;
+                    for(x in tmp_m) {
+               	       if(first_a == 0){
+               	   	      mycurrent_cell.appendChild(document.createTextNode(", "));
+               	       }
+               	       myLink = document.createElement("a");
+               	       myLink.href = '#';
+               	       if(execReg(/^\d+$/,tmp_m[x])){
+               	   	      myLink.href = 'http://www.ncbi.nlm.nih.gov/pubmed/'+tmp_m[x];
+               	       }
+               	       if(execReg(/^10\./,tmp_m[x])){
+               	   	      myLink.href = 'http://dx.doi.org/'+tmp_m[x];
+               	       }
+               	       //myLink.href = 'http://www.ncbi.nlm.nih.gov/pubmed/'+tmp_m[x];
+               	       myLink.addEventListener("click", function(e){window.open(this.href,'_blank');e.preventDefault();return false;}, false);
+               	       myLink.appendChild(document.createTextNode(tmp_m[x]));
+               	       //myLink.addEventListener("mouseover", function(e){changeTxt2(this.href);e.preventDefault();return false;}, false);
+               	       mycurrent_cell.appendChild(myLink);
+               	       first_a = 0;
+                   }
+                   mycurrent_row.appendChild(mycurrent_cell);
+                 }
+                 else{
+                   mycurrent_cell = document.createElement("td");
+                   mycurrent_cell.appendChild(document.createTextNode("Not presented"));
+                   mycurrent_cell.align = 'center';
+                   mycurrent_row.appendChild(mycurrent_cell);
+                 } 
+                 mytablebody.insertBefore(mycurrent_row, last_row);
+                 last_row=mycurrent_row;
+              }
+           }
+           mytable.appendChild(mytablebody);
+           mydiv.innerHTML = '';
+           var mychart = document.getElementById("chart");
+           //mychart.innerHTML = '';
+           mydiv.appendChild(mytable);
+           //return;
+           d3.selectAll("line.link").remove();
+           d3.selectAll("circle").remove();
+           d3.selectAll("g").remove();
+           var w = 960,
+           h = 500,
+           fill = d3.scale.category10();
+           //json.nodes[0].fixed=1;
+           force = d3.layout.force()
+              .nodes(json.nodes)
+              .links(json.links)
+              .gravity(.06)
+              .distance(100)
+              .charge(nodeCharge)
+              //.linkDistance(0)
+              .size([w, h])
+              .start();
+
+
+            var link = vis.selectAll("line.link")
+             .data(json.links)
+            .enter().append("svg:line")
+              .attr("class", "link")
+              .style("stroke-width", function(d) { return Math.sqrt(d.value); })
+              .attr("x1", function(d) { return d.source.x; })
+              .attr("y1", function(d) { return d.source.y; })
+              .attr("x2", function(d) { return d.target.x; })
+              .attr("y2", function(d) { return d.target.y; })
+              .style("stroke", function(d) { if (d.value>10){ return '#000000'} else {return '#666666'}})
+              .on("mouseover", function(d){
+              	  if(d.value > 10){
+              	  	 d3.select(this).style("stroke-width", Math.sqrt(d.value)+2);
+              	  }else{
+              	  	 d3.select(this).style("stroke-width", Math.sqrt(d.value)+2);
+                  }
+                })
+              .on("mouseout", function(d){
+              	  if(d.value > 10){
+              	  	 d3.select(this).style("stroke-width", Math.sqrt(d.value));
+              	  }else{
+                     d3.select(this).style("stroke-width", Math.sqrt(d.value));
+                  }
+               });
+
+            var node = vis.selectAll("circle")
+              .data(json.nodes)
+            .enter().append("svg:circle")
+              .attr("class", "node")
+              .attr("r", function(d) { if(d.group==1){ return 16;} else {if(nodeNum<=30){return 9}else{return 8};}})
+            .style("fill", function(d) { return d.color})
+            .style("stroke-width", function(d) { return 2})
+            .style("stroke", function(d) { return '#000000'})
+              .on("click", function(d){
+              	  if(pathLen==1){
+              	  	 document.getElementById('pro_id').value=d.name;
+                     loadJS();
+                     return;
+              	  }
+                  window.open("http://www.uniprot.org/uniprot/"+getSwiss(d.name),'_blank');
+                })
+              .on("mouseover", function(d){
+                  window.status="http://www.uniprot.org/uniprot/"+getSwiss(d.name);
+                  if(pathLen!=1){
+                     changeTxt2(getRealName(d.name)+ ": http://www.uniprot.org/uniprot/"+getSwiss(d.name));
+                  }
+                  d3.select(this).style("stroke-width",4);
+                  firstDragf();
+                })
+              .on("mouseout", function(d){
+                  window.status="";
+                  changeTxt2("");
+                  d3.select(this).style("stroke-width",2);
+               })
+              .call(force.drag);
+
+            var text = vis.selectAll("g")
+              .data(json.nodes)
+            .enter().append("svg:g"); 
+
+            text.append("svg:text")
+            .attr("dx", 12)
+            .attr("dy", ".35em")
+            .attr("class", "shadow")
+            .text(function(d) { return getRealName(d.name) });
+
+            text.append("svg:text")
+            .attr("dx", 12)
+            .attr("dy", ".35em")
+            .text(function(d) { return getRealName(d.name) });
+
+          force.on("tick", function() {
+            link.attr("x1", function(d) { return d.source.x; })
+                .attr("y1", function(d) { return d.source.y; })
+                .attr("x2", function(d) { return d.target.x; })
+                .attr("y2", function(d) { return d.target.y; });
+
+            node.attr("transform", function(d) {
+            return "translate(" + d.x + "," + d.y + ")";
+          });
+
+          text.attr("transform", function(d) {
+            return "translate(" + d.x + "," + d.y + ")";
+          });
+          });
+          //d3.select("#chart").append("table:tr").text;
+          addfixButton();
+        }
+    </script>
+    <script type="text/javascript">
+        var w = 960,
+            h = 500,
+            fill = d3.scale.category10();
+
+        var vis = d3.select("#chart").append("svg:svg")
+            .attr("width", w)
+            .attr("height", h);
+        var graphView;
+        function loadJS(){
+           var oHead = document.getElementsByTagName('HEAD').item(0); 
+           var oScript= document.createElement("script"); 
+           oScript.type = "text/javascript"; 
+           oScript.src="./js/graph.js"; 
+           oHead.appendChild(oScript); 
+           oScript.onload = oScript.onreadystatechange = function(){
+               if(!this.readyState|| this.readyState=='loaded' || this.readyState=='complete'){
+               	  var json = graphView;
+                  processJson(json);
+               }
+           };
+    	  };
+    	  function fixGraph(v){
+    	  	 fixValue=v;
+    	  }
+    	  function clickFix(item){
+    	  	 if(item.value=="Freeze graph"){
+    	  	 	  fixGraph(0);
+    	  	 	  item.value="Release graph";
+    	  	 	  force.stop();
+    	  	 }else{
+    	  	 	  fixGraph(0.1);
+    	  	 	  item.value="Freeze graph";
+    	  	 	  force.resume();
+    	  	 }
+    	  }
+    	  function addfixButton(){
+        	  var tmp = document.getElementById("fixButton");
+        	  tmp.type="button";
+        	  tmp.value="Release graph";
+        	  //tmp.click(); 
+    	  }
+    	  function showExample(){
+    	  	 if(document.getElementById('pro_id').value!=exampleProteinName){
+        	   document.getElementById('pro_id').value=exampleProteinName;
+        	   document.getElementsByName('subtype')[0].checked=true;
+        	   document.getElementsByName('subtype')[1].checked=false;
+        	 }else{
+        	 	 document.getElementById('pro_id').value=exampleProteinId;
+        	 	 document.getElementsByName('subtype')[0].checked=false;
+        	   document.getElementsByName('subtype')[1].checked=true;
+        	 }
+           //alert(jsonTmp);
+           //processJson(jsonTmp);
+    	  };
+        /////////////// 2012-12-21
+        loadJS();
+        //document.getElementById('pro_id').value="";        
+    </script>
+       <div class="guide" id="tourguide"><h1><br></h1><h1><br></h1>
+        Tour guide <br><br>
+       &bull; Try clicking on a node. <br>
+       &bull; Try dragging a node with the mouse. <br>
+       &bull; Gestures can be used for touch screen users. <br>
+       &bull; Use Ctrl (&#8984;) and '+' or '-' to zoom in and out. <br>
+       &bull; The links between the main nodes are highlighted.
+       </div>
+      <div><p id="fixButtonDiv">
+      	   <input type="button" id='fixButton' onclick="clickFix(this);">&nbsp;&nbsp;&nbsp;
+           <span id="proteinIntroP"><br></span></p></div>
+      <div id="table_id"></div>
+      <div><p class="guide2">
+      </p>
+      <div id="table_id2"></div>	
+      </div>
+  </body>
+</html>

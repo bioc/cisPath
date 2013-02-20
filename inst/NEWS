@@ -1,0 +1,27 @@
+VERSION 0.99.6
+------------------------
+   o Several improvements have been done.
+
+VERSION 0.99.5
+------------------------
+   o Several improvements have been done.
+
+VERSION 0.99.4
+------------------------
+   o A button has been added which can be used to freeze the graph.
+
+VERSION 0.99.3
+------------------------
+   o hash_map -> unordered_map.
+   
+VERSION 0.99.2
+------------------------
+   o The size of output was reduced to about 30%.
+   
+VERSION 0.99.1
+------------------------
+   o A new method called networkView has been added to this new package.
+
+VERSION 0.99.0
+------------------------
+   o Package released

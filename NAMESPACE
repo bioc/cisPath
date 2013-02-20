@@ -1,0 +1,7 @@
+##Namespace file for DEGseq package
+useDynLib(cisPath,.registration = TRUE)
+importClassesFrom(methods, call, character)
+importFrom(utils, flush.console)
+export("cisPath")
+export("addProteinNames")
+export("networkView")
