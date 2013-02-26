@@ -1,3 +1,4 @@
+#define GCC_VERSION (__GNUC__*10000+__GNUC_MINOR__*100+__GNUC_PATCHLEVEL__)
 #include <vector>
 #include <map>
 #include <string>
@@ -10,7 +11,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <list>
+
+#if GCC_VERSION > 40600
 #include <tr1/unordered_map>
+#else
+#include <ext/hash_map>
+#endif
 
 #ifdef INDEP_PROGRAM
 #include <unistd.h>
@@ -25,7 +31,14 @@
 
 #define INF 1<<20
 using namespace std;
+
+#if GCC_VERSION > 40600
+#define HASHMAP unordered_map
 using namespace std::tr1;
+#else
+#define HASHMAP hash_map
+using namespace __gnu_cxx;
+#endif
 //////////////////////
 struct str_hash1
 {
@@ -60,10 +73,10 @@ public:
 //////////////////////
 bool cispath(const char *input, const char *protein, const char *output);
 bool viewGraph(const char *input, const char *proteinFile, const char *output,
-                                          int addChilds, const char *childCol);
+               int addChilds, const char *childCol);
 bool processInput(const char *input);
-vector<string> string_tokenize(const string &str, 
-                               const string &delimiters = " \t\n\r", 
+vector<string> string_tokenize(const string &str,
+                               const string &delimiters = " \t\n\r",
                                bool skip_empty = true);
 string get_package_bin_path(string path);
 bool cp_html(string path, string outputDir);
@@ -80,15 +93,15 @@ map<string, int> dist;
 map<string, string> prev;
 vector<string> hasPath;*/
 
-unordered_map<string, string> name2prot;
-unordered_map<string, string> prot2real;
-unordered_map<string, map<string, int> > edge;
-unordered_map<string, string> edgeInfo;
-unordered_map<string, string> edgeInfo_string;
+HASHMAP<string, string, str_hash1> name2prot;
+HASHMAP<string, string, str_hash1> prot2real;
+HASHMAP<string, map<string, int>, str_hash1> edge;
+HASHMAP<string, string, str_hash1> edgeInfo;
+HASHMAP<string, string, str_hash1> edgeInfo_string;
 vector<string> nodes;
-unordered_map<string, int> nodesExist;
-unordered_map<string, int> dist;
-unordered_map<string, string> prev;
+HASHMAP<string, int, str_hash1> nodesExist;
+HASHMAP<string, int, str_hash1> dist;
+HASHMAP<string, string, str_hash1> prev;
 vector<string> hasPath;
 
 bool withPubmed = false;
@@ -100,33 +113,34 @@ fstream OUTJS1;
 fstream OUTJS2;
 string n2pFile = "";
 string targetFile = "";
-unordered_map<string, int> targets;
+HASHMAP<string, int, str_hash1> targets;
 int maxNum = 10000;
 int outputPath = 1;
 
 ///////////////////////////////////
 vector<string> OutPutID2names;
-unordered_map<string, int> name2OutPutID;
-int outputID=0;
+HASHMAP<string, int, str_hash1> name2OutPutID;
+int outputID = 0;
 ////////////////////g++ cisPath.cpp -o cisPath -DINDEP_PROGRAM
 #ifdef INDEP_PROGRAM
 void print_usage()
 {
     cerr << "cispath <PPIFile> <protein> <outputDir>";
     cerr << " [-n name2prot.txt] [-t targets.txt]" << endl;
-    
-    cerr << "----------------------------------------------------------"<< endl;
-    cerr << "  PPIFile: file that contains PPI data for proteins" << endl;
+
+    cerr <<"----------------------------------------------------------"<<endl;
+    cerr <<"  PPIFile: file that contains PPI data for proteins" << endl;
     cerr << "  protein: protein name or Swiss-Prot accession number";
     cerr << " for source protein" << endl;
     cerr << "outputDir: output directory" << endl;
-    cerr << "----------------------------------------------------------"<< endl;
+    cerr <<"----------------------------------------------------------"<<endl;
     cerr << " optional:" << endl;
     cerr << "   -n name2prot.txt:";
     cerr << " additional ID mapping information file" << endl;
     cerr << "   -t targets.txt: output paths only for proteins";
     cerr << " listed in this file (default: all)\n";
-    cerr << "----------------------------------------------------------"<< endl;
+    cerr << " (gcc version: " << GCC_VERSION << ")" << endl;
+    cerr<< "----------------------------------------------------------"<<endl;
     exit(1);
 }
 
@@ -183,6 +197,7 @@ bool getTargets(string outputDir);
 bool addInfoFirst();
 bool cispath(const char *input, const char *protein, const char *output)
 {
+    //PRINTFUNCTION("gcc version: %d\n", GCC_VERSION);
     addInfoFirst();
     PRINTFUNCTION("Processing input file\n");
     PRINTFUNCTION("input file: %s\n", input);
@@ -362,8 +377,9 @@ bool showPath(string root)
     OUTJSALL << "var sourceProteinId=\"" << root << "\";\n";
     OUTJSALL << "var sourceProteinName=\"" << prot2real[root] << "\";\n";
     string example = hasPath[hasPath.size() / 2];
-    if((hasPath.size() >= 2)&&(hasPath.size() <= 1155)){
-       example = hasPath[hasPath.size()-1];
+    if((hasPath.size() >= 2) && (hasPath.size() <= 1155))
+    {
+        example = hasPath[hasPath.size() - 1];
     }
     if(targetFile != "")  //2012-12-04
     {
@@ -381,9 +397,9 @@ bool showPath(string root)
     OUTJSALL << "var allPaths=new Array();\n";
     OUTJSALL << "var allGraphs=new Array();\n";
     OUTJSALL << "var name2prot = {";
-    unordered_map<string, string>::iterator iter;
-    unordered_map<string, string>::iterator iter_begin = name2prot.begin();
-    unordered_map<string, string>::iterator iter_end = name2prot.end();
+    HASHMAP<string, string, str_hash1>::iterator iter;
+    HASHMAP<string, string, str_hash1>::iterator iter_begin = name2prot.begin();
+    HASHMAP<string, string, str_hash1>::iterator iter_end = name2prot.end();
     for(iter = iter_begin; iter != iter_end; iter++)
     {
         if(iter != iter_begin)
@@ -406,11 +422,12 @@ bool showPath(string root)
             OUTJSALL << ", ";
         }
         ///////////////////////////////////
-        string pName=hasPath[i];
-        if(prot2real.count(pName) != 0) {
-           pName = prot2real[pName];
+        string pName = hasPath[i];
+        if(prot2real.count(pName) != 0)
+        {
+            pName = prot2real[pName];
         }
-        pName = pName+","+hasPath[i];
+        pName = pName + "," + hasPath[i];
         validInputs.push_back(pName);
         ///////////////////////////////////
         OUTJSALL << "\"" << hasPath[i] << "\":1";
@@ -450,11 +467,13 @@ bool showPath(string root)
     OUTJSALL << "};\n";
     /////////////////////////////////////////////////2013-01-24
     OUTJSALL << "var id2ProteinName=[";
-    for(int i = 0; i < (int)OutPutID2names.size(); i++){
-        if(i!=0){
-           OUTJSALL << ",";
+    for(int i = 0; i < (int)OutPutID2names.size(); i++)
+    {
+        if(i != 0)
+        {
+            OUTJSALL << ",";
         }
-        OUTJSALL<<"\""<<OutPutID2names[i]<<"\"";
+        OUTJSALL << "\"" << OutPutID2names[i] << "\"";
     }
     OUTJSALL << "];\n";
     /////////////////////////////////////////////////2013-01-24
@@ -466,7 +485,7 @@ bool showPath(string root)
     R_FlushConsole();
 #endif
     //////////////////////////////////////////////2013-01-05
-    string validIuputFile=outputDir + "/validInputProteins.txt";
+    string validIuputFile = outputDir + "/validInputProteins.txt";
     ofstream VALIDOUT(validIuputFile.c_str());
     if(!VALIDOUT)
     {
@@ -474,8 +493,9 @@ bool showPath(string root)
         return false;
     }
     sort(validInputs.begin(), validInputs.end());
-    for(int i = 0; i < (int)validInputs.size(); i++){
-        VALIDOUT<<validInputs[i]<<"\n";
+    for(int i = 0; i < (int)validInputs.size(); i++)
+    {
+        VALIDOUT << validInputs[i] << "\n";
     }
     VALIDOUT.close();
     //////////////////////////////////////////////
@@ -716,8 +736,8 @@ bool processInput(const char *input)
             map<string, bool> pubmeds;
             for(int index = 0; index < (int)pubmedIds.size(); index++)
             {
-                if((pubmedIds[index].substr(0, 7) == "pubmed:") && 
-                	 (pubmedIds[index].substr(0, 17) != "pubmed:unassigned"))
+                if((pubmedIds[index].substr(0, 7) == "pubmed:") &&
+                        (pubmedIds[index].substr(0, 17) != "pubmed:unassigned"))
                 {
                     if(pubmedstr == "")
                     {
@@ -790,8 +810,8 @@ bool processInput(const char *input)
             edge[tokens[1]][tokens[0]] = 1;
             if((tokens[4] != "NA") && (tokens[4] != ""))
             {
-                if((edgeInfo.count(tokens[0] + "&" + tokens[1]) == 0) || 
-                	 (edgeInfo[tokens[0] + "&" + tokens[1]] == ""))
+                if((edgeInfo.count(tokens[0] + "&" + tokens[1]) == 0) ||
+                        (edgeInfo[tokens[0] + "&" + tokens[1]] == ""))
                 {
                     edgeInfo[tokens[0] + "&" + tokens[1]] = tokens[4];
                     edgeInfo[tokens[1] + "&" + tokens[0]] = tokens[4];
@@ -805,17 +825,17 @@ bool processInput(const char *input)
             if((tokens[5] != "NA") && (tokens[5] != ""))
             {
                 if((edgeInfo_string.count(tokens[0] + "&" + tokens[1]) == 0) ||
-                	 (edgeInfo_string[tokens[0] + "&" + tokens[1]] == ""))
+                        (edgeInfo_string[tokens[0] + "&" + tokens[1]] == ""))
                 {
                     edgeInfo_string[tokens[0] + "&" + tokens[1]] = tokens[5];
                     edgeInfo_string[tokens[1] + "&" + tokens[0]] = tokens[5];
                 }
                 else
                 {
-                    edgeInfo_string[tokens[0] + "&" + tokens[1]] += 
-                                                  ("#" + tokens[5]);
-                    edgeInfo_string[tokens[1] + "&" + tokens[0]] += 
-                                                  ("#" + tokens[5]);
+                    edgeInfo_string[tokens[0] + "&" + tokens[1]] +=
+                        ("#" + tokens[5]);
+                    edgeInfo_string[tokens[1] + "&" + tokens[0]] +=
+                        ("#" + tokens[5]);
                 }
             }
             if(edgeInfo.count(tokens[0] + "&" + tokens[1]) == 0)
@@ -841,7 +861,7 @@ string int2str(int value);
 string double2str(double value);
 
 bool addNodeStr(string Name, int group)
-{   
+{
     if(prot2real.count(Name) != 0)
     {
         //Name = prot2real[Name] + ":" + Name;
@@ -852,22 +872,25 @@ bool addNodeStr(string Name, int group)
         //Name = Name + ":" + Name;
         Name = Name;
     }
-    int outputID=0;
-    if(name2OutPutID.count(Name)!=0){
-       outputID=name2OutPutID[Name];
-    }else{
-       outputID=(int)(OutPutID2names.size());
-       OutPutID2names.push_back(Name);
-       name2OutPutID[Name]=outputID;
-    }
-    if(nodeStr == "")
-    {   
-        nodeStr = int2str(outputID)+";"+int2str(group);
+    int outputID = 0;
+    if(name2OutPutID.count(Name) != 0)
+    {
+        outputID = name2OutPutID[Name];
     }
     else
-    {   
+    {
+        outputID = (int)(OutPutID2names.size());
+        OutPutID2names.push_back(Name);
+        name2OutPutID[Name] = outputID;
+    }
+    if(nodeStr == "")
+    {
+        nodeStr = int2str(outputID) + ";" + int2str(group);
+    }
+    else
+    {
         nodeStr += "&";
-        nodeStr += int2str(outputID)+";"+int2str(group);
+        nodeStr += int2str(outputID) + ";" + int2str(group);
     }
     return true;
 }
@@ -956,19 +979,25 @@ bool addLink(string source, string target, int group, int bigNode)
     target = int2str(nodeName2id[target]);
     if(linkStr == "")
     {
-        if(bigNode > 0){
+        if(bigNode > 0)
+        {
            linkStr=source+";"+target+";"+int2str(value)+";"+value2+";"+value3;
-        }else{
-           linkStr=source+";"+target+";"+int2str(value);
+        }
+        else
+        {
+            linkStr = source + ";" + target + ";" + int2str(value);
         }
     }
     else
     {
         linkStr += "&";
-        if(bigNode > 0){
+        if(bigNode > 0)
+        {
            linkStr+=source+";"+target+";"+int2str(value)+";"+value2+";"+value3;
-        }else{
-           linkStr+=source+";"+target+";"+int2str(value);
+        }
+        else
+        {
+            linkStr += source + ";" + target + ";" + int2str(value);
         }
     }
     return true;
@@ -984,9 +1013,9 @@ bool lessFunction2(const string &m1, const string &m2)
     }
     if(withPubmed == true)
     {
-        int size1 = 
+        int size1 =
             string_tokenize(edgeInfo[currentNode + "&" + m1], ", ").size();
-        int size2 = 
+        int size2 =
             string_tokenize(edgeInfo[currentNode + "&" + m2], ", ").size();
         if(edgeInfo[currentNode + "&" + m1] == "")
         {
@@ -1053,14 +1082,14 @@ bool addChildLink(string source, string target)
     target = int2str(nodeName2id[target]);
     if(linkStr == "")
     {
-        linkStr = string("{\"source\":") + source + ", \"target\":" + 
+        linkStr = string("{\"source\":") + source + ", \"target\":" +
                   target + ", \"value\":" + int2str(value) + "\"}";
     }
     else
     {
         linkStr += ", ";
-        linkStr += string("{\"source\":") + source + ", \"target\":" + 
-                  target + ", \"value\":" + int2str(value) + "\"}";
+        linkStr += string("{\"source\":") + source + ", \"target\":" +
+                   target + ", \"value\":" + int2str(value) + "\"}";
     }
     return true;
 
@@ -1210,7 +1239,7 @@ bool getTargets(string outputDir)
         if(tmp[tmp.size() - 1] == '\r')
         {
             buffer[tmp.size() - 1] = '\0';
-            tmp=buffer;
+            tmp = buffer;
         }
         vector<string> tokens = string_tokenize(tmp, ",", false);
         if(tokens.size() < 1)
@@ -1249,13 +1278,13 @@ bool getTargets(string outputDir)
     return true;
 }
 ///////////////////////////////////////////////////
-inline vector<string> string_tokenize(const string &str, 
-                                      const string &delimiters, 
+inline vector<string> string_tokenize(const string &str,
+                                      const string &delimiters,
                                       bool skip_empty)
 {
     // Skip delimiters at beginning.
-    string::size_type lastPos = skip_empty ? 
-    	                          str.find_first_not_of(delimiters, 0) : 0;
+    string::size_type lastPos = skip_empty ?
+                                str.find_first_not_of(delimiters, 0) : 0;
     // Find first "non-delimiter".
     string::size_type pos     = str.find_first_of(delimiters, lastPos);
     vector<string> result;
@@ -1274,7 +1303,7 @@ inline vector<string> string_tokenize(const string &str,
             break;
         }
         // Skip delimiters.  Note the "not_of"
-        lastPos = skip_empty?str.find_first_not_of(delimiters, pos):pos+1;
+        lastPos = skip_empty ? str.find_first_not_of(delimiters, pos) : pos + 1;
         // Find next "non-delimiter"
         pos = str.find_first_of(delimiters, lastPos);
     }
@@ -1401,9 +1430,9 @@ bool makedir(const char *dir, int mask)
 }
 ////////////////////////////////////////////////////////////////////
 vector <string> proteinNodes;
-unordered_map<string, int> name2big;
-unordered_map<string, string> name2color;
-int colNodeid=0;
+HASHMAP<string, int, str_hash1> name2big;
+HASHMAP<string, string, str_hash1> name2color;
+int colNodeid = 0;
 bool clearInfo()
 {
     name2prot.clear();
@@ -1428,21 +1457,22 @@ bool clearInfo()
     proteinNodes.clear();
     name2big.clear();
     name2color.clear();
-    colNodeid=0;
+    colNodeid = 0;
     outputID = 0;
     OutPutID2names.clear();
     name2OutPutID.clear();
     return true;
 }
 bool addColorNodeStr(string Name)
-{       
-    if(nodeName2id.count(Name) != 0){
-       return false;
+{
+    if(nodeName2id.count(Name) != 0)
+    {
+        return false;
     }
-    nodeName2id[Name]=colNodeid;
+    nodeName2id[Name] = colNodeid;
     colNodeid++;
-    int big=name2big[Name];
-    string color="'"+name2color[Name]+"'";
+    int big = name2big[Name];
+    string color = "'" + name2color[Name] + "'";
     if(prot2real.count(Name) != 0)
     {
         Name = prot2real[Name] + ":" + Name;
@@ -1453,14 +1483,14 @@ bool addColorNodeStr(string Name)
     }
     if(nodeStr == "")
     {
-        nodeStr=string("{\"name\":") + "\"" + Name + "\"" + "," + "\"group\":"
-                + int2str(big) + "," + "\"color\":" + color + "}";
+        nodeStr = string("{\"name\":") + "\"" + Name + "\"" + "," + "\"group\":"
+                  + int2str(big) + "," + "\"color\":" + color + "}";
     }
     else
     {
-        nodeStr+=", ";
+        nodeStr += ", ";
         nodeStr+=string("{\"name\":") + "\"" + Name + "\"" + "," + "\"group\":"
-                 + int2str(big) + "," + "\"color\":" + color + "}";
+                   + int2str(big) + "," + "\"color\":" + color + "}";
     }
     return true;
 }
@@ -1486,7 +1516,7 @@ bool addColorLink(string source, string target)
         return false;
     }
     link2id[target + "&" + source] = 1;
-    if((name2big[source] == 1)&&(name2big[target] == 1))
+    if((name2big[source] == 1) && (name2big[target] == 1))
     {
         value += 1000;
     }
@@ -1495,27 +1525,27 @@ bool addColorLink(string source, string target)
     target = int2str(nodeName2id[target]);
     if(linkStr == "")
     {
-        linkStr = string("{\"source\":") + source + ", \"target\":" + target 
-                  + ", \"value\":" + int2str(value) + ", \"pubmed\":\"" 
+        linkStr = string("{\"source\":") + source + ", \"target\":" + target
+                  + ", \"value\":" + int2str(value) + ", \"pubmed\":\""
                   + value2 + "\", \"Evidence\":\"" + value3 + "\"}";
     }
     else
     {
         linkStr += ", ";
-        linkStr += string("{\"source\":") + source + ", \"target\":" + target 
-                  + ", \"value\":" + int2str(value) + ", \"pubmed\":\""
-                  + value2 + "\", \"Evidence\":\"" + value3 + "\"}";
+        linkStr += string("{\"source\":") + source + ", \"target\":" + target
+                   + ", \"value\":" + int2str(value) + ", \"pubmed\":\""
+                   + value2 + "\", \"Evidence\":\"" + value3 + "\"}";
     }
     return true;
 }
-bool addColorChilds(vector<string> &allChilds, 
-                    vector<string> &mainNodes, 
+bool addColorChilds(vector<string> &allChilds,
+                    vector<string> &mainNodes,
                     string col)
 {
     //sort(allChilds.begin(), allChilds.end());
     for(int i = 0; i < (int)allChilds.size(); i++)
-    {   
-        string aChild=allChilds[i];
+    {
+        string aChild = allChilds[i];
         vector<string> valideNodes;
         for(int j = 0; j < (int)mainNodes.size(); j++)
         {
@@ -1531,16 +1561,22 @@ bool addColorChilds(vector<string> &allChilds,
         if(valideNodes.size() >= 2)
         {
             for(int j = 0; j < (int)valideNodes.size(); j++)
-            {   
-                if(name2color.count(aChild)==0){
-                   name2color[aChild]=col;
-                }else{
-                   //PRINTFUNCTION("Thers is something wrong! Position11\n");
+            {
+                if(name2color.count(aChild) == 0)
+                {
+                    name2color[aChild] = col;
                 }
-                if(name2big.count(aChild)==0){
-                   name2big[aChild]=0;
-                }else{
-                   //PRINTFUNCTION("Thers is something wrong! Position12\n");
+                else
+                {
+                    //PRINTFUNCTION("Thers is something wrong! Position11\n");
+                }
+                if(name2big.count(aChild) == 0)
+                {
+                    name2big[aChild] = 0;
+                }
+                else
+                {
+                    //PRINTFUNCTION("Thers is something wrong! Position12\n");
                 }
                 addColorNodeStr(aChild);
                 addColorLink(valideNodes[j], aChild);
@@ -1549,7 +1585,8 @@ bool addColorChilds(vector<string> &allChilds,
     }
     return true;
 }
-bool getProteinNodes(string proteinFile, string outputDir){
+bool getProteinNodes(string proteinFile, string outputDir)
+{
     ifstream in(proteinFile.c_str());
     if(!in)
     {
@@ -1576,7 +1613,7 @@ bool getProteinNodes(string proteinFile, string outputDir){
         if(tmp[tmp.size() - 1] == '\r')
         {
             buffer[tmp.size() - 1] = '\0';
-            tmp=buffer;
+            tmp = buffer;
         }
         vector<string> tokens = string_tokenize(tmp, ",", false);
         if(tokens.size() != 4)
@@ -1584,11 +1621,11 @@ bool getProteinNodes(string proteinFile, string outputDir){
             out << tmp << "#" << "invalid format\n";
             continue;
         }
-        string swissID="";
+        string swissID = "";
         if(tokens[1] == "1")
         {
             proteinNodes.push_back(tokens[0]);
-            swissID=tokens[0];
+            swissID = tokens[0];
         }
         else
         {
@@ -1601,37 +1638,41 @@ bool getProteinNodes(string proteinFile, string outputDir){
             {
                 out<<tmp<<"#"<<"valid ID: "<<name2prot[tokens[0]]<< "\n";
                 proteinNodes.push_back(name2prot[tokens[0]]);
-                swissID=name2prot[tokens[0]];
+                swissID = name2prot[tokens[0]];
             }
         }
-        if(tokens[2]=="1"){
-           name2big[swissID]=1;
-        }else{
-           name2big[swissID]=0;
+        if(tokens[2] == "1")
+        {
+            name2big[swissID] = 1;
         }
-        name2color[swissID]=tokens[3];
+        else
+        {
+            name2big[swissID] = 0;
+        }
+        name2color[swissID] = tokens[3];
     }
     in.close();
     out.close();
     return false;
 }
-bool viewGraph(const char *input, const char *proteinFile, 
+bool viewGraph(const char *input, const char *proteinFile,
                const char *output, int addChilds, const char *childCol)
 {
     PRINTFUNCTION("Processing input file\n");
     PRINTFUNCTION("input file: %s\n", input);
     PRINTFUNCTION("protein file: %s\n", proteinFile);
     PRINTFUNCTION("output directory: %s\n", output);
-    string outputFile = string(output) +"/js/graph.js";
+    string outputFile = string(output) + "/js/graph.js";
 #ifdef INDEP_PROGRAM
 #else
     R_FlushConsole();
 #endif
     //return true;
     ofstream OUT(outputFile.c_str());
-    if(!OUT){
-       PRINTFUNCTION("Can not open file:%s\n", outputFile.c_str());
-       return false;
+    if(!OUT)
+    {
+        PRINTFUNCTION("Can not open file:%s\n", outputFile.c_str());
+        return false;
     }
     if(!processInput(input))
     {
@@ -1643,43 +1684,48 @@ bool viewGraph(const char *input, const char *proteinFile,
     nodeStr = "";
     linkStr = "";
     vector<string> colorChilds;
-    for(int i=0; i < (int)proteinNodes.size(); i++){
+    for(int i = 0; i < (int)proteinNodes.size(); i++)
+    {
         addColorNodeStr(proteinNodes[i]);
-        string name=proteinNodes[i];
+        string name = proteinNodes[i];
         map<string, int>::iterator iter;
         for(iter = edge[name].begin(); iter != edge[name].end(); iter++)
         {
             colorChilds.push_back(iter->first);
         }
     }
-    for(int i=0; i < (int)proteinNodes.size(); i++){
-        for(int j=0; j < (int)proteinNodes.size(); j++){
+    for(int i = 0; i < (int)proteinNodes.size(); i++)
+    {
+        for(int j = 0; j < (int)proteinNodes.size(); j++)
+        {
             string source = proteinNodes[i];
             string target = proteinNodes[j];
-            if(name2big[source]==1){
-               addColorLink(source, target);
-               continue;
+            if(name2big[source] == 1)
+            {
+                addColorLink(source, target);
+                continue;
             }
-            if(name2big[target]==1){
-               addColorLink(target, source);
-               continue;
+            if(name2big[target] == 1)
+            {
+                addColorLink(target, source);
+                continue;
             }
             addColorLink(source, target);
         }
     }
-    if(addChilds==1)
+    if(addChilds == 1)
     {
-       addColorChilds(colorChilds, proteinNodes, childCol);
+        addColorChilds(colorChilds, proteinNodes, childCol);
     }
-    OUT << "graphView=" << "{\"nodes\":[" + nodeStr 
-           + "], \"links\":[" + linkStr + "]};\n";
+    OUT << "graphView=" << "{\"nodes\":[" + nodeStr
+        + "], \"links\":[" + linkStr + "]};\n";
     OUT.close();
     return true;
 }
 //////////////////////////////////////////////////////////////////////////////
 bool addInfo(string infoFileName, string resultDir)
 {
-    unordered_map<string, string> name2prot;
+    HASHMAP<string, string, str_hash1> name2prot;
     resultDir = resultDir + "/js/name2prot.js";
     name2prot.clear();
     ifstream in(resultDir.c_str());
@@ -1731,7 +1777,7 @@ bool addInfo(string infoFileName, string resultDir)
             {
                 tokens[i] = tokens[i].substr(0, tokens[i].size() - 2);
             }
-            vector<string> smalltokens=string_tokenize(tokens[i], ":", false);
+            vector<string> smalltokens = string_tokenize(tokens[i], ":", false);
             string name = smalltokens[0];
             string prot = smalltokens[smalltokens.size() - 1];
             for(int i = 1; i < (int)smalltokens.size() - 1; i++)
@@ -1769,9 +1815,9 @@ bool addInfo(string infoFileName, string resultDir)
         PRINTFUNCTION("Can not open %s to write\n", resultDir.c_str());
         return false;
     }
-    unordered_map<string, string>::iterator iter;
-    unordered_map<string, string>::iterator iter_begin = name2prot.begin();
-    unordered_map<string, string>::iterator iter_end = name2prot.end();
+    HASHMAP<string, string, str_hash1>::iterator iter;
+    HASHMAP<string, string, str_hash1>::iterator iter_begin = name2prot.begin();
+    HASHMAP<string, string, str_hash1>::iterator iter_end = name2prot.end();
     for(int i = 0; i < (int)lines.size(); i++)
     {
         OUTJSALL << lines[i] << "\n";
@@ -1793,7 +1839,7 @@ bool addInfo(string infoFileName, string resultDir)
 #ifdef INDEP_PROGRAM
 #else
 extern "C" {
-    int cisPathC(char **input, char **protein, char **output, 
+    int cisPathC(char **input, char **protein, char **output,
                  char **targetsFile, char **name2protFile, int *maxPathCount)
     {
         n2pFile = name2protFile[0];
@@ -1811,10 +1857,10 @@ extern "C" {
         addInfo(infoFileName[0], resultDir[0]);
         return 1;
     }
-    int viewGraphC(char **input, char **proteinFile, 
+    int viewGraphC(char **input, char **proteinFile,
                    char **outputDir, int *addChilds, char **childCol)
-    {   
-        viewGraph(input[0], proteinFile[0], 
+    {
+        viewGraph(input[0], proteinFile[0],
                   outputDir[0], addChilds[0], childCol[0]);
         clearInfo();
         return 1;
@@ -1822,11 +1868,11 @@ extern "C" {
 }
 
 extern "C" {
-    static R_NativePrimitiveArgType cisPathC_t[] = 
-          {STRSXP, STRSXP, STRSXP, STRSXP, STRSXP, INTSXP};
+    static R_NativePrimitiveArgType cisPathC_t[] =
+    {STRSXP, STRSXP, STRSXP, STRSXP, STRSXP, INTSXP};
     static R_NativePrimitiveArgType addInfoC_t[] = {STRSXP, STRSXP};
-    static R_NativePrimitiveArgType viewGraphC_t[] = 
-          {STRSXP, STRSXP, STRSXP, INTSXP, STRSXP};
+    static R_NativePrimitiveArgType viewGraphC_t[] =
+    {STRSXP, STRSXP, STRSXP, INTSXP, STRSXP};
     R_CMethodDef cMethods[] =
     {
         {".cisPathC", (DL_FUNC) &cisPathC, 6, cisPathC_t},
