@@ -18,4 +18,8 @@ setGeneric("networkView",
                     displayMore=TRUE, leafColor="#2CA02C") 
                     standardGeneric("networkView"), 
                     signature=c("infoFile", "proteinNames", "outputDir"))
+setGeneric("easyEditor",
+           function(outputDir) 
+                    standardGeneric("easyEditor"), 
+                    signature=c("outputDir"))
            

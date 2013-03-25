@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+    <title>Directed Graph Editor</title>
+    <link rel="stylesheet" href="D3/app.css">
+    <script type="text/javascript" src="D3/d3.v3.min.js"></script>
+  </head>
+  <body>
+  <h1>Network Editor</h1>
+  <div id="chartfather"></div>
+  <div id="chart"></div>
+  <div>
+   <br>
+   <input type="button" id='fixButton' value='Freeze all nodes' onclick="clickFix();">
+   <input type="button" id='releaseButton' value='Release all nodes' onclick="clickRelease();">
+   <input type='button' id='ctrlkey' class='pbuttton' value='Ctrl key' onclick='changeStatus()'>
+   <input type='button' id='savesection' class='pbuttton' value='Graph detail' onclick='changeStatus2()'>
+   <input type='button' id='helpsection' class='pbuttton' value='Help' onclick='changeStatus3()'>
+   <br><br>
+   <table id="table_id1">
+   	<tr>
+   		<td>Protein Name</td>
+   		<td colspan=3>Fill Color</td>
+   		<td colspan=2>Circle size</td>
+   		<td colspan=3>Stroke Color</td>
+   		<td colspan=2>Stroke Size</td>
+   		<td colspan=3>Text Color</td>
+   		<td colspan=2>Text Size</td>
+   		<td colspan=4>Text Position</td>
+   		<td>Delete</td>
+    </tr>
+   	<tr>
+   		<td><input type="text" name="pro_name" id='pro_name_id'></td>
+   		<td><input type="text" name="red1" id='red1'></td>
+   		<td><input type="text" name="green1" id='green1'></td>
+   		<td><input type="text" name="blue1" id='blue1'></td>
+   		<td><input type="button" name="pro_size1" id='pro_size1_id' value='+'></td>
+   		<td><input type="button" name="pro_size2" id='pro_size2_id' value='-'></td>
+   		<td><input type="text" name="red2" id='red2'></td>
+   		<td><input type="text" name="green2" id='green2'></td>
+   		<td><input type="text" name="blue2" id='blue2'></td>
+   		<td><input type="button" name="pro_size1_2" id='pro_size1_id2' value='+'></td>
+   		<td><input type="button" name="pro_size2_2" id='pro_size2_id2' value='-'></td>
+   		<td><input type="text" name="red3" id='red3'></td>
+   		<td><input type="text" name="green3" id='green3'></td>
+   		<td><input type="text" name="blue3" id='blue3'></td>
+   		<td><input type="button" name="pro_size1_3" id='pro_size1_id3' value='+'></td>
+   		<td><input type="button" name="pro_size2_3" id='pro_size2_id3' value='-'></td>
+   		
+   		<td><input type="button" name="txt_pos1" id='txt_pos_id1' value='&#8592;'></td>
+   		<td><input type="button" name="txt_pos2" id='txt_pos_id2' value='&#8594;'></td>
+   		<td><input type="button" name="txt_pos3" id='txt_pos_id3' value='&#8593;'></td>
+   		<td><input type="button" name="txt_pos4" id='txt_pos_id4' value='&#8595;'></td>
+   		<td><input type="button" name="p_del" id='p_del_id' value='Delete'></td>
+    </tr>
+   </table>
+   <table id="table_id2">
+   	<tr>
+   	  <td>Source</td>
+   	  <td>Target</td>
+   	  <td colspan=3>Edge Color</td>
+   	  <td colspan=2>Edge Size</td>
+   	  <td colspan=3>End Arrow</td>
+   	  <td colspan=3>Curve Kind</td>
+   	  <td colspan=3>Dotted</td>
+   	  <td>Delete</td>
+   	</tr>
+   	<tr>
+   	  <td id='source_td'><span id='source_id'>Source</span></td>
+   	  <td id='target_td'><span id='target_id'>Target</span></td>
+   	  <td><input type="text" name="red4" id='red4'></td>
+   		<td><input type="text" name="green4" id='green4'></td>
+   		<td><input type="text" name="blue4" id='blue4'></td>
+   		<td><input type="button" name="edgesize1" id='edgesize1_id' value='+'></td>
+   		<td><input type="button" name="edgesize2" id='edgesize2_id' value='-'></td>
+   		<td><input type="button" name="arrow1" id='arrow1_id' value='&#8594;'></td>
+   		<td><input type="button" name="arrow2" id='arrow2_id' value='&mdash;|'></td>
+   		<td><input type="button" name="arrow3" id='arrow3_id' value='&mdash;'></td>
+   		<td><input type="button" name="curve1" id='curve1_id' value='('></td>
+   		<td><input type="button" name="curve2" id='curve2_id' value='|'></td>
+   		<td><input type="button" name="curve3" id='curve3_id' value=')'></td>
+   		<td><input type="button" name="dotted1" id='dotted1_id' value='&mdash;'></td>
+   		<td><input type="button" name="dotted2" id='dotted2_id' value='--'></td>
+   		<td><input type="button" name="dotted3" id='dotted3_id' value='&bull;&bull;'></td>
+   		<td><input type="button" name="del" id='del_id' value='Delete'></td>
+   	</tr>
+   </table><br>
+  </div>
+  <div id='cookie_div'>
+  	  Graph name: <select id="graphLoad_id"><option></option></select>
+  	  <input type="button" name="load" id='loadGraphID' value='Load Graph'>
+  	  <input type="button" name="load" id='DeleteGraphID' value='Delete Graph'><br>
+  	  Graph name: <input type="text" name="graphname" id='graphname_id'>
+  	  <input type="button" name="save" id='saveGraphID' value='Save Graph'>
+  </div>
+  <div id='save_div'>
+  	  Graph detail:<br>
+  	  <textarea rows="5" cols="132" id="saveid">
+  	  </textarea>
+  	  <br>
+  	  <input type="button" name="Refresh" id='Refresh_id' value='Refresh'>
+  	  <input type="button" name="Submit" id='Submit_id' value='Submit'>
+  </div>
+  <div id='help_div'>
+  	  <h3>How to use</h3>
+  	  Click in the open space to <b>add a node</b>.<br>
+  	  Drag from one node to another to <b>add an edge</b>. <br>
+      Ctrl-drag a node to <b>move</b> the graph layout. <br>
+      Click a node or an edge to <b>select</b> it. <br>
+      Drag from the source node to the target node to <b>select</b> a <b>pre-existing</b> edge.<br>
+      <h4>Shortcut key</h4>
+      <table id="keyboard_table">
+      	<tr><td><button class="keyboard">&#x25C4;</button></td><td>Reduce the size of seleted node or link</td>
+      	<td><button class="keyboard">&#x25BA;</button></td><td>Amplify the size of seleted node or link</td></tr>
+      	<tr><td><button class="keyboard">F</button></td><td>Freeze or release selected node</td>
+      	<td><button class="keyboard">><br>.</button></td><td>Change the arrow kind of seleted link</td></tr>
+      	<tr><td><button class="keyboard">(<br>9</button></td><td>Change the curve kind of seleted link</td>
+      	<td><button class="keyboard">:<br>;</button></td><td>Change the dotted style of seleted link</td></tr>
+      </table>
+      <br>For inquiries, please send email to wang.likun at gmail.com.
+      <h3>Graph detail</h3>
+      Graph detail contains all the information for the current graph. <br>
+      The graph can be regenerated by submit the information.
+      <h3>Acknowledgements</h3>
+      This tool is developed based on an <a href="http://bl.ocks.org/rkirsling/5001347" onclick="{window.open(this.href,'_blank');return false;}">example</a> of 
+      <a href="http://mbostock.github.com/d3/" onclick="{window.open(this.href,'_blank');return false;}"><i>D3</i></a> library.<br> 
+      We reuse quite a few code from this example.<br>
+      
+  </div>
+  <script type="text/javascript" src="D3/app.js"></script>
+  </body>
+</html>

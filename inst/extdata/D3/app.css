@@ -1,0 +1,162 @@
+body {
+            background-color: #EEFFEE;
+            margin-left:5%;       
+            margin-right:10%; 
+            font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+}
+svg {
+  background-color: #FFF;
+  cursor: default;
+}
+
+svg:not(.active):not(.ctrl) {
+  cursor: crosshair;
+}
+
+path.link {
+  cursor: default;
+}
+
+svg:not(.active):not(.ctrl) path.link {
+  cursor: pointer;
+}
+
+path.link.selected {
+}
+
+path.link.dragline {
+}
+
+path.link.hidden {
+}
+
+circle.node {
+  cursor: pointer;
+}
+
+circle.node.selected {
+}
+
+text {
+  font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+}
+
+text.id {
+  font-weight: bold;
+}
+#pro_name_id,#source_id,#target_id{
+	font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #6666EE;
+	width: 98px;
+}
+#source_td, #target_td{
+	width: 100px;
+}
+#red1,#red2,#red3,#red4{
+	font-family: "Times New Roman", Georgia, "Courier New", Messenger, Geneva, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #FF0000;
+	width: 23px;
+	border:2px #FF0000 solid;
+}
+#green1,#green2,#green3,#green4{
+	font-family: "Times New Roman", Georgia, "Courier New", Messenger, Geneva, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #00FF00;
+	width: 23px;
+	border:2px #00FF00 solid;
+}
+#blue1,#blue2,#blue3,#blue4{
+	font-family: "Times New Roman", Georgia, "Courier New",  Messenger, Geneva, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #0000FF;
+	width: 23px;
+	border:2px #0000FF solid;
+}
+#pro_ok_id,#p_del_id{
+	width: 56px;
+}
+#del_id{
+	width: 60px;
+}
+#edge_ok_id,#del_id{
+	width: 53px;
+}
+#pro_size1_id,#pro_size2_id,#pro_size1_id2,#pro_size2_id2,#pro_size1_id3,#pro_size2_id3{
+	width: 28px;
+	font-size: 16px;
+}
+#edgesize1_id,#edgesize2_id{
+	width: 28px;
+	font-size: 16px;
+}
+#txt_pos_id1,#txt_pos_id2,#txt_pos_id3,#txt_pos_id4{
+	width: 28px;
+	font-size: 16px;
+}
+#arrow1_id,#arrow2_id,#arrow3_id,#dotted1_id,#dotted2_id,#dotted3_id{
+	width: 36px;
+	font-size: 16px;
+}
+#curve1_id,#curve2_id,#curve3_id{
+	width: 36px;
+	font-size: 16px;
+}
+#chart{
+	width:960px;
+	height:600px;
+}
+table {
+  margin-right:20px;
+  margin-bottom:10px;
+  border:2px solid gray;
+  caption-side:top;
+  border-spacing:0px;
+  border-collapse: collapse;
+}
+th{
+  background-color: #e6e6e6;
+  padding: 5px;
+  border:2px solid gray;
+  font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}
+td{
+  padding: 5px;
+  border:2px solid gray;
+  font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+  text-align:center; 
+}
+#saveid{
+	font-family: "Times New Roman", Georgia,"Courier New", Messenger, Geneva, Arial, sans-serif;
+	font-size: 16px;
+}
+.pbuttton {
+  width:100px;
+}
+#help_div,#save_div,#cookie_div{
+  font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+	font-size: 16px;
+}
+.keyboard{
+	background-color: #000000;
+	font-size: 10px;
+	color: #FFFFFF;
+	width:35px;
+	height:35px;
+	font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+	font-style: italic;
+}
+#keyboard_table td{
+	text-align:left;
+}
+#graphLoad_id{
+	width:105px;
+}
+#graphname_id{
+	width:100px;
+}

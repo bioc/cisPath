@@ -52,7 +52,8 @@ The following examples (section 4 below) will show how these files may be used.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Getting started}
 To load the \Rpackage{cisPath} package, type {\tt library(cisPath)}.
-Three methods of this package are presented here, with several examples of each. These methods are called {\tt cisPath}, {\tt addProteinNames} and {\tt networkView}.
+Four methods of this package are presented here, with several examples of each. These methods are called 
+{\tt cisPath}, {\tt addProteinNames}, {\tt networkView} and {\tt easyEditor}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Examples}
@@ -201,6 +202,17 @@ The evidence for the functional interactions between the main proteins is shown 
   networkView(infoFile, proteins, outputDir, FALSE, sizes, colors, FALSE)
 @
 \end{center}
+\noindent
+
+\subsection{Example of the easyEditor method}
+The output HTML file of this method is a network editor. 
+Users can generate and edit their own network by this editor.
+\begin{center}
+<<example9,echo=TRUE,print=FALSE>>=
+  outputDir <- file.path(tempdir(), "easyEditor")
+  easyEditor(outputDir)
+@
+\end{center} 
 \noindent
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\newpage
