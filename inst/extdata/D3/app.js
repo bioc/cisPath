@@ -1,4 +1,5 @@
 // set up SVG for D3
+var localInfo=0;
 var width  = 960,
     height = 600,
     colors = d3.scale.category10();
@@ -73,8 +74,8 @@ var force = d3.layout.force()
     .nodes(nodes)
     .links(links)
     .size([width, height])
-    .linkDistance(150)
-    .distance(100)
+    .linkDistance(300)
+    .distance(200)
     .charge(-120)
     .gravity(.06)
     .charge(-300)
@@ -127,6 +128,8 @@ var selected_node = null,
     mousedown_link = null,
     mousedown_node = null,
     mouseup_node = null;
+var shift_node1 = null;
+var shift_node2 = null;
 
 function resetMouseVars() {
   mousedown_node = null;
@@ -197,6 +200,7 @@ function tick() {
   //saveInfo();
 }
 var ctrl_key_flag = 0;
+var shift_key_flag = 0;
 function changeStatus()
 {   
 	  var object=document.getElementById("ctrlkey");
@@ -204,17 +208,45 @@ function changeStatus()
     {
         object.style.borderStyle="inset";
         ctrl_key_flag = 1;
-        circle.call(force.drag);
-        svg.classed('ctrl', true);
+        circle
+        .on('mousedown.drag', null)
+        //.on('touchstart.drag', null);
+        selected_node = null;
+        restart();
     }
     else
     {
        object.style.borderStyle="";
        ctrl_key_flag = 0;
-       circle
-        .on('mousedown.drag', null)
-        .on('touchstart.drag', null);
-        svg.classed('ctrl', false);
+       circle.call(force.drag);
+    }
+    shift_key_flag=ctrl_key_flag;
+    shift_node1 = null;
+    shift_node2 = null;
+}
+function changeStatus6()
+{   
+	  var object=document.getElementById("shiftkey");
+    if (shift_key_flag == 0)
+    {
+        object.style.borderStyle="inset";
+        shift_key_flag = 1;
+        selected_node = null;
+        selected_link = null;
+        mousedown_link = null;
+        mousedown_node = null;
+        mouseup_node = null;
+        shift_node1 = null;
+        shift_node2 = null;
+        restart();
+    }
+    else
+    {
+       object.style.borderStyle="";
+       shift_key_flag = 0;
+       shift_node1 = null;
+       shift_node2 = null;
+       changeSouce();  
     }
 }
 var save_section=0;
@@ -241,12 +273,25 @@ function changeStatus3(){
         object.style.borderStyle="inset";
         help_section = 1;
         document.getElementById("help_div").style.display="";
+        if(save_section==1){
+    	     document.getElementById("savesection").click();
+        }
+        if(localInfo==1){
+           document.getElementById("cookie_div").style.display="none"; 
+        } 
+        selected_node = null;
+        shift_node1 = null;
+        shift_node2 = null;
+        restart();
     }
     else
     {
         object.style.borderStyle="";
         help_section = 0;
         document.getElementById("help_div").style.display="none";
+        if(localInfo==1){
+           document.getElementById("cookie_div").style.display=""; 
+        } 
     }
 }
 function drawMaker(d){
@@ -305,7 +350,7 @@ function restart() {
     .style('stroke-dasharray', function(d) { return drawLine(d); })
     .style('fill', function(d) { return (d === selected_link) ? 'none':'none'; })
     .on('mousedown', function(d) {
-      if(d3.event.ctrlKey||ctrl_key_flag) return;
+      //if((d3.event.ctrlKey||d3.event.metaKey||ctrl_key_flag)) return;
       // select link
       mousedown_link = d;
       if(mousedown_link === selected_link) selected_link = null;
@@ -347,34 +392,53 @@ function restart() {
     .on('mouseover', function(d) {
       if(!mousedown_node || d === mousedown_node) return;
       // enlarge target node
-      d3.select(this).attr('transform', 'scale(1.1)');
+      if(d3.event.ctrlKey||d3.event.metaKey||ctrl_key_flag){
+         d3.select(this).attr('transform', 'scale(1.2)');
+      }
     })
     .on('mouseout', function(d) {
+    	d3.select(this).attr('transform', '');
       if(!mousedown_node || d === mousedown_node) return;
       // unenlarge target node
-      d3.select(this).attr('transform', '');
     })
     .on('mousedown', function(d) {
-      if(d3.event.ctrlKey||ctrl_key_flag) return;
+      //if(d3.event.ctrlKey||d3.event.metaKey||ctrl_key_flag) return;
 
       // select node
+      svg.classed('ctrl', true);
       clickOK();
       mousedown_node = d;
       if(mousedown_node === selected_node) selected_node = null;
       else selected_node = mousedown_node;
       selected_link = null;
+      //////////////////////
+      if((shift_key_flag==1)&&(selected_node)){
+      	 if(!shift_node1){
+      	 	  shift_node1=selected_node;
+      	 	  shift_node2=null;
+      	 }else{
+      	 	  if(shift_node1 != selected_node){
+      	 	  	 shift_node2=selected_node;
+      	 	  }
+      	 }
+      }
+      //////////////////////
 
       // reposition drag line
+      if(d3.event.ctrlKey||d3.event.metaKey||ctrl_key_flag){
       drag_line
         .style('marker-end', 'url(#end-arrow)')
         .classed('hidden', false)
         .style("stroke-width", '4px')
         .style('stroke', '#000000')
         .attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + mousedown_node.x + ',' + mousedown_node.y);
-
+      }
       restart();
     })
     .on('mouseup', function(d) {
+    	svg.classed('ctrl', false);
+    	// unenlarge target node
+      d3.select(this).attr('transform', '');
       if(!mousedown_node) return;
 
       // needed by FF
@@ -382,25 +446,31 @@ function restart() {
         .classed('hidden', true)
         .style('stroke', 'none')
         .style('marker-end', '');
-
       // check for drag-to-self
       mouseup_node = d;
-      if(mouseup_node === mousedown_node) { resetMouseVars(); return; }
-
-      // unenlarge target node
-      d3.select(this).attr('transform', '');
+      if((mouseup_node === mousedown_node)&&(shift_key_flag==0)) {resetMouseVars(); return; }
+      if(mouseup_node === mousedown_node){
+      	 if((shift_node1)&&(shift_node2)){
+      	 	   mousedown_node=shift_node1;
+      	 	   mouseup_node=shift_node2;
+      	 	   shift_node1=null;
+      	 	   shift_node2=null;
+      	 	   //document.getElementById("shiftkey").style.borderStyle="";
+             //shift_key_flag = 0;
+      	 }else{
+      	 	   resetMouseVars(); return;
+      	 }
+      }
 
       // add link to graph (update if exists)
       // NB: links are strictly source < target; arrows separately specified by booleans
       var source, target, direction;
-      if(1) {
+      if(d3.event.ctrlKey||d3.event.metaKey||ctrl_key_flag||shift_key_flag){
         source = mousedown_node;
         target = mouseup_node;
-        //direction = 'right';
-      } else {
-        source = mouseup_node;
-        target = mousedown_node;
-        //direction = 'left';
+      }else{
+      	restart();
+      	return;
       }
 
       var link;
@@ -440,21 +510,24 @@ function restart() {
 
   // remove old nodes
   circle.exit().remove();
-  
   //if(d3.event) d3.event.preventDefault();
 
   // set the graph in motion
   force.start();
+  circle.call(force.drag);
+  if(ctrl_key_flag){
+  	 circle.on('mousedown.drag', null)
+  }
   checkSelectNode();
   checkSelectLink();
   saveInfo();
+  changeSouce();
 }
 
 function mousedown() {
   // because :active only works in WebKit?
   svg.classed('active', true);
-
-if(d3.event.ctrlKey || mousedown_node || mousedown_link ||ctrl_key_flag) return;
+  if((mousedown_node&&ctrl_key_flag) || mousedown_link) return;
 
   // insert new node at point
   var point = d3.mouse(this),
@@ -471,6 +544,11 @@ if(d3.event.ctrlKey || mousedown_node || mousedown_link ||ctrl_key_flag) return;
   clickOK();
   selected_node=node;
   selected_link=null;
+  if(shift_key_flag==1){
+  	 shift_node1=selected_node;
+  }
+  //document.getElementById("shiftkey").style.borderStyle="";
+  //shift_key_flag = 0;
   restart();
 }
 
@@ -479,14 +557,15 @@ function mousemove() {
   if(!mousedown_node) return;
 
   // update drag line
+  if(d3.event.ctrlKey || d3.event.metaKey || mousedown_node || mousedown_link ||ctrl_key_flag){
   drag_line.attr('d', 'M' + mousedown_node.x + ',' + mousedown_node.y + 'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
-
+  }
   restart();
 }
 
 function mouseup() {
 	saveInfo();
-  if(mousedown_node) {
+  if(1) {
     // hide drag line
     drag_line
       .classed('hidden', true)
@@ -532,11 +611,17 @@ function keydown() {
   if(document.activeElement.id.substr(0,5)=="green"){
   	 return;
   }
-  if(d3.event.keyCode === 17) {
-    circle.call(force.drag);
-    svg.classed('ctrl', true);
+  if((d3.event.keyCode === 17)||(d3.event.keyCode === 224)||(d3.event.keyCode === 91)||(d3.event.keyCode === 93)){
+    circle
+      .on('mousedown.drag', null)
+      //.on('touchstart.drag', null);
     if(ctrl_key_flag==0){
   	 document.getElementById("ctrlkey").click();
+    }
+  }
+  if(d3.event.keyCode === 16) {
+    if(shift_key_flag==0){
+  	   document.getElementById("shiftkey").click();
     }
   }
   if(!selected_node && !selected_link) return;
@@ -551,6 +636,7 @@ function keydown() {
       }
       selected_link = null;
       selected_node = null;
+      shift_node1=null;
       restart();
       break;
     case 39: // +
@@ -634,14 +720,17 @@ function keydown() {
 
 function keyup() {
   // ctrl
-  if(d3.event.keyCode === 17) {
-    circle
-      .on('mousedown.drag', null)
-      .on('touchstart.drag', null);
-    svg.classed('ctrl', false);
-  }
-  if(ctrl_key_flag==1){
+  if((d3.event.keyCode === 17)||(d3.event.keyCode === 224)||(d3.event.keyCode === 91)||(d3.event.keyCode === 93)){
+    circle.call(force.drag);
+    if(ctrl_key_flag==1){
   	 document.getElementById("ctrlkey").click();
+    }
+  }
+  if(d3.event.keyCode === 16) {
+    if(shift_key_flag==1){
+  	   document.getElementById("shiftkey").click();
+    }
+    changeSouce(); 
   }
 }
 
@@ -695,7 +784,22 @@ function changeTxt(obj, newtxt){
       obj.removeChild(obj.lastChild);
    }
    obj.appendChild(document.createTextNode(newtxt));
-   }
+}
+function changeSouce(){
+	 var obj=document.getElementById("source_name_id");
+	 if(!shift_node1){
+	 	  changeTxt(obj, "");
+	 }else{
+	 	  changeTxt(obj, "  source: "+shift_node1.txt);
+	 }
+}
+var allStr=""
+function logStr(str){
+	 var obj=document.getElementById("log_id");
+	 allStr=allStr+"~"+str;
+	 changeTxt(obj, allStr);
+
+}
 function checkSelectLink(){
 	 if(selected_link==null){
 	 	  document.getElementById("table_id2").style.display="none";
@@ -723,6 +827,20 @@ function onBegin(){
 	 document.getElementById("red3").addEventListener("change", function(e){checkCol(this);}, false);
 	 document.getElementById("green3").addEventListener("change", function(e){checkCol(this);}, false);
 	 document.getElementById("blue3").addEventListener("change", function(e){checkCol(this);}, false);
+	 document.getElementById("red1").addEventListener("keydown", function(e){pressEnter(this);}, false);
+	 document.getElementById("green1").addEventListener("keydown", function(e){pressEnter(this);}, false);
+	 document.getElementById("blue1").addEventListener("keydown", function(e){pressEnter(this);}, false);
+	 document.getElementById("red2").addEventListener("keydown", function(e){pressEnter(this);}, false);
+	 document.getElementById("green2").addEventListener("keydown", function(e){pressEnter(this);}, false);
+	 document.getElementById("blue2").addEventListener("keydown", function(e){pressEnter(this);}, false);
+	 document.getElementById("red3").addEventListener("keydown", function(e){pressEnter(this);}, false);
+	 document.getElementById("green3").addEventListener("keydown", function(e){pressEnter(this);}, false);
+	 document.getElementById("blue3").addEventListener("keydown", function(e){pressEnter(this);}, false);
+	 document.getElementById("red4").addEventListener("keydown", function(e){pressEnter2(this);}, false);
+	 document.getElementById("green4").addEventListener("keydown", function(e){pressEnter2(this);}, false);
+	 document.getElementById("blue4").addEventListener("keydown", function(e){pressEnter2(this);}, false);
+	 
+	 
 	 document.getElementById("pro_size1_id").addEventListener("click", function(e){clicksize1();}, false);
 	 document.getElementById("pro_size2_id").addEventListener("click", function(e){clicksize2();}, false);
 	 document.getElementById("pro_size1_id2").addEventListener("click", function(e){clicksize1_2();}, false);
@@ -759,15 +877,21 @@ function onBegin(){
 	 document.getElementById("saveid").value="";
 	 document.getElementById("save_div").style.display="none";
 	 document.getElementById("help_div").style.display="none";
+	 document.getElementById("shiftkey").style.display="none";
 	 
 	 document.getElementById("saveGraphID").addEventListener("click", function(e){saveGraph();}, false);
 	 document.getElementById("loadGraphID").addEventListener("click", function(e){loadGraph();}, false);
 	 document.getElementById("DeleteGraphID").addEventListener("click", function(e){deleteGraph();}, false);
+	 document.getElementById("DeleteAllID").addEventListener("click", function(e){deleteAll();}, false);
 	 //localStorage.clear();
-	 if(navigator.userAgent.indexOf("MSIE")>0) { 
+	 //if(navigator.userAgent.indexOf("MSIE")>0) { 
+	 if(testLocal()!=1){
       document.getElementById("cookie_div").style.display="none"; 
    } 
 	 doShowAll();
+	 if(!(ctrl_key_flag)){
+     circle.call(force.drag);
+   }
 }
 function edgesize1(){
 	 selected_link.size = selected_link.size+1;
@@ -868,6 +992,18 @@ function validChar(chr){
 	 }
 	 return 0;
 }
+function pressEnter(object){
+	var event = window.event || arguments.callee.caller.arguments[0];
+  if(event.keyCode == 13){
+     checkCol(object);      
+  }
+}
+function pressEnter2(object){
+	var event = window.event || arguments.callee.caller.arguments[0];
+  if(event.keyCode == 13){
+     checkCol2(object);      
+  }
+}
 function checkCol(object){
 	 object.value=object.value.toUpperCase();
 	 var str=object.value;
@@ -885,8 +1021,7 @@ function checkCol(object){
 	 	   return;
 	 }
 	 alert("Valid value: 00~FF");
-	 checkSelectNode();
-	 
+	 checkSelectNode(); 
 }
 function checkCol2(object){
 	 object.value=object.value.toUpperCase();
@@ -1032,6 +1167,26 @@ function deleteGraph(){
 	delValue(graphName);
 	doShowAll();
 }
+function deleteAll(){
+	if(window.confirm('Do you want to delete all graphs?')){
+  }else{
+       return false;
+  }
+	var validNames=[];
+	var i=0;
+	for(i=0; i<=localStorage.length-1; i++) {
+      key = localStorage.key(i);
+      //alert(key);
+      if(key.substr(0,13)!="cisPathValue#"){
+      	 continue;
+      }
+      validNames.push(key);
+  }
+  for(i=0; i < validNames.length; i++){
+  	  localStorage.removeItem(validNames[i]);
+  }
+  doShowAll();
+}
 function saveGraph(){
 	saveInfo();
 	var graphValue=document.getElementById("saveid").value;
@@ -1071,15 +1226,20 @@ function loadGraph(){
 	parseText();
 }
 function doShowAll(){
-	if(navigator.userAgent.indexOf("MSIE")>0) { 
+	if(localInfo==0) { 
+		 //alert(localInfo);
      return;
-   } 
+  } 
 	var tmp=document.getElementById("graphLoad_id");
 	tmp.options.length=0;
 	var key = "";
   var i=0;
   for(i=0; i<=localStorage.length-1; i++) {
       key = localStorage.key(i);
+      //alert(key);
+      if(key.substr(0,13)!="cisPathValue#"){
+      	 continue;
+      }
       var filename=key.substr(13);
       var time=getTimestamp(key);
       var filedate=new Date(parseInt(time));
@@ -1090,4 +1250,20 @@ function doShowAll(){
 	 	  tmp.options.add(option);
   }
 }
-
+function testLocal(){
+	try{
+		  var value_str="";
+	    localStorage.setItem("easytest", "test");
+	    value_str=localStorage.getItem("easytest");
+	    if(value_str != "test"){
+	    	 localInfo=0;
+		     return 0;
+	    }
+	}
+	catch(err){
+		  localInfo=0;
+		  return 0;
+	}
+	localInfo=1;
+	return 1;
+}

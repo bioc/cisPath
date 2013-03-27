@@ -1,6 +1,6 @@
 Package: cisPath
 Title: Visualization of the Shortest Functional Paths between Proteins.
-Version: 0.99.8
+Version: 0.99.9
 Author: Likun Wang <wanglk@hsc.pku.edu.cn>
 Description: cisPath is an R package for identification and visualization of the shortest functional paths between proteins in the protein-protein interaction network.
 Maintainer: Likun Wang <wanglk@hsc.pku.edu.cn>

@@ -59,7 +59,7 @@ text.id {
   font-size: 16px;
   font-weight: bold;
   color: #FF0000;
-	width: 23px;
+	width: 22px;
 	border:2px #FF0000 solid;
 }
 #green1,#green2,#green3,#green4{
@@ -67,7 +67,7 @@ text.id {
   font-size: 16px;
   font-weight: bold;
   color: #00FF00;
-	width: 23px;
+	width: 22px;
 	border:2px #00FF00 solid;
 }
 #blue1,#blue2,#blue3,#blue4{
@@ -75,7 +75,7 @@ text.id {
   font-size: 16px;
   font-weight: bold;
   color: #0000FF;
-	width: 23px;
+	width: 22px;
 	border:2px #0000FF solid;
 }
 #pro_ok_id,#p_del_id{
@@ -158,5 +158,22 @@ td{
 	width:105px;
 }
 #graphname_id{
+	width:100px;
+}
+#loadGraphID, #DeleteGraphID, #saveGraphID, #DeleteAllID{
+	width:100px;
+}
+#cookie_table td{
+	padding: 1px;
+	border:0px solid gray;
+}
+#cookie_table{
+	padding: 1px;
+	border:0px solid gray;
+}
+#source_name_id{
+	font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+	font-size: 16px;
+	color: #0000FF;
 	width:100px;
 }
