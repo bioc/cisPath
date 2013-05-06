@@ -74,11 +74,11 @@ var force = d3.layout.force()
     .nodes(nodes)
     .links(links)
     .size([width, height])
-    .linkDistance(300)
-    .distance(200)
+    .linkDistance(120)
+    .distance(120)
     .charge(-120)
     .gravity(.06)
-    .charge(-300)
+    .charge(-120)
     .on('tick', tick)
 
 // define arrow markers for graph links
@@ -117,6 +117,11 @@ var drag_line = svg.append('svg:path')
   .attr('d', 'M0,0L0,0')
   .style("stroke-width", '4px')
   .style('stroke', '#000000');
+  
+drag_line
+        .classed('hidden', true)
+        .style('stroke', 'none')
+        .style('marker-end', '');
 
 // handles to link and node element groups
 var path = svg.append('svg:g').selectAll('path'),
@@ -311,7 +316,7 @@ function drawLine(d){
 		 return '1,1';
 	}
 	if(d.dotted==0){
-		 return '10,0';
+		 return '';
 	}
 	if(d.dotted==1){
 		 return '10,2';
@@ -324,7 +329,7 @@ function drawCircle(d){
 	if(d === selected_node){
 		 return '10,2';
 	}
-	return '10,0';
+	return '';
 }
 // update graph (called when needed)
 function restart() {
@@ -888,10 +893,13 @@ function onBegin(){
 	 if(testLocal()!=1){
       document.getElementById("cookie_div").style.display="none"; 
    } 
+   //showGraph("P04637", 0);
 	 doShowAll();
 	 if(!(ctrl_key_flag)){
      circle.call(force.drag);
    }
+   testExist();
+   restart();
 }
 function edgesize1(){
 	 selected_link.size = selected_link.size+1;
@@ -1266,4 +1274,227 @@ function testLocal(){
 	}
 	localInfo=1;
 	return 1;
+}
+var graph_txt="";
+function getName2prot(){
+	var fileName1 = "js/name2prot.js";
+	var oHead = document.getElementsByTagName('HEAD').item(0); 
+  var oScript= document.createElement("script"); 
+  oScript.type = "text/javascript"; 
+  oScript.src=fileName1; 
+  oHead.appendChild(oScript); 
+  oScript.onload = oScript.onreadystatechange = function(){
+     if(!this.readyState|| this.readyState=='loaded' || this.readyState=='complete'){
+        var json = txt2Json(graph_txt);
+        graph_txt="";
+        processJson(json);
+     }
+  };
+}
+//{id: 0, size:12, col:'#FF0000', txt: "Protein1", fixed: 0, posx:0, posy:0,txtsize:12, txtcol:'#FF0000',stosize:0,stocol:'#FF0000'},
+//{source: nodes[0], target: nodes[1], size: 3, col:'#00FF00', arrow:1, direction:0, dotted:0}
+function processJson(json){
+	if(!json){
+		 return;
+	}
+	var nodeNum=json.nodes.length;
+	for(var i=0; i < nodeNum; i++){
+		  var newNode = {id:i, fixed: 0, posx:0, posy:0, txtsize:12, txtcol:'#000000', stosize:2,stocol:'#000000'};
+	 	  if(json.nodes[i].group<1000){
+	 	     newNode.size=16;
+		  }else{
+		  	 newNode.size=((nodeNum<=30)?9:8);
+		  }
+		  newNode.col=getCol(json.nodes[i].group);
+		  newNode.txt=json.nodes[i].name;
+		  nodes.push(newNode);
+	}
+	lastNodeId=nodeNum-1;
+	var linkNum=json.links.length;
+	for(var i=0; i < linkNum; i++){
+		  var newLink = {col:'#666666', arrow:0, direction:2, dotted:0};
+		  newLink.source=nodes[json.links[i].source];
+		  newLink.target=nodes[json.links[i].target];
+		  newLink.size= Math.sqrt(json.links[i].value);
+		  if(json.links[i].value > 10){
+		  	 newLink.col='#000000';
+		  }
+		  links.push(newLink);
+	}
+	restart();
+}
+function getRealName(nameStr){
+   var tmp_names = nameStr.split(":");
+   var real_name = tmp_names[0];
+   var swiss_prot = real_name;
+   if(tmp_names[1]){
+      swiss_prot = tmp_names[1];
+   }
+   return real_name;
+}
+function processJson2(json){
+	if(!json){
+		 return;
+	}
+	var nodeNum=json.nodes.length;
+	for(var i=0; i < nodeNum; i++){
+		  var newNode = {id:i, fixed: 0, posx:0, posy:0, txtsize:12, txtcol:'#000000', stosize:2,stocol:'#000000'};
+	 	  if(json.nodes[i].group==1){
+	 	     newNode.size=16;
+		  }else{
+		  	 newNode.size=((nodeNum<=30)?9:8);
+		  }
+		  newNode.col=json.nodes[i].color;
+		  newNode.txt=getRealName(json.nodes[i].name);
+		  nodes.push(newNode);
+	}
+	lastNodeId=nodeNum-1;
+	var linkNum=json.links.length;
+	for(var i=0; i < linkNum; i++){
+		  var newLink = {col:'#666666', arrow:0, direction:2, dotted:0};
+		  newLink.source=nodes[json.links[i].source];
+		  newLink.target=nodes[json.links[i].target];
+		  newLink.size= Math.sqrt(json.links[i].value);
+		  if(json.links[i].value > 10){
+		  	 newLink.col='#000000';
+		  }
+		  links.push(newLink);
+	}
+	restart();
+}
+function showGraph(geneName, graph_num){
+	var fileName1 = "js/"+geneName+"_graph.js";
+	var oHead = document.getElementsByTagName('HEAD').item(0); 
+  var oScript= document.createElement("script"); 
+  oScript.type = "text/javascript"; 
+  oScript.src=fileName1; 
+  oHead.appendChild(oScript); 
+  oScript.onload = oScript.onreadystatechange = function(){
+     if(!this.readyState|| this.readyState=='loaded' || this.readyState=='complete'){
+     	  //alert(this.readyState);
+        graph_txt = allGraphs[graph_num];
+        getName2prot();
+     }
+  };
+}
+var pathLen=0;
+var nodeNum=0;
+function txt2Json(json_old){
+ 	  var txt=json_old;
+  	var nodes = [];
+    var links = [];
+    if(!txt){
+    	 return;
+    }
+ 	  var tmp_m = txt.split("#");
+    var tmp1=tmp_m[0].split("&");
+    var tmp2=tmp_m[1].split("&");
+    for(var x=0;x<tmp1.length;x++){
+        var tmp = tmp1[x].split(";");
+        var s = {};
+        s["name"] = id2ProteinName[tmp[0]];
+        s["group"] = parseInt(tmp[1]);
+        nodes[x]=s;
+        if(s["group"] < 1000){
+        	 pathLen++;
+        }
+    }
+    nodeNum=tmp1.length;
+    if(pathLen==1){
+       nodeNum=1;
+    } 
+    for(var x=0;x<tmp2.length;x++){
+        var tmp = tmp2[x].split(";");
+        var s = {};
+        s["source"] = parseInt(tmp[0]);
+        s["target"] = parseInt(tmp[1]);
+        s["value"] = parseInt(tmp[2]);
+        if(tmp.length==5){
+        	 s["pubmed"] = tmp[3];
+        	 s["Evidence"] = tmp[4];
+        }
+        links[x]=s;
+    }
+    var json = {};
+    json["nodes"]=nodes;
+    var firstGraph=pathLen;
+    if(firstGraph==1){
+       json["links"]=[];
+       setTimeout(timerFun, 800);
+    }else{
+       json["links"]=links;
+       document.getElementById("chart").style.display = "none";
+       setTimeout(timerFun, 1000);
+    }
+    showLink=0;
+    setTimeout(timerFun2, 1000);
+    if(pathLen==1){
+    	force.charge(-30);
+    }
+    return json;
+}
+function timerFun2(){
+    showLink=1;
+}
+function timerFun(){
+    document.getElementById("chart").style.display = "";
+    restart();
+}
+function getCol(group){
+  if(group > 1000){
+     return leafNodeCol;
+  }
+  var len=mainNodeCols.length;
+  var idx=(group)%len;
+  idx=pathLen-1-idx;
+  idx=idx%len;
+  return mainNodeCols[idx];
+}
+
+function showNetwork(){
+	var fileName1 = "js/graph.js";
+	var oHead = document.getElementsByTagName('HEAD').item(0); 
+  var oScript= document.createElement("script"); 
+  oScript.type = "text/javascript"; 
+  oScript.src=fileName1; 
+  oHead.appendChild(oScript); 
+  oScript.onload = oScript.onreadystatechange = function(){
+     if(!this.readyState|| this.readyState=='loaded' || this.readyState=='complete'){
+     	  //alert(this.readyState);
+        var json = graphView;
+        processJson2(json);
+        graphView=null;
+     }
+  };
+  document.getElementById("chart").style.display = "none";
+  setTimeout(timerFun, 1000);
+}
+function testExist(){
+	var geneid=getparastr("geneid");
+	if(geneid==""){
+		 return;
+	}
+	if(geneid=="graph"){
+		 showNetwork();
+		 return;
+	}
+	var graph_num=getparastr("number");
+	graph_num=parseInt(graph_num);
+	showGraph(geneid, graph_num);
+}
+function getparastr(strname){
+   var hrefstr,pos,parastr,para,tempstr;
+   hrefstr = window.location.href;
+   pos = hrefstr.indexOf("?")
+   parastr = hrefstr.substring(pos+1);
+   para = parastr.split("&");
+   tempstr="";
+   for(i=0;i<para.length;i++){
+       tempstr = para[i];
+       pos = tempstr.indexOf("=");
+       if(tempstr.substring(0,pos) == strname){
+          return tempstr.substring(pos+1);
+       }
+   }
+   return "";
 }

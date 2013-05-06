@@ -38,7 +38,7 @@ circle.node.selected {
 }
 
 text {
-  font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+  font: 12px Arial,Georgia,"Courier New","Times New Roman",Messenger,Geneva,sans-serif;
 }
 
 text.id {
@@ -55,7 +55,7 @@ text.id {
 	width: 100px;
 }
 #red1,#red2,#red3,#red4{
-	font-family: "Times New Roman", Georgia, "Courier New", Messenger, Geneva, Arial, sans-serif;
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
   font-size: 16px;
   font-weight: bold;
   color: #FF0000;
@@ -63,7 +63,7 @@ text.id {
 	border:2px #FF0000 solid;
 }
 #green1,#green2,#green3,#green4{
-	font-family: "Times New Roman", Georgia, "Courier New", Messenger, Geneva, Arial, sans-serif;
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
   font-size: 16px;
   font-weight: bold;
   color: #00FF00;
@@ -71,7 +71,7 @@ text.id {
 	border:2px #00FF00 solid;
 }
 #blue1,#blue2,#blue3,#blue4{
-	font-family: "Times New Roman", Georgia, "Courier New",  Messenger, Geneva, Arial, sans-serif;
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
   font-size: 16px;
   font-weight: bold;
   color: #0000FF;
@@ -79,37 +79,49 @@ text.id {
 	border:2px #0000FF solid;
 }
 #pro_ok_id,#p_del_id{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
 	width: 56px;
 }
 #del_id{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
 	width: 60px;
 }
 #edge_ok_id,#del_id{
 	width: 53px;
 }
 #pro_size1_id,#pro_size2_id,#pro_size1_id2,#pro_size2_id2,#pro_size1_id3,#pro_size2_id3{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
 	width: 28px;
 	font-size: 16px;
 }
 #edgesize1_id,#edgesize2_id{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
 	width: 28px;
 	font-size: 16px;
 }
 #txt_pos_id1,#txt_pos_id2,#txt_pos_id3,#txt_pos_id4{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
 	width: 28px;
 	font-size: 16px;
 }
 #arrow1_id,#arrow2_id,#arrow3_id,#dotted1_id,#dotted2_id,#dotted3_id{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
 	width: 36px;
 	font-size: 16px;
 }
 #curve1_id,#curve2_id,#curve3_id{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
 	width: 36px;
 	font-size: 16px;
 }
 #chart{
 	width:960px;
 	height:600px;
+}
+#chartfather{
+	width:960px;
+	height:600px;
+	background-color: #FFFFFF;
 }
 table {
   margin-right:20px;
@@ -161,6 +173,7 @@ td{
 	width:100px;
 }
 #loadGraphID, #DeleteGraphID, #saveGraphID, #DeleteAllID{
+	font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
 	width:100px;
 }
 #cookie_table td{
@@ -176,4 +189,10 @@ td{
 	font-size: 16px;
 	color: #0000FF;
 	width:100px;
+}
+#fixButton,#releaseButton,#ctrlkey,#shiftkey,#savesection,#helpsection{
+	font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}
+#Refresh_id, #Submit_id,#graphLoad_id,#graphname_id{
+	font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
 }

@@ -18,6 +18,7 @@ function(infoFile, proteinNames, outputDir, swissProtID=FALSE, mainNode=c(1),
     #cat("htmlFile: ", htmlFile, "\n")
     htmlFile_out <- paste(outputDir,"/","graphView.html",sep="")
     file.copy(htmlFile, htmlFile_out, overwrite = TRUE, copy.mode = TRUE)
+    copyHTML(outputDir)
     #############################################################
     jsFile <- system.file("extdata", "D3/d3.js", package="cisPath")
     js_out <- paste(outputDir,"/D3/","d3.js",sep="")

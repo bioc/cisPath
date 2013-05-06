@@ -13,9 +13,9 @@ networkView(infoFile, proteinNames, outputDir, swissProtID=FALSE, mainNode=c(1),
 }
 \arguments{
  \item{infoFile}{File that contains PPI data (character(1)). \cr Please see the file \code{PPI_Info.txt} as an example.}
- \item{proteinNames}{Protein names or Swiss-Prot numbers (character) of the proteins.}
+ \item{proteinNames}{Gene names or Swiss-Prot numbers of the proteins (character vector).}
  \item{outputDir}{Output directory (character(1)).}
- \item{swissProtID}{A logical value. If \code{proteinNames} contains Swiss-Prot numbers, set as \code{TRUE}. \cr If \code{proteinNames} contains protein names, set as \code{FALSE}.}
+ \item{swissProtID}{A logical value. If \code{proteinNames} contains Swiss-Prot numbers, set as \code{TRUE}. \cr If \code{proteinNames} contains gene names, set as \code{FALSE}.}
  \item{mainNode}{A vector of value \code{0} and \code{1}. \cr 
                 \code{0}: display the corresponding protein as a small node. \cr
                 \code{1}: display the corresponding protein as a main node. \cr
@@ -28,7 +28,7 @@ networkView(infoFile, proteinNames, outputDir, swissProtID=FALSE, mainNode=c(1),
             }
 }
 \details{
-  As an example, we have generated protein-protein interaction data (considering Homo sapiens proteins only) 
+  As an example, we have generated protein-protein interaction data for several species 
   from the PINA database (\url{http://cbg.garvan.unsw.edu.au/pina/}) and the STRING database (\url{http://string-db.org/}). 
   Users can download these files from \url{http://www.isb.pku.edu.cn/cisPath/}.  
   If you make use of these files, please cite PINA or STRING accordingly. 
@@ -39,7 +39,7 @@ networkView(infoFile, proteinNames, outputDir, swissProtID=FALSE, mainNode=c(1),
   A protein often has several names, and some of these names have perhaps not been included in the input file \code{infoFile}.
   We therefore suggest users take a look at the output file \code{proteinIDs.txt} to check whether the input protein names are valid.
   In order to avoid inputting invalid target protein names, the unique identifier Swiss-Prot numbers may alternately be used as input. 
-  The Swiss-Prot numbers can be sought in UniProt (\url{http://www.uniprot.org/}).
+  The Swiss-Prot numbers can be sought in the UniProt (\url{http://www.uniprot.org/}) database.
 }
 \value{
   The output HTML file contains the protein-protein interactions and related supporting evidences.  
@@ -57,7 +57,7 @@ networkView(infoFile, proteinNames, outputDir, swissProtID=FALSE, mainNode=c(1),
   
 }
 \seealso{
- \code{\link{cisPath}}, \code{\link{addProteinNames}}.
+ \code{\link{cisPath}}, \code{\link{addProteinNames}}, \code{\link{easyEditor}}.
 }
 \examples{
     library(cisPath)
