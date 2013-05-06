@@ -51,6 +51,7 @@
           padding: 5px;
           border:2px solid gray;
           font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+          text-align: left;
         }
         #table_id {
             width: 960px;
@@ -114,9 +115,10 @@
         	  font-size: 15px;
             font-family: Arial, "Times New Roman", Georgia, "Courier New", Messenger, Geneva, Arial, sans-serif;
         }
-        #fixButton{
+        #fixButton, #easyEditorId{
         	  font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
             font-size: 16px;
+            width: 120px;
         }
         #fixButtonDiv{
         	  clear:left;
@@ -133,6 +135,23 @@
   		 </div>
     <div id="chartfather">
     <div id="chart"></div>
+    </div>
+    <div class="guide" id="tourguide"><h1><br></h1><h1><br></h1>
+        Tour guide <br><br>
+       &bull; Try clicking on a node. <br>
+       &bull; Try dragging a node with the mouse. <br>
+       &bull; Gestures can be used for touch screen users. <br>
+       &bull; Use Ctrl (&#8984;) and '+' or '-' to zoom in and out. <br>
+       &bull; The links between the main nodes are highlighted.
+       </div>
+      <div><p id="fixButtonDiv">
+      	   <input type="button" id='fixButton' onclick="clickFix(this);">
+      	   <input type="button" value="Edit graph" id='easyEditorId' onclick="openEditor();">&nbsp;&nbsp;&nbsp;
+           <span id="proteinIntroP"><br></span></p></div>
+      <div id="table_id"></div>
+      <div><p class="guide2">
+      </p>
+      <div id="table_id2"></div>	
     </div>
     <script type="text/javascript">
     	  ///////////////////////////////////////////20130202
@@ -377,9 +396,9 @@
         	 Object.extend(json,json_old);
            var mydiv = document.getElementById("table_id");
            var html_text = '';
-           var head1 = 'Pubmed IDs';
+           var head1 = 'PubMed IDs';
            if((json.links[0] != null)&&(json.links[0]['pubmed'])){
-              head1 = 'Pubmed IDs';
+              head1 = 'PubMed IDs';
            }
            var mytable = document.createElement("table");
            var mytablebody = document.createElement("tbody");
@@ -439,6 +458,7 @@
                  mycurrent_cell = document.createElement("td");
                  mycurrent_cell.appendChild(document.createTextNode(strChange(json.links[x]['Evidence'])));
                  mycurrent_cell.align = 'center';
+                 mycurrent_cell.width = '200px';
                  mycurrent_row.appendChild(mycurrent_cell);
                  
                  if((json.links[x]['pubmed'])&&(json.links[x]['pubmed'] !="")){
@@ -484,6 +504,14 @@
            var mychart = document.getElementById("chart");
            //mychart.innerHTML = '';
            mydiv.appendChild(mytable);
+           var nodedis=100;
+           if(displayGraph==0){
+           	if(json.nodes.length > 60){
+           		 json.nodes.length=60;
+           	}
+           	  json.links=[];
+           	  nodeCharge=-80;
+           }
            //return;
            d3.selectAll("line.link").remove();
            d3.selectAll("circle").remove();
@@ -501,8 +529,7 @@
               //.linkDistance(0)
               .size([w, h])
               .start();
-
-
+              
             var link = vis.selectAll("line.link")
              .data(json.links)
             .enter().append("svg:line")
@@ -628,6 +655,11 @@
     	  	 	  force.resume();
     	  	 }
     	  }
+    	  function openEditor(){
+    	  	 var link_address="./easyEditor.html"+"?geneid=graph";
+    	  	 //alert(link_address);
+    	  	 window.open(link_address,'_blank');
+    	  }
     	  function addfixButton(){
         	  var tmp = document.getElementById("fixButton");
         	  tmp.type="button";
@@ -651,21 +683,5 @@
         loadJS();
         //document.getElementById('pro_id').value="";        
     </script>
-       <div class="guide" id="tourguide"><h1><br></h1><h1><br></h1>
-        Tour guide <br><br>
-       &bull; Try clicking on a node. <br>
-       &bull; Try dragging a node with the mouse. <br>
-       &bull; Gestures can be used for touch screen users. <br>
-       &bull; Use Ctrl (&#8984;) and '+' or '-' to zoom in and out. <br>
-       &bull; The links between the main nodes are highlighted.
-       </div>
-      <div><p id="fixButtonDiv">
-      	   <input type="button" id='fixButton' onclick="clickFix(this);">&nbsp;&nbsp;&nbsp;
-           <span id="proteinIntroP"><br></span></p></div>
-      <div id="table_id"></div>
-      <div><p class="guide2">
-      </p>
-      <div id="table_id2"></div>	
-      </div>
   </body>
 </html>

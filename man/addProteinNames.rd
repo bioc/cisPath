@@ -1,16 +1,16 @@
 \name{addProteinNames}
 \alias{addProteinNames}
 \alias{addProteinNames,character,character-method}
-\title{add ID Mapping information}
+\title{Add ID mapping information}
 \description{
-   This method is used to add more ID Mapping information. 
+   This method is used to add more ID mapping information. 
 }
 \usage{
 addProteinNames(name2IDFile, outputDir)
 \S4method{addProteinNames}{character,character}(name2IDFile, outputDir)
 }
 \arguments{
- \item{name2IDFile}{File contains ID Mapping information (character(1)). \cr Please see the file \code{name2prot.txt} as an example.}
+ \item{name2IDFile}{File contains ID mapping information (character(1)). \cr Please see the file \code{name2prot.txt} as an example.}
  \item{outputDir}{Output directory (character(1)).}
 }
 \details{
@@ -18,7 +18,7 @@ addProteinNames(name2IDFile, outputDir)
   In this way, users can search for the shortest paths using the protein names with which they are familiar. 
 }
 \value{
-  The corresponding ID Mapping information will be added.
+  The corresponding ID mapping information will be added.
 }
 \references{
   Cowley, M.J. and et al. (2012) PINA v2.0:mining interactome modules. \emph{Nucleic Acids Res}, \bold{40}, D862-865. 

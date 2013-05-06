@@ -3,7 +3,7 @@ function(infoFile, proteinName, outputDir, targetProteins=NULL,
          swissProtID=FALSE, name2IDFile=NULL,
          nodeColors=c("#1F77B4", "#FF7F0E", "#D62728",
                       "#9467BD", "#8C564B", "#E377C2"),
-         leafColor="#2CA02C")
+         leafColor="#2CA02C", byStep=FALSE)
 {   
     if(is.null(outputDir[1])){
        outputDir <- paste(tempdir(),"/","outputFile",sep="")
@@ -19,6 +19,7 @@ function(infoFile, proteinName, outputDir, targetProteins=NULL,
     #cat("htmlFile: ", htmlFile, "\n")
     htmlFile_out <- paste(outputDir,"/","network.html",sep="")
     file.copy(htmlFile, htmlFile_out, overwrite = TRUE, copy.mode = TRUE)
+    copyHTML(outputDir)
     #############################################################
     jsFile <- system.file("extdata", "D3/d3.js", package="cisPath")
     js_out <- paste(outputDir,"/D3/","d3.js",sep="")
@@ -49,9 +50,13 @@ function(infoFile, proteinName, outputDir, targetProteins=NULL,
     if(is.null(name2IDFile[1])){
        name2IDFile <- ""
     }
+    byScore <- 1
+    if(byStep){
+       byScore <- 0
+    }
     kk <- .C(".cisPathC",as.character(infoFile),as.character(proteinName), 
              as.character(outputDir), as.character(targetFile), 
-             as.character(name2IDFile), as.integer(10000))
+             as.character(name2IDFile), as.integer(10000), as.integer(byScore))
     results <- getResults(outputDir)
     cat("Done.\n")
     name2protFile <- paste(outputDir,"/","js/name2prot.js",sep="");

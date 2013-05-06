@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <list>
 
 #if GCC_VERSION > 40600
@@ -105,6 +106,7 @@ HASHMAP<string, string, str_hash1> prev;
 vector<string> hasPath;
 
 bool withPubmed = false;
+bool byScoreFlag = true;
 bool makedir(const char *dir, int mask = 0744);
 string root;
 string outputDir;
@@ -122,14 +124,14 @@ vector<string> OutPutID2names;
 HASHMAP<string, int, str_hash1> name2OutPutID;
 int outputID = 0;
 ////////////////////g++ cisPath.cpp -o cisPath -DINDEP_PROGRAM
-#ifdef INDEP_PROGRAM
+#ifdef INDEP_PROGRAM0
 void print_usage()
 {
     cerr << "cispath <PPIFile> <protein> <outputDir>";
     cerr << " [-n name2prot.txt] [-t targets.txt]" << endl;
 
     cerr <<"----------------------------------------------------------"<<endl;
-    cerr <<"  PPIFile: file that contains PPI data for proteins" << endl;
+    cerr << "  PPIFile: file that contains PPI data for proteins" << endl;
     cerr << "  protein: protein name or Swiss-Prot accession number";
     cerr << " for source protein" << endl;
     cerr << "outputDir: output directory" << endl;
@@ -199,7 +201,7 @@ bool cispath(const char *input, const char *protein, const char *output)
 {
     //PRINTFUNCTION("gcc version: %d\n", GCC_VERSION);
     addInfoFirst();
-    PRINTFUNCTION("Processing input file\n");
+    PRINTFUNCTION("Processing input file...\n");
     PRINTFUNCTION("input file: %s\n", input);
     PRINTFUNCTION("source protein: %s\n", protein);
     PRINTFUNCTION("output directory: %s\n", output);
@@ -234,10 +236,10 @@ bool cispath(const char *input, const char *protein, const char *output)
     {
         root_prot = name2prot[root_prot];
 #ifdef INDEP_PROGRAM
-        cerr << protein << ": valid protein name" << endl;
+        cerr << protein << ": valid gene name" << endl;
         cerr << "Swiss-Prot number: " << root_prot << endl;
 #else
-        PRINTFUNCTION("%s: valid protein name\n", protein);
+        PRINTFUNCTION("%s: valid gene name\n", protein);
         PRINTFUNCTION("Swiss-Prot number: %s\n", root_prot.c_str());
         R_FlushConsole();
 #endif
@@ -660,10 +662,19 @@ bool processInput(const char *input)
             PRINTFUNCTION("20 columns: standard MITAB format from PINA\n");
             withPubmed = true;
         }
+        else if(tokens.size() == 7)
+        {
+            //PRINTFUNCTION("7 columns: valid header\n");
+            if(tokens[5] == "PubMedID")
+            {
+                withPubmed = true;
+            }
+            pnasFormat = 0;
+        }
         else if(tokens.size() == 6)
         {
             PRINTFUNCTION("6 columns: valid header\n");
-            if(tokens[5] == "PubmedID")
+            if(tokens[5] == "PubMedID")
             {
                 withPubmed = true;
             }
@@ -676,6 +687,7 @@ bool processInput(const char *input)
         }
     }
     int lineCount = 1;
+    //ofstream LOG((outputDir+"/log.txt").c_str());
     while(!in.eof())
     {
         in.getline(buffer, 1000000);
@@ -789,9 +801,14 @@ bool processInput(const char *input)
             //cerr<<tokens[3]<<endl;
             //cerr<<pubmedstr<<endl;
         }
-        if((pnasFormat != 1) && (tokens.size() == 6))
+        if(tokens.size() == 6)
         {
-            vector<string> tokens = string_tokenize(tmp, "\t", false);
+            string tmp = "1.000";
+            tokens.push_back(tmp);
+        }
+        if((pnasFormat != 1) && (tokens.size() == 7))
+        {
+            //vector<string> tokens = string_tokenize(tmp, "\t", false);
             name2prot[tokens[2]] = tokens[0];
             name2prot[tokens[3]] = tokens[1];
             prot2real[tokens[0]] = tokens[2];
@@ -808,6 +825,17 @@ bool processInput(const char *input)
             }
             edge[tokens[0]][tokens[1]] = 1;
             edge[tokens[1]][tokens[0]] = 1;
+            if(byScoreFlag)
+            {
+                int score = (int)(atof(tokens[6].c_str()) * 1000 + 0.01);
+                if(score < 1000)
+                {
+                    score = 1000;
+                }
+                edge[tokens[0]][tokens[1]] = score;
+                edge[tokens[1]][tokens[0]] = score;
+                //LOG << tmp << "\t" << score << "\n";
+            }
             if((tokens[4] != "NA") && (tokens[4] != ""))
             {
                 if((edgeInfo.count(tokens[0] + "&" + tokens[1]) == 0) ||
@@ -1003,6 +1031,18 @@ bool addLink(string source, string target, int group, int bigNode)
     return true;
 }
 string currentNode;
+int getStringScore(string info)
+{
+    char *p = strstr(info.c_str(), "STRING score: ");
+    if(p == NULL)
+    {
+        Rprintf("%s~0#0\n", info.c_str());
+        return 0;
+    }
+    p += strlen("STRING score: ");
+    Rprintf("%s~%s$%d\n", info.c_str(), p, atoi(p));
+    return atoi(p);
+}
 bool lessFunction2(const string &m1, const string &m2)
 {
     int value1 = edge[currentNode][m1];
@@ -1011,7 +1051,7 @@ bool lessFunction2(const string &m1, const string &m2)
     {
         return value1 < value2;
     }
-    if(withPubmed == true)
+    if(1)
     {
         int size1 =
             string_tokenize(edgeInfo[currentNode + "&" + m1], ", ").size();
@@ -1029,6 +1069,12 @@ bool lessFunction2(const string &m1, const string &m2)
         {
             return size1 > size2;
         }
+    }
+    int stringScore1 = getStringScore(edgeInfo_string[currentNode + "&" + m1]);
+    int stringScore2 = getStringScore(edgeInfo_string[currentNode + "&" + m2]);
+    if(stringScore1 != stringScore2)
+    {
+        return stringScore1 > stringScore2;
     }
     if(m1 != m2)
     {
@@ -1446,6 +1492,7 @@ bool clearInfo()
     prev.clear();
     hasPath.clear();
     withPubmed = false;
+    byScoreFlag = false;
     nodeName2id.clear();
     link2id.clear();
     childs.clear();
@@ -1494,7 +1541,7 @@ bool addColorNodeStr(string Name)
     }
     return true;
 }
-bool addColorLink(string source, string target)
+bool addColorLink(string source, string target, int oneNode = 0)
 {
     if(edge.count(source) == 0)
     {
@@ -1519,6 +1566,10 @@ bool addColorLink(string source, string target)
     if((name2big[source] == 1) && (name2big[target] == 1))
     {
         value += 1000;
+    }
+    if(oneNode == 1)
+    {
+        value = 1500;
     }
     value = value * 10 / 1000;
     source = int2str(nodeName2id[source]);
@@ -1655,10 +1706,11 @@ bool getProteinNodes(string proteinFile, string outputDir)
     out.close();
     return false;
 }
+//////////////////////////////////////////////////////////
 bool viewGraph(const char *input, const char *proteinFile,
                const char *output, int addChilds, const char *childCol)
 {
-    PRINTFUNCTION("Processing input file\n");
+    PRINTFUNCTION("Processing input file...\n");
     PRINTFUNCTION("input file: %s\n", input);
     PRINTFUNCTION("protein file: %s\n", proteinFile);
     PRINTFUNCTION("output directory: %s\n", output);
@@ -1712,6 +1764,36 @@ bool viewGraph(const char *input, const char *proteinFile,
             }
             addColorLink(source, target);
         }
+    }
+    if(proteinNodes.size() == 1)
+    {
+        currentNode = proteinNodes[0];
+        sort(colorChilds.begin(), colorChilds.end(), lessFunction2);
+        reverse(colorChilds.begin(), colorChilds.end());
+        for(int i = 0; i < (int)colorChilds.size(); i++)
+        {
+            string source = proteinNodes[0];
+            string target = colorChilds[i];
+            name2big[target] = 0;
+            name2color[target] = childCol;
+            addColorNodeStr(target);
+            if(name2big[source] == 1)
+            {
+                addColorLink(source, target, 1);
+                continue;
+            }
+            if(name2big[target] == 1)
+            {
+                addColorLink(target, source, 1);
+                continue;
+            }
+            addColorLink(source, target, 1);
+        }
+        OUT << "var displayGraph=0;\n";
+    }
+    else
+    {
+        OUT << "var displayGraph=1;\n";
     }
     if(addChilds == 1)
     {
@@ -1836,15 +1918,653 @@ bool addInfo(string infoFileName, string resultDir)
     OUTJSALL.close();
     return true;
 }
+////////////////////////////////////////////////////////////////////////////
+bool getMappingFile(string input, string output, string OX1)
+{
+    ifstream IN(input.c_str());
+    if(!IN)
+    {
+        PRINTFUNCTION("Can not open %s\n", input.c_str());
+        return false;
+    }
+    ofstream OUT(output.c_str());
+    if(!OUT)
+    {
+        PRINTFUNCTION("Can not open %s to write\n", output.c_str());
+        return false;
+    }
+
+    char buffer[1000000 + 1];
+    string AC = "";
+    string name = "";
+    string ensembel = "";
+    string ensembel_string = "";
+    string OX = "";
+    string OS = "";
+    int line_num = 0;
+    while(!IN.eof())
+    {
+        IN.getline(buffer, 1000000);
+        line_num++;
+        if(line_num % 1000 == 0)
+        {
+            PRINTFUNCTION("\rProcessed lines: %d", line_num);
+        }
+        string tmp = buffer;
+        if((tmp.substr(0, 2) == "AC") && (AC == ""))
+        {
+            tmp = tmp.substr(2);
+            vector<string> smalltokens = string_tokenize(tmp, "; ", true);
+            if(smalltokens.size() < 1)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            AC = smalltokens[0];
+        }
+        if((tmp.substr(0, 2) == "GN") && (name == ""))
+        {
+            tmp = tmp.substr(2);
+            vector<string> smalltokens = string_tokenize(tmp, "=;", true);
+            if(smalltokens.size() < 2)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            name = smalltokens[1];
+        }
+        if(tmp.substr(0, 12) == "DR   STRING;")
+        {
+            tmp = tmp.substr(13);
+            vector<string> smalltokens = string_tokenize(tmp, "; ", true);
+            if(smalltokens.size() < 1)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            if(ensembel_string != "")
+            {
+                ensembel_string += ",";
+            }
+            ensembel_string += smalltokens[0];
+        }
+        if(tmp.substr(0, 12) == "DR   Ensembl")
+        {
+            tmp = tmp.substr(5);
+            vector<string> smalltokens = string_tokenize(tmp, "; ", true);
+            if(smalltokens.size() < 4)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            if(ensembel != "")
+            {
+                ensembel += ",";
+            }
+            ensembel += smalltokens[2];
+        }
+        if(tmp.substr(0, 2) == "OS")
+        {
+            tmp = tmp.substr(5);
+            vector<string> smalltokens = string_tokenize(tmp, ".", true);
+            if(smalltokens.size() < 1)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            OS = smalltokens[0];
+        }
+        if(tmp.substr(0, 2) == "OX")
+        {
+            tmp = tmp.substr(2);
+            vector<string> smalltokens = string_tokenize(tmp, "=;", true);
+            if(smalltokens.size() < 2)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            OX = smalltokens[1];
+        }
+        if(tmp.substr(0, 2) == "//")
+        {
+            if((OX1 == "") || (OX1 == "0000") || (OX == OX1))
+            {
+                OUT << AC << "\t" << name << "\t" << ensembel << "\t";
+                OUT << OX << "\t" << ensembel_string << "\t" << OS << "\n";
+            }
+            AC = "";
+            name = "";
+            ensembel = "";
+            ensembel_string = "";
+            OX = "";
+            OS = "";
+        }
+    }
+    PRINTFUNCTION("\rProcessed lines: %d\n", line_num);
+    IN.close();
+    OUT.close();
+    return true;
+}
+#ifdef INDEP_PROGRAM1
+int main(int argc, char *argv[])
+{
+    if(argc == 4)
+    {
+        getMappingFile(argv[1], argv[2], argv[3]);
+    }
+    else
+    {
+        cerr << "getMappingFile input output OS" << endl;
+    }
+}
+#else
+#endif
+///////////////////////////////////////////////////////////////////////////
+int roundValue(double d)
+{
+    return (int)(floor(d + 0.5));
+}
+string double2string(double score)
+{
+    char tmp[100];
+    sprintf(tmp, "%.3f", score);
+    return string(tmp);
+}
+bool formatSTRINGPPI(string input, string mappingFile, string OX,
+                     string output, string minScore)
+{
+    ifstream IN(input.c_str());
+    if(!IN)
+    {
+        PRINTFUNCTION("Can not open %s\n", input.c_str());
+        return false;
+    }
+    ifstream MAPFILE(mappingFile.c_str());
+    if(!MAPFILE)
+    {
+        PRINTFUNCTION("Can not open %s\n", mappingFile.c_str());
+        return false;
+    }
+    ofstream OUT(output.c_str());
+    if(!OUT)
+    {
+        PRINTFUNCTION("Can not open %s to write\n", output.c_str());
+        return false;
+    }
+    char buffer[1000000 + 1];
+    PRINTFUNCTION("Processing ID mapping file...\n");
+    int line_num = 0;
+    HASHMAP<string, string, str_hash1> ens2prot;
+    HASHMAP<string, string, str_hash1> string2prot;
+    HASHMAP<string, string, str_hash1> prot2name;
+    while(!MAPFILE.eof())
+    {
+        MAPFILE.getline(buffer, 1000000);
+        string tmp = buffer;
+        if(tmp.size() < 4)
+        {
+            continue;
+        }
+        line_num++;
+        if(line_num % 1000 == 0)
+        {
+            PRINTFUNCTION("\rProcessed lines: %d", line_num);
+        }
+        vector<string> smalltokens = string_tokenize(tmp, "\t", false);
+        if(smalltokens.size() < 3)
+        {
+            PRINTFUNCTION("Wrong format %s", tmp.c_str());
+            return false;
+        }
+        prot2name[smalltokens[0]] = smalltokens[1];
+        if(smalltokens[2] != "")
+        {
+            vector <string> ensIds=string_tokenize(smalltokens[2],", ",true);
+            for(int i = 0; i < (int)ensIds.size(); i++)
+            {
+                if(ens2prot.count(ensIds[i]) == 0)
+                {
+                    ens2prot[ensIds[i]] = smalltokens[0];
+                }
+                else
+                {
+                    ens2prot[ensIds[i]] += string(",") + smalltokens[0];
+                }
+            }
+        }
+        if(smalltokens.size() < 5)
+        {
+            continue;
+        }
+        if(smalltokens[4] != "")
+        {
+            vector <string> ensIds=string_tokenize(smalltokens[4],", ",true);
+            for(int i = 0; i < (int)ensIds.size(); i++)
+            {
+                if(string2prot.count(ensIds[i]) == 0)
+                {
+                    string2prot[ensIds[i]] = smalltokens[0];
+                }
+                else
+                {
+                    string2prot[ensIds[i]] += string(",") + smalltokens[0];
+                }
+            }
+        }
+    }
+    PRINTFUNCTION("\rProcessed lines: %d\n", line_num);
+    PRINTFUNCTION("Formatting PPI data...\n");
+    line_num = 0;
+    string OX_str = OX + ".";
+    int OX_len = OX_str.size();
+    int min_score = atoi(minScore.c_str());
+    //ofstream LOG("log.txt");
+    OUT << "uniprotkb\tuniprotkb\tgeneName\tgeneName\t";
+    OUT << "PubMedID\tevidence\tedgeValue" << "\n";
+    while(!IN.eof())
+    {
+        IN.getline(buffer, 1000000);
+        string tmp = buffer;
+        if(tmp.size() < 4)
+        {
+            continue;
+        }
+        line_num++;
+        if(line_num % 1000 == 0)
+        {
+            PRINTFUNCTION("\rProcessed lines: %d", line_num);
+        }
+        vector<string> smalltokens = string_tokenize(tmp, " ", false);
+        if(smalltokens.size() < 3)
+        {
+            PRINTFUNCTION("Wrong format %s\n", tmp.c_str());
+            return false;
+        }
+        if(smalltokens[0].substr(0, OX_len) != OX_str)
+        {
+            continue;
+        }
+        int score = atoi(smalltokens[2].c_str());
+        if(score < min_score)
+        {
+            continue;
+        }
+        double edgeValue = (log10(1000 - score) / 2 * 1000);
+        if(edgeValue < 1000)
+        {
+            edgeValue = 1000;
+        }
+        edgeValue = edgeValue / 1000;
+        //LOG<<tmp<<endl;
+        string protein1 = smalltokens[0].substr(OX_len);
+        string protein2 = smalltokens[1].substr(OX_len);
+        if(protein1.substr(protein1.size() - 2, 2) == "-P")
+        {
+            protein1 = protein1.substr(0, protein1.size() - 2);
+        }
+        if(protein2.substr(protein2.size() - 2, 2) == "-P")
+        {
+            protein2 = protein2.substr(0, protein2.size() - 2);
+        }
+        string prots1 = "";
+        if(ens2prot.count(protein1) != 0)
+        {
+            prots1 = ens2prot[protein1];
+            //LOG<<prots1<<endl;
+        }
+        if(string2prot.count(smalltokens[0]) != 0)
+        {
+            prots1 += string(",") + string2prot[smalltokens[0]];
+            //LOG<<prots1<<endl;
+        }
+        vector <string> prots_1 = string_tokenize(prots1, ", ", true);
+        string prots2 = "";
+        if(ens2prot.count(protein2) != 0)
+        {
+            prots2 = ens2prot[protein2];
+            //LOG<<prots2<<endl;
+        }
+        if(string2prot.count(smalltokens[1]) != 0)
+        {
+            prots2 += string(",") + string2prot[smalltokens[1]];
+            //LOG<<prots2<<endl;
+        }
+        vector <string> prots_2 = string_tokenize(prots2, ", ", true);
+
+        vector<string>::iterator iter;
+        sort(prots_1.begin(), prots_1.end());
+        iter = unique(prots_1.begin(), prots_1.end());
+        prots_1.erase(iter, prots_1.end());
+        sort(prots_2.begin(), prots_2.end());
+        iter = unique(prots_2.begin(), prots_2.end());
+        prots_2.erase(iter, prots_2.end());
+        if((prots_1.size() == 0) || (prots_2.size() == 0))
+        {
+            //LOG<<"Can not find id\n"<<endl;
+        }
+        if((prots_1.size() > 1) || (prots_2.size() > 1))
+        {
+            //LOG<<"More than one ID\n"<<endl;
+        }
+        if((prots_1.size() > 1) && (prots_2.size() > 1))
+        {
+            //LOG<<"All More than one ID\n"<<endl;
+        }
+        for(int i = 0; i < (int) prots_1.size(); i++)
+        {
+            for(int j = 0; j < (int) prots_2.size(); j++)
+            {
+                string name1 = prots_1[i];
+                string name2 = prots_2[j];
+                if(prot2name.count(name1) != 0)
+                {
+                    name1 = prot2name[name1];
+                }
+                if(prot2name.count(name2) != 0)
+                {
+                    name2 = prot2name[name2];
+                }
+                OUT << prots_1[i] << "\t" << prots_2[j] << "\t";
+                OUT << name1 << "\t" << name2 << "\tNA\tSTRING score: ";
+                OUT << smalltokens[2];
+                OUT << "\t" << double2string(edgeValue) << "\n";
+            }
+        }
+        //LOG<<"-------------------------------------------"<<endl;
+    }
+    PRINTFUNCTION("\rProcessed lines: %d\n", line_num);
+    IN.close();
+    MAPFILE.close();
+    OUT.close();
+    //LOG.close();
+    return true;
+}
+#ifdef INDEP_PROGRAM2
+int main(int argc, char *argv[])
+{
+    if(argc == 6)
+    {
+        formatSTRINGPPI(argv[1], argv[2], argv[3], argv[4], argv[5]);
+    }
+    else
+    {
+        cerr << "formatSTRINGPPI input mappingFile OX output minScore" << endl;
+    }
+}
+#else
+#endif
+////////////////////////////////////////////////////////////////////////////
+bool formatPINAPPI(string input, string output)
+{
+    ifstream in(input.c_str());
+    if(!in)
+    {
+        PRINTFUNCTION("Can not open %s\n", input.c_str());
+        return false;
+    }
+    ofstream OUT(output.c_str());
+    if(!OUT)
+    {
+        PRINTFUNCTION("Can not open %s to write\n", output.c_str());
+        return false;
+    }
+    char buffer[1000000 + 1];
+    if(!in.eof())
+    {
+        in.getline(buffer, 1000000);
+        string tmp = buffer;
+        trim(tmp);
+        if(tmp[tmp.size() - 1] == '\r')
+        {
+            buffer[tmp.size() - 1] = '\0';
+            tmp = buffer;
+        }
+        vector<string> tokens = string_tokenize(tmp, "\t", false);
+
+        if(tokens.size() == 20)
+        {
+            PRINTFUNCTION("Correct MITAB format input\n");
+        }
+        else
+        {
+            PRINTFUNCTION("Invalid file format!\n");
+            return false;
+        }
+    }
+    int lineCount = 0;
+    OUT << "uniprotkb\tuniprotkb\tgeneName\tgeneName\t";
+    OUT << "PubMedID\tevidence\tedgeValue" << "\n";
+    while(!in.eof())
+    {
+        in.getline(buffer, 1000000);
+        lineCount++;
+        if(lineCount % 100 == 0)
+        {
+            PRINTFUNCTION("\rProcessed %d lines", lineCount);
+        }
+        string tmp = buffer;
+        trim(tmp);
+        if(tmp[tmp.size() - 1] == '\r')
+        {
+            buffer[tmp.size() - 1] = '\0';
+            tmp = buffer;
+        }
+        vector<string> tokens = string_tokenize(tmp, "\t", false);
+        if(tokens.size() == 20)
+        {
+            if(tokens[0].substr(0, 10) == "uniprotkb:")
+            {
+                tokens[0] = tokens[0].substr(10);
+            }
+            if(tokens[1].substr(0, 10) == "uniprotkb:")
+            {
+                tokens[1] = tokens[1].substr(10);
+            }
+            if(tokens[2].substr(0, 10) == "uniprotkb:")
+            {
+                tokens[2] = tokens[2].substr(10);
+                string::size_type pos = tokens[2].find_first_of("(", 0);
+                if(pos != string::npos)
+                {
+                    if(pos == 0)
+                    {
+                        tokens[2] = tokens[0];
+                    }
+                    else
+                    {
+                        tokens[2] = tokens[2].substr(0, pos);
+                    }
+                }
+            }
+            if(tokens[3].substr(0, 10) == "uniprotkb:")
+            {
+                tokens[3] = tokens[3].substr(10);
+                string::size_type pos = tokens[3].find_first_of("(", 0);
+                if(pos != string::npos)
+                {
+                    if(pos == 0)
+                    {
+                        tokens[3] = tokens[1];
+                    }
+                    else
+                    {
+                        tokens[3] = tokens[3].substr(0, pos);
+                    }
+                }
+            }
+            vector<string> pubmedIds = string_tokenize(tokens[8], "\\|");
+            string pubmedstr = "";
+            map<string, bool> pubmeds;
+            for(int index = 0; index < (int)pubmedIds.size(); index++)
+            {
+                if((pubmedIds[index].substr(0, 7) == "pubmed:") &&
+                        (pubmedIds[index].substr(0, 17) != "pubmed:unassigned"))
+                {
+                    if(pubmedstr == "")
+                    {
+                        pubmedstr = pubmedIds[index].substr(7);
+                        pubmeds[pubmedstr] = true;
+                    }
+                    else
+                    {
+                        string id = pubmedIds[index].substr(7);
+                        if(pubmeds.find(id) == pubmeds.end())
+                        {
+                            pubmedstr = pubmedstr + ", " + id;
+                            pubmeds[id] = true;
+                        }
+                    }
+                }
+            }
+            OUT << tokens[0] << "\t" << tokens[1] << "\t";
+            OUT << tokens[2] << "\t" << tokens[3];
+            OUT << "\t" << pubmedstr << "\tPINA\t1.000" << "\n";
+            name2prot[tokens[2]] = tokens[0];
+            name2prot[tokens[3]] = tokens[1];
+            prot2real[tokens[0]] = tokens[2];
+            prot2real[tokens[1]] = tokens[3];
+        }
+    }
+    PRINTFUNCTION("\rProcessed %d lines\n", lineCount);
+    in.close();
+    OUT.close();
+    return true;
+}
+#ifdef INDEP_PROGRAM3
+int main(int argc, char *argv[])
+{
+    if(argc == 3)
+    {
+        formatPINAPPI(argv[1], argv[2]);
+    }
+    else
+    {
+        cerr << "formatPINAPPI input output" << endl;
+    }
+}
+#else
+#endif
+////////////////////////////////////////////////////////////////////////////
+bool combinePPI(char **input, int num, char *output, const char *maxEdgeValue)
+{
+    ofstream OUT(output);
+    double thres = atof(maxEdgeValue);
+    if(!OUT)
+    {
+        PRINTFUNCTION("Can not open %s to write\n", output);
+        return false;
+    }
+    else
+    {
+        PRINTFUNCTION("Output: %s\n", output);
+
+        PRINTFUNCTION("Maximum edge value: %.3f\n", thres);
+    }
+    char buffer[1000000 + 1];
+    int lineCount = 0;
+    OUT << "uniprotkb\tuniprotkb\tgeneName\tgeneName\t";
+    OUT << "PubMedID\tevidence\tedgeValue" << "\n";
+    for(int i = 0; i < num; i++)
+    {
+        ifstream in(input[i]);
+        if(!in)
+        {
+            PRINTFUNCTION("Can not open %s\n", input[i]);
+            return false;
+        }
+        else
+        {
+            PRINTFUNCTION("Processing file %s\n", input[i]);
+        }
+        while(!in.eof())
+        {
+            in.getline(buffer, 1000000);
+            lineCount++;
+            if(lineCount % 100 == 0)
+            {
+                PRINTFUNCTION("\rProcessed %d lines", lineCount);
+            }
+            string tmp = buffer;
+            trim(tmp);
+            if(tmp.size() <= 4)
+            {
+                continue;
+            }
+            if(tmp[tmp.size() - 1] == '\r')
+            {
+                buffer[tmp.size() - 1] = '\0';
+                tmp = buffer;
+            }
+            if((tmp.size() >= 9) && (tmp.substr(0, 9) == "uniprotkb"))
+            {
+                if(lineCount == 1)
+                {
+                    //OUT<<tmp<<"\n";
+                }
+                continue;
+            }
+            vector<string> tokens = string_tokenize(tmp, "\t", false);
+            if(tokens.size() < 6)
+            {
+                PRINTFUNCTION("Wrong format: %s\n", tmp.c_str());
+                continue;
+            }
+            if(tokens.size() == 6)
+            {
+                OUT << tmp << "\t1.000" << "\n";
+                continue;
+                //PRINTFUNCTION("Wrong format: %s\n", tmp.c_str());
+            }
+            if(tokens.size() == 7)
+            {
+                double score = atof(tokens[6].c_str());
+                if((thres > 0) && (score > thres + 0.00001))
+                {
+                    continue;
+                }
+            }
+            OUT << tmp << "\n";
+        }
+        PRINTFUNCTION("\rProcessed %d lines\n", lineCount);
+        in.close();
+    }
+    OUT.close();
+    return true;
+}
+#ifdef INDEP_PROGRAM4
+int main(int argc, char *argv[])
+{
+    if(argc >= 4)
+    {
+        char **files = argv + 1;
+        combinePPI(files, argc - 3, argv[argc - 2], argv[argc - 1]);
+    }
+    else
+    {
+        cerr<<"combinePPI <input1> [input2...] <output> <maxEdgeValue>"<<endl;
+    }
+}
+#else
+#endif
+////////////////////////////////////////////////////////////////////////////
 #ifdef INDEP_PROGRAM
 #else
 extern "C" {
     int cisPathC(char **input, char **protein, char **output,
-                 char **targetsFile, char **name2protFile, int *maxPathCount)
+                 char **targetsFile, char **name2protFile,
+                 int *maxPathCount, int *byScore)
     {
         n2pFile = name2protFile[0];
         targetFile = targetsFile[0];
         maxNum = maxPathCount[0];
+        if(byScore[0] >= 1)
+        {
+            byScoreFlag = true;
+        }
+        else
+        {
+            byScoreFlag = false;
+        }
         cispath(input[0], protein[0], output[0]);
         /////////////////////////////
         clearInfo();
@@ -1865,19 +2585,59 @@ extern "C" {
         clearInfo();
         return 1;
     }
+    int getMappingFileC(char **input, char **output, char **OX)
+    {
+        getMappingFile(input[0], output[0], OX[0]);
+        return 1;
+    }
+    int formatPINAPPIC(char **input, char **output)
+    {
+        formatPINAPPI(input[0], output[0]);
+        return 1;
+    }
+    int formatSTRINGPPIC(char **input, char **mappingFile, char **OX,
+                         char **output, int *minScore)
+    {
+        string score = int2str(minScore[0]);
+        formatSTRINGPPI(input[0], mappingFile[0], OX[0], output[0], score);
+        return 1;
+    }
+    //bool combinePPI(char **input, int num, char *output, char *maxEdgeValue)
+    int combinePPIC(char **input, int *num, char **output,
+                    double *maxEdgeValue)
+    {
+        string score = double2string(maxEdgeValue[0]);
+        combinePPI(input, num[0], output[0], score.c_str());
+        return 1;
+    }
 }
 
 extern "C" {
     static R_NativePrimitiveArgType cisPathC_t[] =
-    {STRSXP, STRSXP, STRSXP, STRSXP, STRSXP, INTSXP};
+    {STRSXP, STRSXP, STRSXP, STRSXP, STRSXP, INTSXP, INTSXP};
     static R_NativePrimitiveArgType addInfoC_t[] = {STRSXP, STRSXP};
     static R_NativePrimitiveArgType viewGraphC_t[] =
     {STRSXP, STRSXP, STRSXP, INTSXP, STRSXP};
+    static R_NativePrimitiveArgType getMappingFileC_t[] =
+    {STRSXP, STRSXP, STRSXP};
+    static R_NativePrimitiveArgType formatPINAPPIC_t[] =
+    {STRSXP, STRSXP};
+    static R_NativePrimitiveArgType formatSTRINGPPIC_t[] =
+    {STRSXP, STRSXP, STRSXP, STRSXP, INTSXP};
+    static R_NativePrimitiveArgType combinePPIC_t[] =
+    {STRSXP, INTSXP, STRSXP, REALSXP};
     R_CMethodDef cMethods[] =
     {
-        {".cisPathC", (DL_FUNC) &cisPathC, 6, cisPathC_t},
+        {".cisPathC", (DL_FUNC) &cisPathC, 7, cisPathC_t},
         {".addInfoC", (DL_FUNC) &addInfoC, 2, addInfoC_t},
         {".viewGraphC", (DL_FUNC) &viewGraphC, 5, viewGraphC_t},
+        {".getMappingFileC", (DL_FUNC) &getMappingFileC, 3, getMappingFileC_t},
+        {".formatPINAPPIC", (DL_FUNC) &formatPINAPPIC, 2, formatPINAPPIC_t},
+        {
+            ".formatSTRINGPPIC", (DL_FUNC) &formatSTRINGPPIC, 5,
+            formatSTRINGPPIC_t
+        },
+        {".combinePPIC", (DL_FUNC) &combinePPIC, 4, combinePPIC_t},
         {NULL, NULL, 0}
     };
 

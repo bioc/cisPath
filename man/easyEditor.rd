@@ -1,7 +1,7 @@
 \name{easyEditor}
 \alias{easyEditor}
 \alias{easyEditor,character-method}
-\title{Easy Editor for Network}
+\title{Easy editor for networks}
 \description{
   This method is used to open the network editor.
 }
@@ -14,7 +14,7 @@ easyEditor(outputDir)
 }
 \value{
   The output HTML file of this method is a network editor. 
-  Users can generate and edit their own network by this editor.
+  Users can draw and edit their own network with this editor.
 }
 \examples{
     library(cisPath)
