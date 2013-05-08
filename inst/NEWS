@@ -1,3 +1,7 @@
+VERSION 1.1.2
+------------------------
+   o Fix a bug
+   
 VERSION 1.1.1
 ------------------------
    o Several methods have been added to format PPI data downloaded from PINA and STRING databases

@@ -107,7 +107,9 @@ vector<string> hasPath;
 
 bool withPubmed = false;
 bool byScoreFlag = true;
+#ifdef INDEP_PROGRAM
 bool makedir(const char *dir, int mask = 0744);
+#endif
 string root;
 string outputDir;
 fstream OUTJSALL;
@@ -1033,14 +1035,16 @@ bool addLink(string source, string target, int group, int bigNode)
 string currentNode;
 int getStringScore(string info)
 {
-    char *p = strstr(info.c_str(), "STRING score: ");
+    char tmp[100];
+    strcpy(tmp, info.c_str());
+    char *p = strstr(tmp, "STRING score: ");
     if(p == NULL)
     {
-        Rprintf("%s~0#0\n", info.c_str());
+        //Rprintf("%s~0#0\n", info.c_str());
         return 0;
     }
     p += strlen("STRING score: ");
-    Rprintf("%s~%s$%d\n", info.c_str(), p, atoi(p));
+    //Rprintf("%s~%s$%d\n", info.c_str(), p, atoi(p));
     return atoi(p);
 }
 bool lessFunction2(const string &m1, const string &m2)
@@ -1460,6 +1464,7 @@ bool cp_html(string path, string outputDir)
     cp_file(path + "template/d3.layout.js", outputDir + "/D3/d3.layout.js");
     return true;
 }
+#ifdef INDEP_PROGRAM
 bool makedir(const char *dir, int mask)
 {
     string system_cmd("mkdir ");
@@ -1474,6 +1479,7 @@ bool makedir(const char *dir, int mask)
     return true;
 #endif
 }
+#endif
 ////////////////////////////////////////////////////////////////////
 vector <string> proteinNodes;
 HASHMAP<string, int, str_hash1> name2big;
