@@ -825,18 +825,33 @@ bool processInput(const char *input)
                 map<string, int> tmp;
                 edge[tokens[1]] = tmp;
             }
-            edge[tokens[0]][tokens[1]] = 1;
-            edge[tokens[1]][tokens[0]] = 1;
             if(byScoreFlag)
             {
                 int score = (int)(atof(tokens[6].c_str()) * 1000 + 0.01);
                 if(score < 1000)
                 {
-                    score = 1000;
+                   score = 1000;
                 }
-                edge[tokens[0]][tokens[1]] = score;
-                edge[tokens[1]][tokens[0]] = score;
+                int wassign=0;
+                if(edge.count(tokens[0])==0){
+                	 wassign=1;
+                }else{
+                	 if(edge[tokens[0]].count(tokens[1])==0){
+                	 	  wassign=1;
+                	 }else{
+                	 	  if(edge[tokens[0]][tokens[1]] > score){
+                	 	  	 wassign=1;
+                	 	  }
+                	 }
+                }
+                if(wassign==1){
+                   edge[tokens[0]][tokens[1]] = score;
+                   edge[tokens[1]][tokens[0]] = score;
+                }
                 //LOG << tmp << "\t" << score << "\n";
+            }else{
+                edge[tokens[0]][tokens[1]] = 1;
+                edge[tokens[1]][tokens[0]] = 1;
             }
             if((tokens[4] != "NA") && (tokens[4] != ""))
             {

@@ -21,8 +21,13 @@ formatPINAPPI(input, output)
 \value{
   Each line of the output file contains Swiss-Prot accession numbers and gene names for two interacting proteins. 
   The edge value will be assigned as \code{1} for each link between two interacting proteins. 
-  This may be treated as the "cost" of identifying the shortest paths between two proteins. 
+  This may be treated as the ``cost'' while identifying the shortest paths between proteins. 
   Advanced users can edit the file and change this value for each edge.
+}
+\references{
+  Cowley, M.J. and et al. (2012) PINA v2.0: mining interactome modules. \emph{Nucleic Acids Res}, \bold{40}, D862-865. 
+
+  Wu, J. and et al. (2009) Integrated network analysis platform for protein-protein interactions. \emph{Nature methods}, \bold{6}, 75-77.  
 }
 \seealso{
  \code{\link{cisPath}}, \code{\link{formatSTRINGPPI}}, \code{\link{combinePPI}}.

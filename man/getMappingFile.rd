@@ -10,7 +10,7 @@ getMappingFile(input, output, taxonId="")
 \S4method{getMappingFile}{character,character}(input, output, taxonId="")
 }
 \arguments{
- \item{input}{File downloaded from UniProt database (character(1)).}
+ \item{input}{File downloaded from the UniProt database (character(1)).}
  \item{output}{Output file (character(1)).}
  \item{taxonId}{NCBI taxonomy specie identifier (character(1)). \cr
                 This method will process only data for this specie. \cr
@@ -41,6 +41,10 @@ getMappingFile(input, output, taxonId="")
 \value{
   The output file contains identifier mapping information which is necessary for the method \code{\link{formatSTRINGPPI}}.
   Each line contains both the Ensembl Genomes Protein identifier and the Swiss-Prot accession number for a given protein.
+}
+\references{
+  UniProt Consortium and others. (2012) Reorganizing the protein space at the Universal Protein Resource (UniProt). \emph{Nucleic Acids Res} \bold{40}, D71-D75.
+  
 }
 \seealso{
  \code{\link{cisPath}}, 

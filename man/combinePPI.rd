@@ -13,16 +13,16 @@ combinePPI(input, output, maxEdgeValue=-1)
  \item{input}{Files that contain PPI information (character vector).}
  \item{output}{Output file (character(1)).}
  \item{maxEdgeValue}{Filter out PPI information with edge cost greater than this value. (double(1)). \cr
-                     Default: no filter}
+                     Default: no filter.}
 }
 \details{
   The input files should follow the format as the output files of the method \code{\link{formatSTRINGPPI}} or \code{\link{formatPINAPPI}}. 
   See the files \code{STRINGPPI.txt} or \code{PINAPPI.txt} as examples.
-  Fields from one to four contain the Swiss-Prot accession numbers and gene names for two interacting proteins. 
-  The \code{PubMed ID} field should be stated to be "NA" if unavailable. 
+  The first four fields contain the Swiss-Prot accession numbers and gene names for two interacting proteins. 
+  The \code{PubMedID} field should be stated to be \code{NA} if unavailable. 
   The \code{evidence} field may present an introduction to the evidence. 
   The \code{edgeValue} field should be given a value no less than \code{1}. 
-  This value will be treated as the cost of identifying the shortest paths. 
+  This value will be treated as the cost while identifying the shortest paths. 
   If there is no method available to estimate this value, please give the value as \code{1}.
 }
 \seealso{

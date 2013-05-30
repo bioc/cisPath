@@ -212,6 +212,7 @@ function changeStatus()
     if (ctrl_key_flag == 0)
     {
         object.style.borderStyle="inset";
+        object.style.color='#0000FF';
         ctrl_key_flag = 1;
         circle
         .on('mousedown.drag', null)
@@ -222,6 +223,7 @@ function changeStatus()
     else
     {
        object.style.borderStyle="";
+       object.style.color='#000000';
        ctrl_key_flag = 0;
        circle.call(force.drag);
     }
