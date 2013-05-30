@@ -31,7 +31,7 @@ formatSTRINGPPI(input, mappingFile, taxonId, output, minScore=700)
 \details{
   The input file is downloaded from the STRING database (\url{http://string-db.org/}). 
   The URL of this file is \url{http://string-db.org/newstring_download/protein.links.v9.05.txt.gz} (4.1 Gb).  
-  Access \url{http://string-db.org/newstring_download/species.v9.05.txt} to determine the parameter {taxonId}. 
+  Access \url{http://string-db.org/newstring_download/species.v9.05.txt} to determine the parameter \code{taxonId}. 
   Access \url{http://string-db.org/newstring_cgi/show_download_page.pl} for more details. \cr
   If you make use of this file, please cite the STRING database.
 
@@ -40,8 +40,16 @@ formatSTRINGPPI(input, mappingFile, taxonId, output, minScore=700)
   Each line of the output file contains Swiss-Prot accession numbers and gene names for two interacting proteins. 
   An edge value is estimated for each link between two interacting proteins. 
   This value is defined as \code{max(1,log(1000-STRING_SCORE,100))}. 
-  This may be treated as the "cost" of determining the shortest paths between two proteins. 
+  This may be treated as the ``cost'' while determining the shortest paths between proteins. 
   Advanced users can edit the file and change this value for each edge.
+}
+\references{
+  Szklarczyk,D. and et al. (2011) The STRING database in 2011: functional interaction networks of proteins, globally integrated and scored. \emph{Nucleic Acids Res}, \bold{39}, D561-D568.
+  
+  Franceschini,A. and et al. (2013) STRING v9.1: protein-protein interaction networks, with increased coverage and integration. \emph{Nucleic Acids Res}, \bold{41}, D808-D815.
+  
+  UniProt Consortium and others. (2012) Reorganizing the protein space at the Universal Protein Resource (UniProt). \emph{Nucleic Acids Res} \bold{40}, D71-D75.
+  
 }
 \seealso{
  \code{\link{cisPath}}, \code{\link{getMappingFile}}, \code{\link{formatPINAPPI}}, \code{\link{combinePPI}}.
