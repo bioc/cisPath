@@ -918,6 +918,8 @@ function delete1(){
 	 if(selected_node) {
       nodes.splice(nodes.indexOf(selected_node), 1);
       spliceLinksForNode(selected_node);
+      shift_node1=null;
+      shift_node2=null;
    }
    selected_node = null;
    restart();
