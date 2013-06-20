@@ -655,10 +655,33 @@
     	  	 	  force.resume();
     	  	 }
     	  }
+    	  function testLocal(){
+          try{
+            var value_str="";
+            localStorage.setItem("easytest", "test");
+            value_str=localStorage.getItem("easytest");
+            if(value_str != "test"){
+               localInfo=0;
+               return 0;
+            }
+          }
+         catch(err){
+           localInfo=0;
+           return 0;
+         }
+         localInfo=1;
+         return 1;
+        }
     	  function openEditor(){
-    	  	 var link_address="./easyEditor.html"+"?geneid=graph";
-    	  	 //alert(link_address);
-    	  	 window.open(link_address,'_blank');
+    	  	 if(testLocal()==0){
+    	  	   var link_address="./easyEditor.html"+"?geneid=graph";
+    	  	   //alert(link_address);
+    	  	   window.open(link_address,'_blank');
+    	  	 }else{
+    	  	   localStorage.setItem("cisPathgeneid", "graph");
+    	  	   var link_address="./easyEditor.html";
+    	  	   window.open(link_address,'_blank');
+    	  	 }
     	  }
     	  function addfixButton(){
         	  var tmp = document.getElementById("fixButton");
