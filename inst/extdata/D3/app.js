@@ -1473,7 +1473,30 @@ function showNetwork(){
   document.getElementById("chart").style.display = "none";
   setTimeout(timerFun, 1000);
 }
+function loadExist(){
+  var geneid=localStorage.getItem("cisPathgeneid");
+  if(geneid==null){
+     return;
+  }
+  if(geneid=="graph"){
+     showNetwork();
+     delValue("cisPathgeneid");
+     return;
+  }
+  var graph_num=localStorage.getItem("cisPathnumber");
+  if(graph_num==null){
+     return;
+  }
+  graph_num=parseInt(graph_num);
+  showGraph(geneid, graph_num);
+  delValue("cisPathgeneid");
+  delValue("cisPathnumber");
+}
 function testExist(){
+	if(testLocal()==1){
+		 loadExist();
+		 return;
+	}
 	var geneid=getparastr("geneid");
 	if(geneid==""){
 		 return;
