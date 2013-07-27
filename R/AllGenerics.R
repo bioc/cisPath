@@ -23,19 +23,23 @@ setGeneric("easyEditor",
                     standardGeneric("easyEditor"), 
                     signature=c("outputDir"))
 setGeneric("getMappingFile",
-           function(input, output, taxonId="")
+           function(sprotFile, output, tremblFile="", taxonId="")
            standardGeneric("getMappingFile"), 
-           signature=c("input", "output"))
+           signature=c("sprotFile", "output"))
 setGeneric("formatPINAPPI",
            function(input, output)
            standardGeneric("formatPINAPPI"), 
+           signature=c("input", "output"))
+setGeneric("formatiRefIndex",
+           function(input, output, taxonId="")
+           standardGeneric("formatiRefIndex"), 
            signature=c("input", "output"))
 setGeneric("formatSTRINGPPI",
            function(input, mappingFile, taxonId, output, minScore=700)
            standardGeneric("formatSTRINGPPI"), 
            signature=c("input", "mappingFile", "taxonId", "output"))
 setGeneric("combinePPI",
-           function(input, output, maxEdgeValue=-1)
+           function(input, output, mappingFile="", dbNames="", maxEdgeValue=-1)
            standardGeneric("combinePPI"), 
            signature=c("input", "output"))
            

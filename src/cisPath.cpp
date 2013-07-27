@@ -888,6 +888,11 @@ bool processInput(const char *input)
                 edgeInfo[tokens[0] + "&" + tokens[1]] = "";
                 edgeInfo[tokens[1] + "&" + tokens[0]] = "";
             }
+            if(edgeInfo_string.count(tokens[0] + "&" + tokens[1]) == 0)
+            {
+                edgeInfo_string[tokens[0] + "&" + tokens[1]] = "";
+                edgeInfo_string[tokens[1] + "&" + tokens[0]] = "";
+            }
             if(nodesExist.count(tokens[0]) == 0)
             {
                 nodes.push_back(tokens[0]);
@@ -983,6 +988,30 @@ string processEvidence(string evidence)
     }
     return pubmedstr;
 }
+string processPubMed(string evidence)
+{   
+    vector<string> pubmedIds = string_tokenize(evidence, "#, ");
+    string pubmedstr = "";
+    map<string, bool> pubmeds;
+    for(int index = 0; index < (int)pubmedIds.size(); index++)
+    {
+        if(pubmedstr == "")
+        {
+            pubmedstr = pubmedIds[index];
+            pubmeds[pubmedstr] = true;
+        }
+        else
+        {
+            string id = pubmedIds[index];
+            if(pubmeds.find(id) == pubmeds.end())
+            {
+                pubmedstr = pubmedstr + ", " + id;
+                pubmeds[id] = true;
+            }
+        }
+    }
+    return pubmedstr;
+}
 bool addLink(string source, string target, int group, int bigNode)
 {
     if(edge.count(source) == 0)
@@ -996,7 +1025,7 @@ bool addLink(string source, string target, int group, int bigNode)
         return false;
     }
     int value = 500;
-    string value2 = processEvidence(edgeInfo[source + "&" + target]);
+    string value2 = processPubMed(edgeInfo[source + "&" + target]);
     string value3 = processEvidence(edgeInfo_string[source + "&" + target]);
     if(link2id.count(source + "&" + target) > 0)
     {
@@ -1573,7 +1602,7 @@ bool addColorLink(string source, string target, int oneNode = 0)
         return false;
     }
     int value = 500;
-    string value2 = processEvidence(edgeInfo[source + "&" + target]);
+    string value2 = processPubMed(edgeInfo[source + "&" + target]);
     string value3 = processEvidence(edgeInfo_string[source + "&" + target]);
     if(link2id.count(source + "&" + target) > 0)
     {
@@ -1940,7 +1969,7 @@ bool addInfo(string infoFileName, string resultDir)
     return true;
 }
 ////////////////////////////////////////////////////////////////////////////
-bool getMappingFile(string input, string output, string OX1)
+bool getMappingFile(string input, string output, string addinput, string OX1)
 {
     ifstream IN(input.c_str());
     if(!IN)
@@ -1963,6 +1992,7 @@ bool getMappingFile(string input, string output, string OX1)
     string OX = "";
     string OS = "";
     int line_num = 0;
+    string AllAC = "";
     while(!IN.eof())
     {
         IN.getline(buffer, 1000000);
@@ -1972,6 +2002,19 @@ bool getMappingFile(string input, string output, string OX1)
             PRINTFUNCTION("\rProcessed lines: %d", line_num);
         }
         string tmp = buffer;
+        if((tmp.substr(0, 2) == "AC") && (AC != ""))
+        {
+            tmp = tmp.substr(2);
+            vector<string> smalltokens = string_tokenize(tmp, "; ", true);
+            if(smalltokens.size() < 1)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            for(int i=0; i < (int)smalltokens.size(); i++){
+            	  AllAC = AllAC + "," + smalltokens[i];
+            }
+        }
         if((tmp.substr(0, 2) == "AC") && (AC == ""))
         {
             tmp = tmp.substr(2);
@@ -1982,6 +2025,10 @@ bool getMappingFile(string input, string output, string OX1)
                 return false;
             }
             AC = smalltokens[0];
+            AllAC = AC;
+            for(int i=1; i < (int)smalltokens.size(); i++){
+            	  AllAC = AllAC + "," + smalltokens[i];
+            }
         }
         if((tmp.substr(0, 2) == "GN") && (name == ""))
         {
@@ -2051,7 +2098,8 @@ bool getMappingFile(string input, string output, string OX1)
             if((OX1 == "") || (OX1 == "0000") || (OX == OX1))
             {
                 OUT << AC << "\t" << name << "\t" << ensembel << "\t";
-                OUT << OX << "\t" << ensembel_string << "\t" << OS << "\n";
+                OUT << OX << "\t" << ensembel_string << "\t" << OS << "\t";
+                OUT << AllAC << "\n";
             }
             AC = "";
             name = "";
@@ -2059,8 +2107,147 @@ bool getMappingFile(string input, string output, string OX1)
             ensembel_string = "";
             OX = "";
             OS = "";
+            AllAC = "";
         }
     }
+    ////////////////////////////////////////////2013-07-25
+    if(addinput==""){
+    	 PRINTFUNCTION("\rProcessed lines: %d\n", line_num);
+       IN.close();
+       OUT.close();
+       return true;
+    }
+    AC = "";
+    name = "";
+    ensembel = "";
+    ensembel_string = "";
+    OX = "";
+    OS = "";
+    AllAC = "";
+    ifstream ADDIN(addinput.c_str());
+    if(!ADDIN)
+    {
+        PRINTFUNCTION("Can not open %s\n", addinput.c_str());
+        return false;
+    }
+    while(!ADDIN.eof())
+    {
+        ADDIN.getline(buffer, 1000000);
+        line_num++;
+        if(line_num % 1000 == 0)
+        {
+            PRINTFUNCTION("\rProcessed lines: %d", line_num);
+        }
+        string tmp = buffer;
+        if((tmp.substr(0, 2) == "AC") && (AC != ""))
+        {
+            tmp = tmp.substr(2);
+            vector<string> smalltokens = string_tokenize(tmp, "; ", true);
+            if(smalltokens.size() < 1)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            for(int i=0; i < (int)smalltokens.size(); i++){
+            	  AllAC = AllAC + "," + smalltokens[i];
+            }
+        }
+        if((tmp.substr(0, 2) == "AC") && (AC == ""))
+        {
+            tmp = tmp.substr(2);
+            vector<string> smalltokens = string_tokenize(tmp, "; ", true);
+            if(smalltokens.size() < 1)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            AC = smalltokens[0];
+            AllAC = AC;
+            for(int i=1; i < (int)smalltokens.size(); i++){
+            	  AllAC = AllAC + "," + smalltokens[i];
+            }
+        }
+        if((tmp.substr(0, 2) == "GN") && (name == ""))
+        {
+            tmp = tmp.substr(2);
+            vector<string> smalltokens = string_tokenize(tmp, "=;", true);
+            if(smalltokens.size() < 2)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            name = smalltokens[1];
+        }
+        if(tmp.substr(0, 12) == "DR   STRING;")
+        {
+            tmp = tmp.substr(13);
+            vector<string> smalltokens = string_tokenize(tmp, "; ", true);
+            if(smalltokens.size() < 1)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            if(ensembel_string != "")
+            {
+                ensembel_string += ",";
+            }
+            ensembel_string += smalltokens[0];
+        }
+        if(tmp.substr(0, 12) == "DR   Ensembl")
+        {
+            tmp = tmp.substr(5);
+            vector<string> smalltokens = string_tokenize(tmp, "; ", true);
+            if(smalltokens.size() < 4)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            if(ensembel != "")
+            {
+                ensembel += ",";
+            }
+            ensembel += smalltokens[2];
+        }
+        if(tmp.substr(0, 2) == "OS")
+        {
+            tmp = tmp.substr(5);
+            vector<string> smalltokens = string_tokenize(tmp, ".", true);
+            if(smalltokens.size() < 1)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            OS = smalltokens[0];
+        }
+        if(tmp.substr(0, 2) == "OX")
+        {
+            tmp = tmp.substr(2);
+            vector<string> smalltokens = string_tokenize(tmp, "=;", true);
+            if(smalltokens.size() < 2)
+            {
+                PRINTFUNCTION("wrong format:%s", tmp.c_str());
+                return false;
+            }
+            OX = smalltokens[1];
+        }
+        if(tmp.substr(0, 2) == "//")
+        {
+            if((OX1 == "") || (OX1 == "0000") || (OX == OX1))
+            {
+                OUT << AC << "\t" << name << "\t" << ensembel << "\t";
+                OUT << OX << "\t" << ensembel_string << "\t" << OS << "\t";
+                OUT << AllAC << "\n";
+            }
+            AC = "";
+            name = "";
+            ensembel = "";
+            ensembel_string = "";
+            OX = "";
+            OS = "";
+            AllAC = "";
+        }
+    }
+    ////////////////////////////////////////////
     PRINTFUNCTION("\rProcessed lines: %d\n", line_num);
     IN.close();
     OUT.close();
@@ -2071,7 +2258,7 @@ int main(int argc, char *argv[])
 {
     if(argc == 4)
     {
-        getMappingFile(argv[1], argv[2], argv[3]);
+        getMappingFile(argv[1], argv[2], string(""), argv[3]);
     }
     else
     {
@@ -2440,10 +2627,10 @@ bool formatPINAPPI(string input, string output)
             OUT << tokens[0] << "\t" << tokens[1] << "\t";
             OUT << tokens[2] << "\t" << tokens[3];
             OUT << "\t" << pubmedstr << "\tPINA\t1.000" << "\n";
-            name2prot[tokens[2]] = tokens[0];
-            name2prot[tokens[3]] = tokens[1];
-            prot2real[tokens[0]] = tokens[2];
-            prot2real[tokens[1]] = tokens[3];
+            //name2prot[tokens[2]] = tokens[0];
+            //name2prot[tokens[3]] = tokens[1];
+            //prot2real[tokens[0]] = tokens[2];
+            //prot2real[tokens[1]] = tokens[3];
         }
     }
     PRINTFUNCTION("\rProcessed %d lines\n", lineCount);
@@ -2466,25 +2653,436 @@ int main(int argc, char *argv[])
 #else
 #endif
 ////////////////////////////////////////////////////////////////////////////
-bool combinePPI(char **input, int num, char *output, const char *maxEdgeValue)
+////////////////////////////////////////////////////////////////////////////
+string getGeneName(string nameStr){
+	  vector<string> tokens = string_tokenize(nameStr, "\\|");
+	  for(int i = 0; i < (int)tokens.size(); i++){
+	  	  if(tokens[i].substr(0, 5) == "hgnc:"){
+	  	  	 return tokens[i].substr(5);
+	  	  }
+	  }
+	  return "";
+}
+bool formatiRefIndex(string input, string output, string OX)
 {
-    ofstream OUT(output);
-    double thres = atof(maxEdgeValue);
-    if(!OUT)
+    ifstream in(input.c_str());
+    if(!in)
     {
-        PRINTFUNCTION("Can not open %s to write\n", output);
+        PRINTFUNCTION("Can not open %s\n", input.c_str());
         return false;
     }
-    else
+    ofstream OUT(output.c_str());
+    if(!OUT)
     {
-        PRINTFUNCTION("Output: %s\n", output);
-
-        PRINTFUNCTION("Maximum edge value: %.3f\n", thres);
+        PRINTFUNCTION("Can not open %s to write\n", output.c_str());
+        return false;
     }
+    string OX_str = "taxid:" + OX + "(";
+    int OX_len = OX_str.size();
     char buffer[1000000 + 1];
+    if(!in.eof())
+    {
+        in.getline(buffer, 1000000);
+        string tmp = buffer;
+        trim(tmp);
+        if(tmp[tmp.size() - 1] == '\r')
+        {
+            buffer[tmp.size() - 1] = '\0';
+            tmp = buffer;
+        }
+        vector<string> tokens = string_tokenize(tmp, "\t", false);
+
+        if(tokens.size() == 54)
+        {
+            PRINTFUNCTION("Correct iRefIndex MITAB format\n");
+        }
+        else
+        {
+            PRINTFUNCTION("Invalid file format!\n");
+            return false;
+        }
+    }
     int lineCount = 0;
     OUT << "uniprotkb\tuniprotkb\tgeneName\tgeneName\t";
     OUT << "PubMedID\tevidence\tedgeValue" << "\n";
+    while(!in.eof())
+    {
+        in.getline(buffer, 1000000);
+        lineCount++;
+        if(lineCount % 100 == 0)
+        {
+            PRINTFUNCTION("\rProcessed %d lines", lineCount);
+        }
+        string tmp = buffer;
+        trim(tmp);
+        if(tmp[tmp.size() - 1] == '\r')
+        {
+            buffer[tmp.size() - 1] = '\0';
+            tmp = buffer;
+        }
+        vector<string> tokens = string_tokenize(tmp, "\t", false);
+        if(tokens.size() == 54)
+        {   
+        	  bool rightOX=0;
+        	  if((OX=="")||(OX=="0000")){
+        	  	 rightOX=1;
+        	  }else{
+        	     if(tokens[9].substr(0, OX_len) == OX_str)
+               {
+                  rightOX=1;
+               }
+               if(tokens[10].substr(0, OX_len) == OX_str)
+               {
+                  rightOX=1;
+               }
+            }
+            if(rightOX==0){
+            	 continue;
+            }
+            if(tokens[0].substr(0, 10) == "uniprotkb:")
+            {
+                tokens[0] = tokens[0].substr(10);
+            }else{
+            	  continue;
+            }
+            if(tokens[1].substr(0, 10) == "uniprotkb:")
+            {
+                tokens[1] = tokens[1].substr(10);
+            }else{
+            	  continue;
+            }
+            tokens[2] = getGeneName(tokens[4]);
+            tokens[3] = getGeneName(tokens[5]);
+            if(tokens[2]==""){
+            	 tokens[2]=tokens[0];
+            }
+            if(tokens[3]==""){
+            	 tokens[3]=tokens[1];
+            }
+            vector<string> pubmedIds = string_tokenize(tokens[8], "\\|");
+            string pubmedstr = "";
+            map<string, bool> pubmeds;
+            for(int index = 0; index < (int)pubmedIds.size(); index++)
+            {
+                if((pubmedIds[index].substr(0, 7) == "pubmed:") &&
+                        (pubmedIds[index].substr(0, 17) != "pubmed:unassigned"))
+                {
+                    if(pubmedstr == "")
+                    {
+                        pubmedstr = pubmedIds[index].substr(7);
+                        pubmeds[pubmedstr] = true;
+                    }
+                    else
+                    {
+                        string id = pubmedIds[index].substr(7);
+                        if(pubmeds.find(id) == pubmeds.end())
+                        {
+                            pubmedstr = pubmedstr + ", " + id;
+                            pubmeds[id] = true;
+                        }
+                    }
+                }
+            }
+            OUT << tokens[0] << "\t" << tokens[1] << "\t";
+            OUT << tokens[2] << "\t" << tokens[3];
+            OUT << "\t" << pubmedstr << "\tiRefIndex\t1.000" << "\n";
+            //name2prot[tokens[2]] = tokens[0];
+            //name2prot[tokens[3]] = tokens[1];
+            //prot2real[tokens[0]] = tokens[2];
+            //prot2real[tokens[1]] = tokens[3];
+        }
+    }
+    PRINTFUNCTION("\rProcessed %d lines\n", lineCount);
+    in.close();
+    OUT.close();
+    return true;
+}
+#ifdef INDEP_PROGRAM5
+int main(int argc, char *argv[])
+{
+    if(argc == 4)
+    {
+        formatiRefIndex(argv[1], argv[2], argv[3]);
+    }
+    else
+    {
+        cerr << "formatiRefIndex input output OX" << endl;
+    }
+}
+#else
+#endif
+HASHMAP<string, string, str_hash1> prot2name;
+HASHMAP<string, vector<int>, str_hash1> prot2db;
+HASHMAP<string, string, str_hash1> prot2pubmed;
+HASHMAP<string, string, str_hash1> prot2evidence;
+HASHMAP<string, int, str_hash1> prot2score;
+vector<string> outputhashkeys;
+HASHMAP<string, int, str_hash1> key2printNum;
+HASHMAP<string, vector<int>, str_hash1> prot2db2;
+
+bool clearAll2()
+{
+    prot2name.clear();
+    prot2db.clear();
+    prot2pubmed.clear();
+    prot2evidence.clear();
+    prot2score.clear();  
+    outputhashkeys.clear();
+    key2printNum.clear();
+    prot2db2.clear();
+    return true;
+}
+bool add2db(string& protein, int dbnum, int dbcount){
+    if(prot2db2.count(protein) == 0)
+    {
+        vector<int> tmp(dbcount, int(0));
+        prot2db2[protein] = tmp;
+    }
+    prot2db2[protein][dbnum]=1;
+     return true;
+}
+int sumVector(vector<int>& nums){
+    int sum=0;
+    for(int i=0; i< (int)nums.size(); i++){
+        sum+=nums[i];
+    }
+    return sum;
+}
+bool processAline(vector<string> &tokens, int num, int dbcount)
+{
+    prot2name[tokens[0]] = tokens[2];
+    prot2name[tokens[1]] = tokens[3];
+    add2db(tokens[0], num, dbcount);
+    add2db(tokens[1], num, dbcount);
+    string key;
+    if(tokens[0] <= tokens[1])
+    {
+        key = tokens[0] + "#" + tokens[1];
+    }
+    else
+    {
+        key = tokens[1] + "#" + tokens[0];
+    }
+    outputhashkeys.push_back(key);
+    key2printNum[key]=outputhashkeys.size()-1;
+    if(prot2db.count(key) == 0)
+    {
+        vector<int> tmp(dbcount, int(0));
+        prot2db[key] = tmp;
+    }
+    prot2db[key][num] = 1;
+    if((tokens[4] != "NA") && (tokens[4] != ""))
+    {
+        if(prot2pubmed.count(key) == 0)
+        {
+            prot2pubmed[key] = tokens[4];
+        }
+        else
+        {
+            prot2pubmed[key] += ("#" + tokens[4]);
+        }
+    }
+    if((tokens[5] != "NA") && (tokens[5] != ""))
+    {
+        if(prot2evidence.count(key) == 0)
+        {
+            prot2evidence[key] = tokens[5];
+        }
+        else
+        {
+            prot2evidence[key] += ("#" + tokens[5]);
+        }
+    }
+    int score = (int)(atof(tokens[6].c_str()) * 1000 + 0.01);
+    if(prot2score.count(key) == 0)
+    {
+        prot2score[key] = score;
+    }
+    else
+    {
+        if(prot2score[key] > score )
+        {
+            prot2score[key] = score;
+        }
+    }
+    return true;
+}
+bool outputStatistics(int dbcount, char *output, char **dbNames){
+     ofstream OUT(output);
+     if(!OUT)
+     {
+        PRINTFUNCTION("Can not open %s to write\n", output);
+        return false;
+     }
+     OUT << "uniprotkb\tuniprotkb\tgeneName\tgeneName\t";
+     OUT << "PubMedID\tevidence\tedgeValue" << "\n";
+     string outputFile(output);
+     outputFile += ".js";
+     ofstream OUT2(outputFile.c_str());
+     if(!OUT2)
+     {
+        PRINTFUNCTION("Can not open %s to write\n", outputFile.c_str());
+        return false;
+     }
+     vector<vector<int> > info;
+     for(int i=0; i < dbcount; i++){
+         vector<int> tmp(dbcount+1, int(0));
+         info.push_back(tmp);
+     }
+     int totalProteins=0;
+     int totalInteractions=0;
+     for(int i=0; i < (int)outputhashkeys.size(); i++){
+         string key=outputhashkeys[i];
+         if(key2printNum[key] != i){
+            continue;
+         }
+         totalInteractions++;
+         int sum=sumVector(prot2db[key]);
+         for(int d1=0; d1 < dbcount; d1++){
+             for(int d2=0; d2 <= d1; d2++){
+                 if(prot2db[key][d1]+prot2db[key][d2]==2){
+                    info[d1][d2]++;
+                    info[d2][d1]=info[d1][d2];
+                 }
+             }
+             if((sum==1)&&(prot2db[key][d1]==1)){
+                 info[d1][dbcount]++;
+             }
+         }
+         vector<string> pairs=string_tokenize(key, "#", false);
+         OUT<<pairs[0]<<"\t"<<pairs[1]<<"\t";
+         OUT<<prot2name[pairs[0]]<<"\t"<<prot2name[pairs[1]]<<"\t";
+         OUT<<processPubMed(prot2pubmed[key])<<"\t";
+         OUT<<processEvidence(prot2evidence[key])<<"\t";
+         OUT<<double2string(double(prot2score[key])/1000)<<"\n";
+     }
+     
+     vector<vector<int> > info2;
+     for(int i=0; i < dbcount; i++){
+         vector<int> tmp(dbcount+1, int(0));
+         info2.push_back(tmp);
+     }
+     HASHMAP<string, vector<int>, str_hash1>::iterator iter;
+     for(iter = prot2db2.begin(); iter != prot2db2.end(); iter++){
+     	   totalProteins++;
+         string key=iter->first;
+         vector<int> status=iter->second;
+         int sum=sumVector(status);
+         for(int d1=0; d1 < dbcount; d1++){
+             for(int d2=0; d2 <= d1; d2++){
+                 if(status[d1]+status[d2]==2){
+                    info2[d1][d2]++;
+                    info2[d2][d1]=info2[d1][d2];
+                 }
+             }
+             if((sum==1)&&(status[d1]==1)){
+                 info2[d1][dbcount]++;
+             }
+         }
+     }
+     OUT2<<"var info1=[";
+     for(int i=0; i < dbcount; i++){
+     	   if(i!=0){
+     	   	  OUT2<<",";
+     	   }
+         OUT2<<"[";
+         for(int j=0; j <=dbcount; j++){
+             if(j!=0){
+                OUT2<<",";
+             }
+             OUT2<<info[i][j];
+         }
+         OUT2<<"]";
+     }
+     OUT2<<"];\n";
+     OUT2<<"var info2=[";
+     for(int i=0; i < dbcount; i++){
+     	   if(i!=0){
+     	   	  OUT2<<",";
+     	   }
+         OUT2<<"[";
+         for(int j=0; j <=dbcount; j++){
+             if(j!=0){
+                OUT2<<",";
+             }
+             OUT2<<info2[i][j];
+         }
+         OUT2<<"]";
+     }
+     OUT2<<"];\n";
+     OUT2<<"var dbnames=[";
+     for(int i=0; i < dbcount; i++){
+         if(i!=0){
+            OUT2<<",";
+         }
+         OUT2<<"\""<<dbNames[i]<<"\"";
+     }
+     OUT2<<"];\n";
+     OUT2<<"var totalProteins="<<totalProteins<<";\n";
+     OUT2<<"var totalInteractions="<<totalInteractions<<";\n";
+     OUT2.close();
+     return true;
+}
+HASHMAP<string, string, str_hash1> prot2prot;
+bool processMappingFile(string mapFile){
+	   prot2prot.clear();
+	   if(mapFile==""){
+	   	  return true;
+	   }
+	   ifstream in(mapFile.c_str());
+     if(!in)
+     {
+        PRINTFUNCTION("Can not open %s\n", mapFile.c_str());
+        return false;
+     }
+     char buffer[1000000 + 1];
+     while(!in.eof())
+     {
+        in.getline(buffer, 1000000);
+        string tmp = buffer;
+        trim(tmp);
+        if(tmp.size() <= 4)
+        {
+           continue;
+        }
+        if(tmp[tmp.size() - 1] == '\r')
+        {
+           buffer[tmp.size() - 1] = '\0';
+           tmp = buffer;
+        }
+        vector<string> tokens = string_tokenize(tmp, "\t", false);
+        if(tokens.size() < 7){
+        	 continue;
+        }
+        vector<string> prots = string_tokenize(tokens[6], ", ", true);
+        if(prots.size()==0){
+        	 PRINTFUNCTION("Wrong format, mapping file %s\n", mapFile.c_str());
+           continue;
+        }
+        if(prots[0] != tokens[0]){
+        	 PRINTFUNCTION("Wrong format, mapping file %s\n", mapFile.c_str());
+           continue;
+        }
+        for(int i=0; i < (int)prots.size(); i++)
+        {
+        	  prot2prot[prots[i]]=tokens[0];
+        } 
+      }
+      return true;
+}
+bool combinePPI(char **input, char **dbNames, int num,
+                char *output, char *mapFile, const char *maxEdgeValue)
+{
+    double thres = atof(maxEdgeValue);
+    PRINTFUNCTION("Output: %s\n", output);
+    PRINTFUNCTION("Maximum edge value: %.3f\n", thres);
+    char buffer[1000000 + 1];
+    int lineCount = 0;
+    bool checkFlag=false;
+    if(string(mapFile) != ""){
+       processMappingFile(mapFile);
+       checkFlag=true;
+    }
     for(int i = 0; i < num; i++)
     {
         ifstream in(input[i]);
@@ -2532,9 +3130,7 @@ bool combinePPI(char **input, int num, char *output, const char *maxEdgeValue)
             }
             if(tokens.size() == 6)
             {
-                OUT << tmp << "\t1.000" << "\n";
-                continue;
-                //PRINTFUNCTION("Wrong format: %s\n", tmp.c_str());
+                tokens.push_back("1.000");
             }
             if(tokens.size() == 7)
             {
@@ -2544,25 +3140,39 @@ bool combinePPI(char **input, int num, char *output, const char *maxEdgeValue)
                     continue;
                 }
             }
-            OUT << tmp << "\n";
+            if(checkFlag){
+            	if(prot2prot.count(tokens[0])==0){
+            		 continue;
+            	}else{
+            		 tokens[0]=prot2prot[tokens[0]];
+            	}
+            	if(prot2prot.count(tokens[1])==0){
+            		 continue;
+            	}else{
+            		 tokens[1]=prot2prot[tokens[1]];
+            	}
+            }
+            processAline(tokens, i, num);
         }
         PRINTFUNCTION("\rProcessed %d lines\n", lineCount);
         in.close();
     }
-    OUT.close();
+    outputStatistics(num, output, dbNames);
     return true;
 }
 #ifdef INDEP_PROGRAM4
 int main(int argc, char *argv[])
 {
-    if(argc >= 4)
+    if(argc >= 5)
     {
         char **files = argv + 1;
-        combinePPI(files, argc - 3, argv[argc - 2], argv[argc - 1]);
+        combinePPI(files, files, argc - 3, argv[argc - 3], 
+                           argv[argc - 2], argv[argc - 1]);
     }
     else
     {
-        cerr<<"combinePPI <input1> [input2...] <output> <maxEdgeValue>"<<endl;
+        cerr << "combinePPI <input1> [input2...]";
+        cerr << "<output> <mappingFile> <maxEdgeValue>" << endl;
     }
 }
 #else
@@ -2606,14 +3216,19 @@ extern "C" {
         clearInfo();
         return 1;
     }
-    int getMappingFileC(char **input, char **output, char **OX)
+    int getMappingFileC(char **input, char **output, char **addinput, char **OX)
     {
-        getMappingFile(input[0], output[0], OX[0]);
+        getMappingFile(input[0], output[0], addinput[0], OX[0]);
         return 1;
     }
     int formatPINAPPIC(char **input, char **output)
     {
         formatPINAPPI(input[0], output[0]);
+        return 1;
+    }
+    int formatiRefC(char **input, char **output, char **OX)
+    {
+        formatiRefIndex(input[0], output[0], OX[0]);
         return 1;
     }
     int formatSTRINGPPIC(char **input, char **mappingFile, char **OX,
@@ -2624,11 +3239,12 @@ extern "C" {
         return 1;
     }
     //bool combinePPI(char **input, int num, char *output, char *maxEdgeValue)
-    int combinePPIC(char **input, int *num, char **output,
-                    double *maxEdgeValue)
+    int combinePPIC(char **input, char **dbNames, int *num, 
+                    char **output, char **mapFile, double *maxEdgeValue)
     {
         string score = double2string(maxEdgeValue[0]);
-        combinePPI(input, num[0], output[0], score.c_str());
+        combinePPI(input, dbNames, num[0], output[0], mapFile[0], 
+                                                  score.c_str());
         return 1;
     }
 }
@@ -2640,25 +3256,28 @@ extern "C" {
     static R_NativePrimitiveArgType viewGraphC_t[] =
     {STRSXP, STRSXP, STRSXP, INTSXP, STRSXP};
     static R_NativePrimitiveArgType getMappingFileC_t[] =
-    {STRSXP, STRSXP, STRSXP};
+    {STRSXP, STRSXP, STRSXP, STRSXP};
     static R_NativePrimitiveArgType formatPINAPPIC_t[] =
     {STRSXP, STRSXP};
+    static R_NativePrimitiveArgType formatiRefC_t[] =
+    {STRSXP, STRSXP, STRSXP};
     static R_NativePrimitiveArgType formatSTRINGPPIC_t[] =
     {STRSXP, STRSXP, STRSXP, STRSXP, INTSXP};
     static R_NativePrimitiveArgType combinePPIC_t[] =
-    {STRSXP, INTSXP, STRSXP, REALSXP};
+    {STRSXP, STRSXP, INTSXP, STRSXP, STRSXP, REALSXP};
     R_CMethodDef cMethods[] =
     {
         {".cisPathC", (DL_FUNC) &cisPathC, 7, cisPathC_t},
         {".addInfoC", (DL_FUNC) &addInfoC, 2, addInfoC_t},
         {".viewGraphC", (DL_FUNC) &viewGraphC, 5, viewGraphC_t},
-        {".getMappingFileC", (DL_FUNC) &getMappingFileC, 3, getMappingFileC_t},
+        {".getMappingFileC", (DL_FUNC) &getMappingFileC, 4, getMappingFileC_t},
         {".formatPINAPPIC", (DL_FUNC) &formatPINAPPIC, 2, formatPINAPPIC_t},
+        {".formatiRefC", (DL_FUNC) &formatiRefC, 3, formatiRefC_t},
         {
             ".formatSTRINGPPIC", (DL_FUNC) &formatSTRINGPPIC, 5,
             formatSTRINGPPIC_t
         },
-        {".combinePPIC", (DL_FUNC) &combinePPIC, 4, combinePPIC_t},
+        {".combinePPIC", (DL_FUNC) &combinePPIC, 6, combinePPIC_t},
         {NULL, NULL, 0}
     };
 
