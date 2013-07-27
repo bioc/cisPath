@@ -38,9 +38,9 @@ Chrome, Firefox, Safari, and IE9 will all properly display the PPI view.
 Please contact us if these paths do not display correctly.
 
 \section{Data}
-As an example, we have generated PPI data for several species from the PINA database \citep{Cowley12, Wu09} and the STRING database \citep{Szklarczyk11, Franceschini13}.
+As an example, we have generated PPI data for several species from the PINA database \citep{Cowley12, Wu09}, the iRefIndex database\citep{Razick08, Aranda11}, and the STRING database \citep{Szklarczyk11, Franceschini13}.
 Users can download these files from \url{http://www.isb.pku.edu.cn/cisPath/}. 
-If you make use of these files, please cite PINA or STRING accordingly.
+If you make use of these files, please cite PINA, iRefIndex, or STRING accordingly.
 Users can edit the PPI data downloaded from these two databases, 
 or combine them with their private data to construct more comprehensive PPI networks. 
 In this introduction, we select only a small portion of the available PPI data as an example. 
@@ -50,10 +50,10 @@ The following examples (section 4 below) will show how these files may be used.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Getting started}
 To load the \Rpackage{cisPath} package, type {\tt library(cisPath)}. 
-Four methods have been included in this package to format the files downloaded from the PINA and STRING databases. 
-These methods are {\tt getMappingFile}, {\tt formatSTRINGPPI}, {\tt formatPINAPPI} and {\tt combinePPI}.
+Five methods have been included in this package to format the files downloaded from the PINA, iRefIndex, and STRING databases. 
+These methods are {\tt getMappingFile}, {\tt formatSTRINGPPI}, {\tt formatPINAPPI}, {\tt formatiRefIndex}, and {\tt combinePPI}.
 Four other methods have been also provided that are used to manage, visualize, and edit PPI networks. 
-These methods are {\tt cisPath}, {\tt addProteinNames}, {\tt networkView} and {\tt easyEditor}.
+These methods are {\tt cisPath}, {\tt addProteinNames}, {\tt networkView}, and {\tt easyEditor}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Format PPI data}
@@ -67,10 +67,10 @@ Each line contains both the Ensembl Genomes Protein identifier and the Swiss-Pro
 \begin{center}
 <<example1,echo=TRUE,print=FALSE>>=
   library(cisPath)
-  input <- system.file("extdata", "uniprot_sprot_human10.dat", 
+  sprotFile <- system.file("extdata", "uniprot_sprot_human10.dat", 
                                             package="cisPath")
   mappingFile <- file.path(tempdir(), "mappingFile.txt")
-  getMappingFile(input, output=mappingFile)
+  getMappingFile(sprotFile, output=mappingFile)
 @
 \end{center} 
 The input file for {\tt formatSTRINGPPI} is downloaded from the STRING database (\url{http://string-db.org/}). 
@@ -107,16 +107,32 @@ The edge value for each link between two interacting proteins is assigned as {\t
 This may be treated as the ``cost'' of determining the shortest paths between two proteins. 
 Advanced users can edit the file and change the edge values for each edge.
 
-\subsection{Combine PPI data from different databases}
-The method {\tt combinePPI} is used to combine the PPIs that were generated from different databases.
+\subsection{Format PPI data downloaded from the iRefIndex database}
+The input file is downloaded from the iRefIndex database (\url{http://irefindex.uio.no/wiki/iRefIndex}).
+Access \url{ftp://ftp.no.embnet.org/irefindex/data/archive/release_10.0/psi_mitab/MITAB2.6/} to download PPI files with the {\tt MITAB2.6 format} for different species.
 \begin{center}
 <<example4,echo=TRUE,print=FALSE>>=
-  output <- file.path(tempdir(), "STRINGANDPINA.txt")
-  combinePPI(c(PINAPPI, STRINGPPI), output)
+  input <- system.file("extdata", "9606.mitab.100.txt", package="cisPath")
+  iRefIndex <- file.path(tempdir(), "iRefIndex.txt")
+  formatiRefIndex(input, output=iRefIndex)
 @
 \end{center} 
 
-We have processed the PPI data from the PINA and STRING databases. 
+Each line of the output file contains Swiss-Prot accession numbers and gene names for two interacting proteins. 
+The edge value for each link between two interacting proteins is assigned as {\tt 1}. 
+This may be treated as the ``cost'' of determining the shortest paths between two proteins. 
+Advanced users can edit the file and change the edge values for each edge.
+
+\subsection{Combine PPI data from different databases}
+The method {\tt combinePPI} is used to combine the PPIs that were generated from different databases.
+\begin{center}
+<<example5,echo=TRUE,print=FALSE>>=
+  output <- file.path(tempdir(), "allPPI.txt")
+  combinePPI(c(PINAPPI, iRefIndex, STRINGPPI), output)
+@
+\end{center} 
+
+We have processed the PPI data from the PINA, iRefIndex, and STRING databases. 
 Users can access these files from our website \url{http://www.isb.pku.edu.cn/cispath/}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Examples}
@@ -131,7 +147,7 @@ This tool therefore also displays other proteins that can interact with at least
 In addition, using this method, users can choose the visual style (color and model size) in which the proteins will be displayed in the network.
 
 \begin{center}
-<<example5,echo=TRUE,print=FALSE>>=
+<<example6,echo=TRUE,print=FALSE>>=
   infoFile <- system.file("extdata", "PPI_Info.txt", package="cisPath")
   outputDir <- file.path(tempdir(), "networkView")
   networkView(infoFile, c("MAGI1","TP53BP2","TP53", "PTEN"), outputDir, 
@@ -157,7 +173,7 @@ The color of these leaf nodes can be customized by the parameter {\tt leafColor}
 The evidence which supports the functional interactions between these main proteins is shown in the table below the graph.
 
 \begin{center}
-<<example6,echo=TRUE,print=FALSE>>=
+<<example7,echo=TRUE,print=FALSE>>=
   infoFile <- system.file("extdata", "PPI_Info.txt", package="cisPath")
   outputDir <- file.path(tempdir(), "networkView2")
   inputFile <- system.file("extdata", "networkView.txt", package="cisPath")
@@ -181,7 +197,7 @@ Please see the file {\tt PPI\_Info.txt} in this package for the input file forma
 Taking the protein {\tt TP53} as an example, 
 input of the following codes in R will result in output of all the shortest paths to the target proteins {\tt MAGI1} and {\tt GH1}.
 \begin{center}
-<<example7,echo=TRUE,print=FALSE>>=
+<<example8,echo=TRUE,print=FALSE>>=
   infoFile <- system.file("extdata", "PPI_Info.txt", package="cisPath")
   outputDir <- file.path(tempdir(), "TP53_example")
   results <- cisPath(infoFile, "TP53", outputDir, c("MAGI1", "GH1"), 
@@ -212,7 +228,7 @@ By clicking the {\tt View Graph} link in the table, users can select the path to
 
 In order to avoid inputting invalid target protein names, the unique identifier Swiss-Prot accession numbers may alternatively be used as input. 
 The Swiss-Prot accession numbers can be sought from the UniProt (\url{http://www.uniprot.org/}) database.
-<<example8,echo=TRUE,print=FALSE>>=
+<<example9,echo=TRUE,print=FALSE>>=
   infoFile <- system.file("extdata", "PPI_Info.txt", package="cisPath")
   outputDir <- file.path(tempdir(), "TP53_example")
   results <- cisPath(infoFile, "TP53", outputDir, 
@@ -224,7 +240,7 @@ The Swiss-Prot accession numbers can be sought from the UniProt (\url{http://www
 This method may be run without input of target proteins. 
 If target proteins are not provided, this method will identify the shortest paths from the source protein to all the other relevant proteins.
 Users can thus query the results with a browser upon finding an interesting ``target'' protein without launching R.
-<<example9,echo=TRUE,print=FALSE, results=hide>>=
+<<example10,echo=TRUE,print=FALSE, results=hide>>=
   infoFile <- system.file("extdata", "PPI_Info.txt", package="cisPath")
   outputDir <- file.path(tempdir(), "TP53_example")
   results <- cisPath(infoFile, "TP53", outputDir)
@@ -237,7 +253,7 @@ We therefore suggest users take a look on the output file {\tt targetIDs.txt} to
 The parameter {\tt name2IDFile} allows users to add ID mapping information. 
 In this way, users can search for the shortest paths using the protein names with which they are familiar.
 
-<<example10,echo=TRUE,print=FALSE, results=hide>>=
+<<example11,echo=TRUE,print=FALSE, results=hide>>=
   infoFile <- system.file("extdata", "PPI_Info.txt", package="cisPath")
   outputDir <- file.path(tempdir(), "TP53_example")
   name2protFile <- system.file("extdata", "name2prot.txt", package="cisPath")
@@ -247,7 +263,7 @@ In this way, users can search for the shortest paths using the protein names wit
 This method allows users to add more ID mapping information even after the shortest paths have been identified. 
 For example, the following codes will add all ID mapping information included in the file {\tt name2prot.txt}.
 \begin{center}
-<<example11,echo=TRUE,print=FALSE>>=
+<<example12,echo=TRUE,print=FALSE>>=
   name2protFile <- system.file("extdata", "name2prot.txt", package="cisPath")
   addProteinNames(name2protFile, outputDir)
 @
@@ -256,10 +272,10 @@ For example, the following codes will add all ID mapping information included in
 
 \subsection{Example of downloading PPI data from our website}
 The following codes will first download the PPI data that was generated for this example, and then will identify the shortest paths from {\tt TP53} to all other proteins. 
-With combined PPI data from PINA and STRING, the output from a single source protein is about {\tt 1.2G} in size.
+With combined PPI data from PINA, iRefIndex, and STRING, the output from a single source protein is about {\tt 1.5G} in size.
 Although the output in such cases is large, we strongly suggest users give this method of selecting a source but not a target a try.
 \begin{center}
-<<example12,echo=TRUE,print=FALSE,eval=FALSE>>= 
+<<example13,echo=TRUE,print=FALSE,eval=FALSE>>= 
   outputDir <- "/home/user/TP53"
   # Create the output directory
   dir.create(outputDir, showWarnings = FALSE, recursive = TRUE)
@@ -284,7 +300,7 @@ Although the output in such cases is large, we strongly suggest users give this 
 The output HTML file of this method is a editor for network graphs. 
 Users can draw and edit their own network with this editor.
 \begin{center}
-<<example13,echo=TRUE,print=FALSE>>=
+<<example14,echo=TRUE,print=FALSE>>=
   outputDir <- file.path(tempdir(), "easyEditor")
   easyEditor(outputDir)
 @

@@ -30,7 +30,7 @@ formatPINAPPI(input, output)
   Wu, J. and et al. (2009) Integrated network analysis platform for protein-protein interactions. \emph{Nature methods}, \bold{6}, 75-77.  
 }
 \seealso{
- \code{\link{cisPath}}, \code{\link{formatSTRINGPPI}}, \code{\link{combinePPI}}.
+ \code{\link{cisPath}}, \code{\link{formatiRefIndex}}, \code{\link{formatSTRINGPPI}}, \code{\link{combinePPI}}.
 }
 \examples{
     library(cisPath)
@@ -39,7 +39,7 @@ formatPINAPPI(input, output)
     formatPINAPPI(input, output)
     
 \dontrun{
-    outputDir <- "/home/user/cisPath_test"
+    outputDir <- file.path(getwd(), "cisPath_test")
     dir.create(outputDir, showWarnings=FALSE, recursive=TRUE)
     
     # Download PINA PPI for humans only (~96M)

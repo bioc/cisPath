@@ -20,7 +20,6 @@ formatSTRINGPPI(input, mappingFile, taxonId, output, minScore=700)
                 \code{4932:  Saccharomyces cerevisiae}   \cr
                 \code{6239:  Caenorhabditis elegans}   \cr
                 \code{7227:  Drosophila melanogaster}  \cr
-                \code{3702:  Arabidopsis thaliana}  \cr
                 \code{10090: Mus musculus} \cr
                 \code{10116: Rattus norvegicus} 
                 }
@@ -52,7 +51,7 @@ formatSTRINGPPI(input, mappingFile, taxonId, output, minScore=700)
   
 }
 \seealso{
- \code{\link{cisPath}}, \code{\link{getMappingFile}}, \code{\link{formatPINAPPI}}, \code{\link{combinePPI}}.
+ \code{\link{cisPath}}, \code{\link{getMappingFile}}, \code{\link{formatPINAPPI}}, \code{\link{formatiRefIndex}}, \code{\link{combinePPI}}.
 }
 \examples{
     library(cisPath)
@@ -72,7 +71,7 @@ formatSTRINGPPI(input, mappingFile, taxonId, output, minScore=700)
     biocLite("R.utils")
     library(R.utils)
     
-    outputDir <- "/home/user/cisPath_test"
+    outputDir <- file.path(getwd(), "cisPath_test")
     dir.create(outputDir, showWarnings=FALSE, recursive=TRUE)
     
     # Generate the identifier mapping file 

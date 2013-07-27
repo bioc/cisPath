@@ -81,15 +81,19 @@ cisPath(infoFile, proteinName, outputDir, targetProteins=NULL, swissProtID=FALSE
 
   Wu, J. and et al. (2009) Integrated network analysis platform for protein-protein interactions. \emph{Nature methods}, \bold{6}, 75-77.
   
+  Razick S. and et al. (2008) iRefIndex: A consolidated protein interaction database with provenance. \emph{BMC Bioinformatics}, \bold{9}, 405
+  
+  Aranda, B. and et al. (2011) PSICQUIC and PSISCORE: accessing and scoring molecular interactions, \emph{Nat Methods}, \bold{8}, 528-529.
+  
   Szklarczyk,D. and et al. (2011) The STRING database in 2011: functional interaction networks of proteins, globally integrated and scored. \emph{Nucleic Acids Res}, \bold{39}, D561-D568.
   
   Franceschini,A. and et al. (2013) STRING v9.1: protein-protein interaction networks, with increased coverage and integration. \emph{Nucleic Acids Res}, \bold{41}, D808-D815.
   
-  UniProt Consortium and others. (2012) Reorganizing the protein space at the Universal Protein Resource (UniProt). \emph{Nucleic Acids Res} \bold{40}, D71-D75.
+  UniProt Consortium and others. (2012) Reorganizing the protein space at the Universal Protein Resource (UniProt). \emph{Nucleic Acids Res}, \bold{40}, D71-D75.
   
 }
 \seealso{
- \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, \code{\link{combinePPI}}, \code{\link{addProteinNames}}, \code{\link{networkView}}, \code{\link{easyEditor}}.
+ \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, \code{\link{formatiRefIndex}}, \code{\link{combinePPI}}, \code{\link{addProteinNames}}, \code{\link{networkView}}, \code{\link{easyEditor}}.
 }
 \examples{
     # examples
@@ -116,7 +120,7 @@ cisPath(infoFile, proteinName, outputDir, targetProteins=NULL, swissProtID=FALSE
     # example of downloading PPI data from our website
     
     # Change to your own output directory
-    outputDir <- "/home/user/TP53"
+    outputDir <- file.path(getwd(), "TP53")
     # Create the output directory
     dir.create(outputDir, showWarnings=FALSE, recursive=TRUE)
     

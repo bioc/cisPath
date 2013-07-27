@@ -6,36 +6,41 @@
   This method is used to generate the identifier mapping file which is necessary for the method \code{\link{formatSTRINGPPI}}.
 }
 \usage{
-getMappingFile(input, output, taxonId="")
-\S4method{getMappingFile}{character,character}(input, output, taxonId="")
+getMappingFile(sprotFile, output, tremblFile="", taxonId="")
+\S4method{getMappingFile}{character,character}(sprotFile, output, tremblFile="", taxonId="")
 }
 \arguments{
- \item{input}{File downloaded from the UniProt database (character(1)).}
+ \item{sprotFile}{Input: File downloaded from the UniProt database (UniProtKB/Swiss-Prot) (character(1)).}
  \item{output}{Output file (character(1)).}
+ \item{tremblFile}{Input: File downloaded from the UniProt database (UniProtKB/TrEMBL) (character(1)).}
  \item{taxonId}{NCBI taxonomy specie identifier (character(1)). \cr
                 This method will process only data for this specie. \cr
                 Default: process all data (recommended).}
 }
 \details{
-   The input file is downloaded from the UniProt (\url{http://www.uniprot.org/}) database. 
+   UniProtKB/Swiss-Prot: fully annotated curated entries. \cr
+   UniProtKB/TrEMBL: computer-generated entries enriched with automated classification and annotation. \cr
+   \code{sprotFile} is mandatory, while \code{tremblFile} is optional. 
+   If users only want to process the reviewed proteins from the UniProt database, \code{tremblFile} should be ignored. \cr  
 
   All species: 
   \url{ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz}  \cr
+  \url{ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz}  \cr
   Taxonomic divisions: 
   \url{ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/} 
 
-  uniprot_sprot_archaea.dat.gz contains all archaea entries. \cr
-  uniprot_sprot_bacteria.dat.gz contains all bacteria entries. \cr
-  uniprot_sprot_fungi.dat.gz contains all fungi entries. \cr
-  uniprot_sprot_human.dat.gz contains all human entries. \cr
-  uniprot_sprot_invertebrates.dat.gz contains all invertebrate entries. \cr
-  uniprot_sprot_mammals.dat.gz contains all mammalian entries except human and rodent entries. \cr
-  uniprot_sprot_plants.dat.gz contains all plant entries. \cr
-  uniprot_sprot_rodents.dat.gz contains all rodent entries. \cr
-  uniprot_sprot_vertebrates.dat.gz contains all vertebrate entries except mammals. \cr
-  uniprot_sprot_viruses.dat.gz contains all eukaryotic entries except those from vertebrates, fungi and plants. \cr
+  uniprot_sprot_archaea.dat.gz and uniprot_trembl_archaea.dat.gz contain all archaea entries. \cr
+  uniprot_sprot_bacteria.dat.gz and uniprot_trembl_bacteria.dat.gz contain all bacteria entries. \cr
+  uniprot_sprot_fungi.dat.gz and uniprot_trembl_fungi.dat.gz contain all fungi entries. \cr
+  uniprot_sprot_human.dat.gz and uniprot_trembl_human.dat.gz contain all human entries. \cr
+  uniprot_sprot_invertebrates.dat.gz and uniprot_trembl_invertebrates.dat.gz contain all invertebrate entries. \cr
+  uniprot_sprot_mammals.dat.gz and uniprot_trembl_mammals.dat.gz contain all mammalian entries except human and rodent entries. \cr
+  uniprot_sprot_plants.dat.gz and uniprot_trembl_plants.dat.gz contain all plant entries. \cr
+  uniprot_sprot_rodents.dat.gz and uniprot_trembl_rodents.dat.gz contain all rodent entries. \cr
+  uniprot_sprot_vertebrates.dat.gz and uniprot_trembl_vertebrates.dat.gz contain all vertebrate entries except mammals. \cr
+  uniprot_sprot_viruses.dat.gz and uniprot_trembl_viruses.dat.gz contain all eukaryotic entries except those from vertebrates, fungi and plants. \cr
   We suggest you take a look at the README file before you download these files.  \cr \cr
-
+  
   If you make use of these files, please cite the UniProt database.
 }
 \value{
@@ -48,13 +53,14 @@ getMappingFile(input, output, taxonId="")
 }
 \seealso{
  \code{\link{cisPath}}, 
- \code{\link{formatSTRINGPPI}}.
+ \code{\link{formatSTRINGPPI}}, 
+ \code{\link{combinePPI}}.
 }
 \examples{
     library(cisPath)
-    input <- system.file("extdata", "uniprot_sprot_human10.dat", package="cisPath")
+    sprotFile <- system.file("extdata", "uniprot_sprot_human10.dat", package="cisPath")
     output <- file.path(tempdir(), "mappingFile.txt")
-    getMappingFile(input, output, taxonId="9606")
+    getMappingFile(sprotFile, output, taxonId="9606")
     
 \dontrun{
     source("http://bioconductor.org/biocLite.R")
@@ -70,10 +76,16 @@ getMappingFile(input, output, taxonId="")
     download.file("ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/uniprot_sprot_human.dat.gz", destfile)
     gunzip(destfile, overwrite=TRUE, remove=FALSE)
     
+    destfile <- file.path(outputDir, "uniprot_trembl_human.dat.gz");
+    cat("Downloading...\n")
+    download.file("ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/uniprot_trembl_human.dat.gz", destfile)
+    gunzip(destfile, overwrite=TRUE, remove=FALSE)
+    
     # Generate identifier mapping file
-    fileFromUniProt <- file.path(outputDir, "uniprot_sprot_human.dat")
+    sprotFile <- file.path(outputDir, "uniprot_sprot_human.dat")
+    tremblFile <- file.path(outputDir, "uniprot_trembl_human.dat")
     mappingFile <- file.path(outputDir, "mappingFile.txt")
-    getMappingFile(fileFromUniProt, output=mappingFile)
+    getMappingFile(sprotFile, output=mappingFile, tremblFile)
     }
 }
 \keyword{methods}

@@ -1,6 +1,6 @@
 Package: cisPath
 Title: Visualization and manage of the protein-protein interaction networks.
-Version: 1.1.5
+Version: 1.1.6
 Author: Likun Wang <wanglk@hsc.pku.edu.cn>
 Description: cisPath is an R package that uses web browsers to visualize and manage protein-protein interaction networks.
 Maintainer: Likun Wang <wanglk@hsc.pku.edu.cn>
@@ -10,5 +10,5 @@ License: GPL (>= 3)
 biocViews: Proteomics
 Collate: AllGenerics.R cisPath.R addProteinNames.R networkView.R
         getResults.R easyEditor.R getMappingFile.R formatPINAPPI.R
-        formatSTRINGPPI.R combinePPI.R
+        formatSTRINGPPI.R combinePPI.R formatiRefIndex.R
 LazyLoad: yes
