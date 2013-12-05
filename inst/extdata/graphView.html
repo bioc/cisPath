@@ -506,11 +506,12 @@
            mydiv.appendChild(mytable);
            var nodedis=100;
            if(displayGraph==0){
-           	if(json.nodes.length > 60){
-           		 json.nodes.length=60;
+           	if(json.nodes.length > 100){
+           		 json.nodes.length=100;
            	}
-           	  json.links=[];
-           	  nodeCharge=-80;
+               json.links=[];
+               nodeNum=1;
+               nodeCharge=-30;
            }
            //return;
            d3.selectAll("line.link").remove();
