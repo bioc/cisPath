@@ -57,7 +57,6 @@ class Node
 {
 public:
     string name;
-    vector <string> prev;
     int dist;
     bool operator<(const Node &t2) const
     {
@@ -457,7 +456,7 @@ bool showPath(string root)
         getPath(hasPath[i]);
         OUTJS1.close();
         OUTJS2.close();
-        if(count2 % 10 == 0)
+        if(count2 % 100 == 0)
         {
 #ifdef INDEP_PROGRAM
             cerr << "\routput: " << count2 << flush;
@@ -512,11 +511,11 @@ bool detectPath(string root)
     list<Node> u;
     int targetProteins = 0;
     targets[root] = 1;
+    Node tmp;
     for(int i = 0; i < (int)nodes.size(); i++)
     {
         dist[nodes[i]] = INF;
         prev[nodes[i]] = nodes[i];
-        Node tmp;
         tmp.name = nodes[i];
         tmp.dist = INF;
         if(nodes[i] == root)
@@ -527,7 +526,6 @@ bool detectPath(string root)
         }
         u.push_back(tmp);
     }
-    Node tmp;
     tmp.name = root;
     tmp.dist = 0;
     u.push_back(tmp);
@@ -620,7 +618,6 @@ bool detectPath(string root)
                     break;
                 }
             }
-            Node tmp;
             tmp.name = it->name;
             tmp.dist = it->dist;
             u.insert(it2, tmp);
@@ -629,6 +626,11 @@ bool detectPath(string root)
     }
     ccc = s.size();
     hasPath = s;
+    /////////////////////////////////////20131208
+    nodes.clear();
+    nodesExist.clear();
+    /////////////////////////////////////20131208
+    
     PRINTFUNCTION("\rNumber of processed proteins:%d\n", ccc);
 #ifdef INDEP_PROGRAM
 #else
@@ -647,17 +649,19 @@ bool processInput(const char *input)
     }
     char buffer[1000000 + 1];
     bool pnasFormat = 1;
+    vector<string> tokens;
+    string tmp;
     if(!in.eof())
     {
         in.getline(buffer, 1000000);
-        string tmp = buffer;
+        tmp = buffer;
         trim(tmp);
         if(tmp[tmp.size() - 1] == '\r')
         {
             buffer[tmp.size() - 1] = '\0';
             tmp = buffer;
         }
-        vector<string> tokens = string_tokenize(tmp, "\t", false);
+        tokens = string_tokenize(tmp, "\t", false);
 
         if(tokens.size() == 20)
         {
@@ -690,19 +694,20 @@ bool processInput(const char *input)
     }
     int lineCount = 1;
     //ofstream LOG((outputDir+"/log.txt").c_str());
+    map<string, int> maptmp;
     while(!in.eof())
     {
         in.getline(buffer, 1000000);
         //PRINTFUNCTION("\rProcessed %d", lineCount);
         lineCount++;
-        string tmp = buffer;
+        tmp = buffer;
         trim(tmp);
         if(tmp[tmp.size() - 1] == '\r')
         {
             buffer[tmp.size() - 1] = '\0';
             tmp = buffer;
         }
-        vector<string> tokens = string_tokenize(tmp, "\t", false);
+        tokens = string_tokenize(tmp, "\t", false);
         if((pnasFormat == 1) && (tokens.size() == 20))
         {
             if(tokens[0].substr(0, 10) == "uniprotkb:")
@@ -817,13 +822,11 @@ bool processInput(const char *input)
             prot2real[tokens[1]] = tokens[3];
             if(edge.count(tokens[0]) == 0)
             {
-                map<string, int> tmp;
-                edge[tokens[0]] = tmp;
+                edge[tokens[0]] = maptmp;
             }
             if(edge.count(tokens[1]) == 0)
             {
-                map<string, int> tmp;
-                edge[tokens[1]] = tmp;
+                edge[tokens[1]] = maptmp;
             }
             if(byScoreFlag)
             {
@@ -964,11 +967,13 @@ bool addNode(string Name, int group)
     }
     return false;
 }
+vector<string> pubmedIds;
+map<string, bool> pubmeds;
 string processEvidence(string evidence)
-{
-    vector<string> pubmedIds = string_tokenize(evidence, "#");
+{   
+    pubmedIds = string_tokenize(evidence, "#");
     string pubmedstr = "";
-    map<string, bool> pubmeds;
+    pubmeds.clear();
     for(int index = 0; index < (int)pubmedIds.size(); index++)
     {
         if(pubmedstr == "")
@@ -986,13 +991,14 @@ string processEvidence(string evidence)
             }
         }
     }
+    pubmeds.clear();
     return pubmedstr;
 }
 string processPubMed(string evidence)
 {   
-    vector<string> pubmedIds = string_tokenize(evidence, "#, ");
+    pubmedIds = string_tokenize(evidence, "#, ");
     string pubmedstr = "";
-    map<string, bool> pubmeds;
+    pubmeds.clear();
     for(int index = 0; index < (int)pubmedIds.size(); index++)
     {
         if(pubmedstr == "")
@@ -1010,6 +1016,7 @@ string processPubMed(string evidence)
             }
         }
     }
+    pubmeds.clear();
     return pubmedstr;
 }
 bool addLink(string source, string target, int group, int bigNode)
@@ -1372,6 +1379,7 @@ bool getTargets(string outputDir)
     return true;
 }
 ///////////////////////////////////////////////////
+vector<string> tokenResult;
 inline vector<string> string_tokenize(const string &str,
                                       const string &delimiters,
                                       bool skip_empty)
@@ -1381,19 +1389,18 @@ inline vector<string> string_tokenize(const string &str,
                                 str.find_first_not_of(delimiters, 0) : 0;
     // Find first "non-delimiter".
     string::size_type pos     = str.find_first_of(delimiters, lastPos);
-    vector<string> result;
-    result.clear();
+    tokenResult.clear();
 
     while (string::npos != pos || string::npos != lastPos)
     {
         // Found a token, add it to the vector.
         //if (pos == lastPos) result.push_back("");
-        result.push_back(str.substr(lastPos, pos - lastPos));
+        tokenResult.push_back(str.substr(lastPos, pos - lastPos));
 
         if (pos == string::npos) break;
         if (pos == str.size() - 1)
         {
-            if (!skip_empty) result.push_back("");
+            if (!skip_empty) tokenResult.push_back("");
             break;
         }
         // Skip delimiters.  Note the "not_of"
@@ -1401,7 +1408,7 @@ inline vector<string> string_tokenize(const string &str,
         // Find next "non-delimiter"
         pos = str.find_first_of(delimiters, lastPos);
     }
-    return result;
+    return tokenResult;
 }
 string int2str(int value)
 {
