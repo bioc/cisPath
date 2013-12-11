@@ -1289,6 +1289,9 @@ function getName2prot(){
   oHead.appendChild(oScript); 
   oScript.onload = oScript.onreadystatechange = function(){
      if(!this.readyState|| this.readyState=='loaded' || this.readyState=='complete'){
+     	  if(graph_txt == ""){
+     	  	 return;
+     	  }
         var json = txt2Json(graph_txt);
         graph_txt="";
         processJson(json);
@@ -1301,6 +1304,14 @@ function processJson(json){
 	if(!json){
 		 return;
 	}
+	while(nodes.length!=0){
+	 	 nodes.splice(nodes.length-1, 1);
+	}
+	while(links.length!=0){
+	 	 links.splice(links.length-1, 1);
+	}
+	restart();
+	lastNodeId=-1;
 	var nodeNum=json.nodes.length;
 	for(var i=0; i < nodeNum; i++){
 		  var newNode = {id:i, fixed: 0, posx:0, posy:0, txtsize:12, txtcol:'#000000', stosize:2,stocol:'#000000'};
@@ -1319,6 +1330,9 @@ function processJson(json){
 		  var newLink = {col:'#666666', arrow:0, direction:2, dotted:0};
 		  newLink.source=nodes[json.links[i].source];
 		  newLink.target=nodes[json.links[i].target];
+		  if(newLink.source == newLink.target){
+		  	 continue;
+		  }
 		  newLink.size= Math.sqrt(json.links[i].value);
 		  if(json.links[i].value > 10){
 		  	 newLink.col='#000000';
@@ -1340,6 +1354,14 @@ function processJson2(json){
 	if(!json){
 		 return;
 	}
+	while(nodes.length!=0){
+	 	 nodes.splice(nodes.length-1, 1);
+	}
+	while(links.length!=0){
+	 	 links.splice(links.length-1, 1);
+	}
+	restart();
+	lastNodeId=-1;
 	var nodeNum=json.nodes.length;
 	for(var i=0; i < nodeNum; i++){
 		  var newNode = {id:i, fixed: 0, posx:0, posy:0, txtsize:12, txtcol:'#000000', stosize:2,stocol:'#000000'};
@@ -1362,11 +1384,22 @@ function processJson2(json){
 		  if(json.links[i].value > 10){
 		  	 newLink.col='#000000';
 		  }
+		  if(newLink.source == newLink.target){
+		  	 continue;
+		  }
 		  links.push(newLink);
 	}
 	restart();
 }
+function addLoadingNode(){
+	var newNode = {id: ++lastNodeId, fixed: 0, posx:0, posy:0, txtsize:18, txtcol:'#FF0000', stosize:0,stocol:'#FF0000'};
+	newNode.size=0;
+	newNode.txt="Loading...";
+	newNode.col='#FF0000';
+	nodes.push(newNode);
+}
 function showGraph(geneName, graph_num){
+	addLoadingNode();
 	var fileName1 = "js/"+geneName+"_graph.js";
 	var oHead = document.getElementsByTagName('HEAD').item(0); 
   var oScript= document.createElement("script"); 
@@ -1456,6 +1489,7 @@ function getCol(group){
 }
 
 function showNetwork(){
+	addLoadingNode();
 	var fileName1 = "js/graph.js";
 	var oHead = document.getElementsByTagName('HEAD').item(0); 
   var oScript= document.createElement("script"); 
