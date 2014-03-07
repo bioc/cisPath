@@ -24,8 +24,8 @@ formatiRefIndex(input, output, taxonId="")
                 }
 }
 \details{
-  The input file is downloaded from the iRefIndex database (\url{http://irefindex.uio.no/wiki/iRefIndex}). \cr
-  Access \url{ftp://ftp.no.embnet.org/irefindex/data/archive/release_10.0/psi_mitab/MITAB2.6/} to download PPI files with the \code{MITAB2.6 format} for different species. \cr
+  The input file is downloaded from the iRefIndex database (\url{http://irefindex.org/wiki/}). \cr
+  Access \url{http://irefindex.org/download/irefindex/data/archive/release_13.0/psi_mitab/MITAB2.6/} to download PPI files with the \code{MITAB2.6 format} for different species. \cr
   If you make use of this file, please cite the iRefIndex database.
 }
 \value{
@@ -52,18 +52,18 @@ formatiRefIndex(input, output, taxonId="")
     outputDir <- file.path(getwd(), "cisPath_test")
     dir.create(outputDir, showWarnings=FALSE, recursive=TRUE)
     
-    # Download iRefIndex PPI for humans only (compressed:~89M, decompressed:~640M)
-    destfile <- file.path(outputDir, "9606.mitab.03022013.txt.zip")
+    # Download iRefIndex PPI for humans only (compressed:~105M, decompressed:~757M)
+    destfile <- file.path(outputDir, "9606.mitab.08122013.txt.zip")
     cat("Downloading...\n")
-    ftpURL <- "ftp://ftp.no.embnet.org"
-    filePath <- "irefindex/data/archive/release_10.0/psi_mitab/MITAB2.6"
-    fileName <- "9606.mitab.03022013.txt.zip"
-    URL <- paste(ftpURL, filePath, fileName, sep="/")
+    httpURL <- "http://irefindex.org/download"
+    filePath <- "irefindex/data/archive/release_13.0/psi_mitab/MITAB2.6"
+    fileName <- "9606.mitab.08122013.txt.zip"
+    URL <- paste(httpURL, filePath, fileName, sep="/")
     download.file(URL, destfile)
     unzip(destfile, overwrite=TRUE, exdir=outputDir)
 
     # Format iRefIndex PPI
-    fileFromiRef <- file.path(outputDir, "9606.mitab.03022013.txt")
+    fileFromiRef <- file.path(outputDir, "9606.mitab.08122013.txt")
     iRefIndex <- file.path(outputDir, "iRefIndex.txt")
     formatiRefIndex(fileFromiRef, output=iRefIndex)
     }

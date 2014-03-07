@@ -74,7 +74,7 @@ Each line contains both the Ensembl Genomes Protein identifier and the Swiss-Pro
 @
 \end{center} 
 The input file for {\tt formatSTRINGPPI} is downloaded from the STRING database (\url{http://string-db.org/}). 
-The URL for this file is \url{http://string-db.org/newstring\_download/protein.links.v9.05.txt.gz}.
+The URL for this file is \url{http://string-db.org/newstring\_download/protein.links.v9.1/9606.protein.links.v9.1.txt.gz}.
 
 \begin{center}
 <<example2,echo=TRUE,print=FALSE>>=
@@ -108,8 +108,8 @@ This may be treated as the ``cost'' of determining the shortest paths between tw
 Advanced users can edit the file and change the edge values for each edge.
 
 \subsection{Format PPI data downloaded from the iRefIndex database}
-The input file is downloaded from the iRefIndex database (\url{http://irefindex.uio.no/wiki/iRefIndex}).
-Access \url{ftp://ftp.no.embnet.org/irefindex/data/archive/release_10.0/psi_mitab/MITAB2.6/} to download PPI files with the {\tt MITAB2.6 format} for different species.
+The input file is downloaded from the iRefIndex database (\url{http://www.irefindex.org/wiki/}).
+Access \url{http://irefindex.org/download/irefindex/data/archive/release_13.0/psi_mitab/MITAB2.6/} to download PPI files with the {\tt MITAB2.6 format} for different species.
 \begin{center}
 <<example4,echo=TRUE,print=FALSE>>=
   input <- system.file("extdata", "9606.mitab.100.txt", package="cisPath")

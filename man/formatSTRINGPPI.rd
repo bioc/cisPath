@@ -29,8 +29,8 @@ formatSTRINGPPI(input, mappingFile, taxonId, output, minScore=700)
 }
 \details{
   The input file is downloaded from the STRING database (\url{http://string-db.org/}). 
-  The URL of this file is \url{http://string-db.org/newstring_download/protein.links.v9.05.txt.gz} (4.1 Gb).  
-  Access \url{http://string-db.org/newstring_download/species.v9.05.txt} to determine the parameter \code{taxonId}. 
+  The URL of this file is \url{http://string-db.org/newstring_download/protein.links.v9.1.txt.gz}.  
+  Access \url{http://string-db.org/newstring_download/species.v9.1.txt} to determine the parameter \code{taxonId}. 
   Access \url{http://string-db.org/newstring_cgi/show_download_page.pl} for more details. \cr
   If you make use of this file, please cite the STRING database.
 
@@ -79,15 +79,15 @@ formatSTRINGPPI(input, mappingFile, taxonId, output, minScore=700)
     mappingFile <- file.path(outputDir, "mappingFile.txt")
     getMappingFile(fileFromUniProt, output=mappingFile)
     
-    # Download STRING PPI for all species (compressed:~4G, decompressed:~25G)
-    destfile <- file.path(outputDir, "protein.links.v9.05.txt.gz")
+    # Download STRING PPI for Homo sapiens (compressed:~27M, decompressed:~213M)
+    destfile <- file.path(outputDir, "9606.protein.links.v9.1.txt.gz")
     cat("Downloading...\n")
-    download.file("http://string-db.org/newstring_download/protein.links.v9.05.txt.gz", destfile)
+    download.file("http://string-db.org/newstring_download/protein.links.v9.1/9606.protein.links.v9.1.txt.gz", destfile)
     cat("Uncompressing...\n")
     gunzip(destfile, overwrite=TRUE, remove=FALSE)
     
     # Format STRING PPI
-    fileFromSTRING <- file.path(outputDir, "protein.links.v9.05.txt")
+    fileFromSTRING <- file.path(outputDir, "9606.protein.links.v9.1.txt")
     STRINGPPI <- file.path(outputDir, "STRINGPPI.txt")
     formatSTRINGPPI(fileFromSTRING, mappingFile, "9606", output=STRINGPPI, 700)
     }    
