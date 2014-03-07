@@ -67,7 +67,7 @@ getMappingFile(sprotFile, output, tremblFile="", taxonId="")
     biocLite("R.utils")
     library(R.utils)
     
-    outputDir <- "/home/user/cisPath_test"
+    outputDir <- file.path(getwd(), "cisPath_test")
     dir.create(outputDir, showWarnings=FALSE, recursive=TRUE)
     
     # Download protein information file for humans only from UniProt (decompressed:~246M)

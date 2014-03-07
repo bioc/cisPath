@@ -19,7 +19,7 @@ combinePPI(input, output, mappingFile="", dbNames="", maxEdgeValue=-1)
                      Default: no filter.}
 }
 \details{
-  The input files should follow the format as the output files of the method \code{\link{formatSTRINGPPI}} or \code{\link{formatPINAPPI}}. 
+  The input files should follow the format as the output files of the method \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, or \code{\link{formatiRefIndex}}. 
   See the files \code{STRINGPPI.txt} or \code{PINAPPI.txt} as examples.
   The first four fields contain the Swiss-Prot accession numbers and gene names for two interacting proteins. 
   The \code{PubMedID} field should be stated to be \code{NA} if unavailable. 

@@ -29,7 +29,7 @@ cisPath(infoFile, proteinName, outputDir, targetProteins=NULL, swissProtID=FALSE
               }
 }
 \details{
-  The input PPI data file  \code{infoFile} should follow the format as the output files of the method \code{\link{formatSTRINGPPI}} or \code{\link{formatPINAPPI}}. 
+  The input PPI data file  \code{infoFile} should follow the format as the output files of the method \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, or \code{\link{formatiRefIndex}}. 
   See files \code{STRINGPPI.txt} or \code{PINAPPI.txt} as examples.
   The first four fields contain the Swiss-Prot accession numbers and gene names for two interacting proteins. 
   The \code{PubMedID} field should be stated to be \code{NA} if unavailable. 
@@ -46,9 +46,9 @@ cisPath(infoFile, proteinName, outputDir, targetProteins=NULL, swissProtID=FALSE
   Please contact us if the paths do not display correctly. \cr
   
   As an example, we have generated PPI interaction data for several species 
-  from the PINA database (\url{http://cbg.garvan.unsw.edu.au/pina/}) and the STRING database (\url{http://string-db.org/}). 
+  from the PINA database (\url{http://cbg.garvan.unsw.edu.au/pina/}), STRING database (\url{http://string-db.org/}), and iRefIndex database (\url{http://www.irefindex.org/wiki/}). 
   Users can download these files from \url{http://www.isb.pku.edu.cn/cisPath/}.  
-  If you make use of these files, please cite PINA or STRING accordingly. 
+  If you make use of these files, please cite PINA, STRING, and iRefIndex accordingly. 
   Users can edit the PPI interactions generated with these two databases, or combine them with their private data to construct more complete PPI interaction networks.
   In this package, we select only a small portion of the available PPI interaction data as an example. 
   An ID mapping file is also provided in this package, which was generated according to the data from the UniProt (\url{http://www.uniprot.org/}) database. \cr
