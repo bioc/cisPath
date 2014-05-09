@@ -13,10 +13,14 @@
 #include <math.h>
 #include <list>
 
-#if GCC_VERSION > 40600
+#if defined(__clang__)
+#include <tr1/unordered_map>
+#else
+#if (GCC_VERSION > 40600)
 #include <tr1/unordered_map>
 #else
 #include <ext/hash_map>
+#endif
 #endif
 
 #ifdef INDEP_PROGRAM
@@ -31,14 +35,21 @@
 #endif
 
 #define INF 1<<20
-using namespace std;
+using std::cerr;
+using std::endl;
+using std::vector;
+using std::map;
+using std::string;
+using std::list;
+using std::fstream;
+using std::ofstream;
+using std::ifstream;
+using std::ios;
 
 #if GCC_VERSION > 40600
-#define HASHMAP unordered_map
-using namespace std::tr1;
+#define HASHMAP std::tr1::unordered_map
 #else
-#define HASHMAP hash_map
-using namespace __gnu_cxx;
+#define HASHMAP __gnu_cxx::hash_map
 #endif
 //////////////////////
 struct str_hash1
