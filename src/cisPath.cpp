@@ -14,7 +14,7 @@
 #include <list>
 
 #if defined(__clang__)
-#include <tr1/unordered_map>
+#include <unordered_map>
 #else
 #if (GCC_VERSION > 40600)
 #include <tr1/unordered_map>
@@ -46,11 +46,16 @@ using std::ofstream;
 using std::ifstream;
 using std::ios;
 
-#if GCC_VERSION > 40600
+#if defined(__clang__)
+#define HASHMAP std::unordered_map
+#else
+#if (GCC_VERSION > 40600)
 #define HASHMAP std::tr1::unordered_map
 #else
 #define HASHMAP __gnu_cxx::hash_map
 #endif
+#endif
+
 //////////////////////
 struct str_hash1
 {
