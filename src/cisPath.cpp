@@ -36,6 +36,7 @@
 
 #define INF 1<<20
 using std::cerr;
+using std::flush;
 using std::endl;
 using std::vector;
 using std::map;
@@ -2120,6 +2121,9 @@ bool getMappingFile(string input, string output, string addinput, string OX1)
         {
             if((OX1 == "") || (OX1 == "0000") || (OX == OX1))
             {
+                if(name==""){
+                   name=AC; //2014/06/26
+                }
                 OUT << AC << "\t" << name << "\t" << ensembel << "\t";
                 OUT << OX << "\t" << ensembel_string << "\t" << OS << "\t";
                 OUT << AllAC << "\n";
@@ -2256,7 +2260,10 @@ bool getMappingFile(string input, string output, string addinput, string OX1)
         if(tmp.substr(0, 2) == "//")
         {
             if((OX1 == "") || (OX1 == "0000") || (OX == OX1))
-            {
+            {   
+                if(name==""){
+                   name=AC; //2014/06/26
+                }
                 OUT << AC << "\t" << name << "\t" << ensembel << "\t";
                 OUT << OX << "\t" << ensembel_string << "\t" << OS << "\t";
                 OUT << AllAC << "\n";
@@ -2520,6 +2527,154 @@ int main(int argc, char *argv[])
     else
     {
         cerr << "formatSTRINGPPI input mappingFile OX output minScore" << endl;
+    }
+}
+#else
+#endif
+////////////////////////////////////////////////////////////////////////////
+bool formatSIFfile(string input, string mappingFile, string output)
+{
+    ifstream IN(input.c_str());
+    if(!IN)
+    {
+        PRINTFUNCTION("Can not open %s\n", input.c_str());
+        return false;
+    }
+    ifstream MAPFILE(mappingFile.c_str());
+    if(!MAPFILE)
+    {
+        PRINTFUNCTION("Can not open %s\n", mappingFile.c_str());
+        return false;
+    }
+    ofstream OUT(output.c_str());
+    if(!OUT)
+    {
+        PRINTFUNCTION("Can not open %s to write\n", output.c_str());
+        return false;
+    }
+    char buffer[1000000 + 1];
+    PRINTFUNCTION("Processing ID mapping file...\n");
+    int line_num = 0;
+    HASHMAP<string, string, str_hash1> ens2prot;
+    HASHMAP<string, string, str_hash1> string2prot;
+    HASHMAP<string, string, str_hash1> prot2name;
+    while(!MAPFILE.eof())
+    {
+        MAPFILE.getline(buffer, 1000000);
+        string tmp = buffer;
+        if(tmp.size() < 4)
+        {
+            continue;
+        }
+        line_num++;
+        if(line_num % 1000 == 0)
+        {
+            PRINTFUNCTION("\rProcessed lines: %d", line_num);
+        }
+        vector<string> smalltokens = string_tokenize(tmp, "\t", false);
+        if(smalltokens.size() < 3)
+        {
+            PRINTFUNCTION("Wrong format %s", tmp.c_str());
+            return false;
+        }
+        prot2name[smalltokens[0]] = smalltokens[1];
+        if(smalltokens[2] != "")
+        {
+            vector <string> ensIds=string_tokenize(smalltokens[2],", ",true);
+            for(int i = 0; i < (int)ensIds.size(); i++)
+            {
+                if(ens2prot.count(ensIds[i]) == 0)
+                {
+                    ens2prot[ensIds[i]] = smalltokens[0];
+                }
+                else
+                {
+                    ens2prot[ensIds[i]] += string(",") + smalltokens[0];
+                }
+            }
+        }
+        if(smalltokens.size() < 5)
+        {
+            continue;
+        }
+        if(smalltokens[4] != "")
+        {
+            vector <string> ensIds=string_tokenize(smalltokens[4],", ",true);
+            for(int i = 0; i < (int)ensIds.size(); i++)
+            {
+                if(string2prot.count(ensIds[i]) == 0)
+                {
+                    string2prot[ensIds[i]] = smalltokens[0];
+                }
+                else
+                {
+                    string2prot[ensIds[i]] += string(",") + smalltokens[0];
+                }
+            }
+        }
+    }
+    PRINTFUNCTION("\rProcessed lines: %d\n", line_num);
+    PRINTFUNCTION("Formatting PPI data...\n");
+    line_num = 0;
+    //ofstream LOG("log.txt");
+    OUT << "uniprotkb\tuniprotkb\tgeneName\tgeneName\t";
+    OUT << "PubMedID\tevidence\tedgeValue" << "\n";
+    while(!IN.eof())
+    {
+        IN.getline(buffer, 1000000);
+        string tmp = buffer;
+        if(tmp.size() < 4)
+        {
+            continue;
+        }
+        line_num++;
+        if(line_num % 1000 == 0)
+        {
+            PRINTFUNCTION("\rProcessed lines: %d", line_num);
+        }
+        vector<string> smalltokens = string_tokenize(tmp, " \t", false);
+        if(smalltokens.size() < 3)
+        {
+            PRINTFUNCTION("Wrong format %s\n", tmp.c_str());
+            return false;
+        }
+        //LOG<<tmp<<endl;
+        for(int i=2; i < (int) smalltokens.size(); i++){
+            string protein1 = smalltokens[0];
+            string protein2 = smalltokens[i];
+            string name1 = protein1;
+            string name2 = protein2;
+            if(prot2name.count(name1) != 0)
+            {
+               name1 = prot2name[name1];
+            }
+            if(prot2name.count(name2) != 0)
+            {
+               name2 = prot2name[name2];
+            }
+            OUT << protein1 << "\t" << protein2<< "\t";
+            OUT << name1 << "\t" << name2 << "\tNA\tPINA";
+            OUT << "\t" << "1" << "\n";
+        }
+        //LOG<<"-------------------------------------------"<<endl;
+    }
+    PRINTFUNCTION("\rProcessed lines: %d\n", line_num);
+    IN.close();
+    MAPFILE.close();
+    OUT.close();
+    //LOG.close();
+    return true;
+}
+#ifdef INDEP_PROGRAM30
+int main(int argc, char *argv[])
+{
+    if(argc == 4)
+    {
+        formatSIFfile(argv[1], argv[2], argv[3]);
+    }
+    else
+    {
+        cerr << "formatSIFfile input mappingFile output" << endl;
     }
 }
 #else
@@ -3249,6 +3404,11 @@ extern "C" {
         formatPINAPPI(input[0], output[0]);
         return 1;
     }
+    int formatSIFfileC(char **input, char **mappingFile, char **output)
+    {
+        formatSIFfile(input[0], mappingFile[0], output[0]);
+        return 1;
+    }
     int formatiRefC(char **input, char **output, char **OX)
     {
         formatiRefIndex(input[0], output[0], OX[0]);
@@ -3282,6 +3442,8 @@ extern "C" {
     {STRSXP, STRSXP, STRSXP, STRSXP};
     static R_NativePrimitiveArgType formatPINAPPIC_t[] =
     {STRSXP, STRSXP};
+    static R_NativePrimitiveArgType formatSIFfileC_t[] =
+    {STRSXP, STRSXP, STRSXP};
     static R_NativePrimitiveArgType formatiRefC_t[] =
     {STRSXP, STRSXP, STRSXP};
     static R_NativePrimitiveArgType formatSTRINGPPIC_t[] =
@@ -3295,6 +3457,7 @@ extern "C" {
         {".viewGraphC", (DL_FUNC) &viewGraphC, 5, viewGraphC_t},
         {".getMappingFileC", (DL_FUNC) &getMappingFileC, 4, getMappingFileC_t},
         {".formatPINAPPIC", (DL_FUNC) &formatPINAPPIC, 2, formatPINAPPIC_t},
+        {".formatSIFfileC", (DL_FUNC) &formatSIFfileC, 3, formatSIFfileC_t},
         {".formatiRefC", (DL_FUNC) &formatiRefC, 3, formatiRefC_t},
         {
             ".formatSTRINGPPIC", (DL_FUNC) &formatSTRINGPPIC, 5,

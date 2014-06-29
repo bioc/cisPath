@@ -26,6 +26,10 @@ setGeneric("getMappingFile",
            function(sprotFile, output, tremblFile="", taxonId="")
            standardGeneric("getMappingFile"), 
            signature=c("sprotFile", "output"))
+setGeneric("formatSIFfile",
+           function(input, mappingFile, output)
+           standardGeneric("formatSIFfile"), 
+           signature=c("input", "mappingFile", "output"))
 setGeneric("formatPINAPPI",
            function(input, output)
            standardGeneric("formatPINAPPI"), 

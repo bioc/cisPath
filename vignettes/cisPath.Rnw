@@ -51,7 +51,7 @@ The following examples (section 4 below) will show how these files may be used.
 \section{Getting started}
 To load the \Rpackage{cisPath} package, type {\tt library(cisPath)}. 
 Five methods have been included in this package to format the files downloaded from the PINA, iRefIndex, and STRING databases. 
-These methods are {\tt getMappingFile}, {\tt formatSTRINGPPI}, {\tt formatPINAPPI}, {\tt formatiRefIndex}, and {\tt combinePPI}.
+These methods are {\tt getMappingFile}, {\tt formatSTRINGPPI}, {\tt formatSIFfile}, {\tt formatPINAPPI}, {\tt formatiRefIndex}, and {\tt combinePPI}.
 Four other methods have been also provided that are used to manage, visualize, and edit PPI networks. 
 These methods are {\tt cisPath}, {\tt addProteinNames}, {\tt networkView}, and {\tt easyEditor}.
 
@@ -91,11 +91,28 @@ This value is defined as {\tt max(1,log(1000-STRING\_SCORE,100))}.
 This may be treated as the ``cost'' of determining the shortest paths between two proteins. 
 Advanced users can edit the file and change the edge values for each edge.
 
-\subsection{Format PPI data downloaded from the PINA database}
+\subsection{Format PPI data downloaded from the PINA2 database (SIF format)}
+The input file is downloaded from the PINA2 database (\url{http://cbg.garvan.unsw.edu.au/pina/}).
+Access \url{http://cbg.garvan.unsw.edu.au/pina/interactome.stat.do} to download PPI files with the {\tt SIF format} for different species.
+\begin{center}
+<<example3_1,echo=TRUE,print=FALSE>>=
+  input <- system.file("extdata", "Homo_sapiens_PINA2.sif", package="cisPath")
+  PINA2PPI <- file.path(tempdir(), "PINA2PPI.txt")
+  formatSIFfile(input, mappingFile, output=PINA2PPI)
+@
+\end{center} 
+
+Each line of the output file contains Swiss-Prot accession numbers and gene names for two interacting proteins. 
+The edge value for each link between two interacting proteins is assigned as {\tt 1}. 
+This may be treated as the ``cost'' of determining the shortest paths between two proteins. 
+Advanced users can edit the file and change the edge values for each edge.
+
+
+\subsection{Format PPI data downloaded from the PINA database (MITAB format)}
 The input file is downloaded from the PINA database (\url{http://cbg.garvan.unsw.edu.au/pina/}).
 Access \url{http://cbg.garvan.unsw.edu.au/pina/interactome.stat.do} to download PPI files with the {\tt MITAB format} for different species.
 \begin{center}
-<<example3,echo=TRUE,print=FALSE>>=
+<<example3_2,echo=TRUE,print=FALSE>>=
   input <- system.file("extdata", "Homo_sapiens_PINA100.txt", package="cisPath")
   PINAPPI <- file.path(tempdir(), "PINAPPI.txt")
   formatPINAPPI(input, output=PINAPPI)
@@ -128,7 +145,7 @@ The method {\tt combinePPI} is used to combine the PPIs that were generated from
 \begin{center}
 <<example5,echo=TRUE,print=FALSE>>=
   output <- file.path(tempdir(), "allPPI.txt")
-  combinePPI(c(PINAPPI, iRefIndex, STRINGPPI), output)
+  combinePPI(c(PINA2PPI, iRefIndex, STRINGPPI), output)
 @
 \end{center} 
 

@@ -40,7 +40,7 @@ formatiRefIndex(input, output, taxonId="")
   Aranda, B. and et al. (2011) PSICQUIC and PSISCORE: accessing and scoring molecular interactions, \emph{Nat Methods}, \bold{8}, 528-529.
 }
 \seealso{
- \code{\link{cisPath}}, \code{\link{formatPINAPPI}}, \code{\link{formatSTRINGPPI}}, \code{\link{combinePPI}}.
+ \code{\link{cisPath}}, \code{\link{formatPINAPPI}}, \code{\link{formatSIFfile}}, \code{\link{formatSTRINGPPI}}, \code{\link{combinePPI}}.
 }
 \examples{
     library(cisPath)

@@ -1,9 +1,9 @@
 \name{formatPINAPPI}
 \alias{formatPINAPPI}
 \alias{formatPINAPPI,character,character-method}
-\title{Format PPI files downloaded from the PINA database}
+\title{Format PPI files downloaded from the PINA database (MITAB Format)}
 \description{
-  This method is used to format the PPI file which is downloaded from the PINA database.
+  This method is used to format the PPI file which is downloaded from the PINA database (MITAB Format).
 }
 \usage{
 formatPINAPPI(input, output)
@@ -14,7 +14,7 @@ formatPINAPPI(input, output)
  \item{output}{Output file (character(1)).}
 }
 \details{
-  The input file is downloaded from the PINA database (\url{http://cbg.garvan.unsw.edu.au/pina/}). \cr
+  The input file (MITAB Format) is downloaded from the PINA database (\url{http://cbg.garvan.unsw.edu.au/pina/}). \cr
   Access \url{http://cbg.garvan.unsw.edu.au/pina/interactome.stat.do} to download PPI files with the \code{MITAB format} for different species. \cr
   If you make use of this file, please cite the PINA database.
 }
@@ -30,7 +30,7 @@ formatPINAPPI(input, output)
   Wu, J. and et al. (2009) Integrated network analysis platform for protein-protein interactions. \emph{Nature methods}, \bold{6}, 75-77.  
 }
 \seealso{
- \code{\link{cisPath}}, \code{\link{formatiRefIndex}}, \code{\link{formatSTRINGPPI}}, \code{\link{combinePPI}}.
+ \code{\link{cisPath}}, \code{\link{formatSIFfile}}, \code{\link{formatiRefIndex}}, \code{\link{formatSTRINGPPI}}, \code{\link{combinePPI}}.
 }
 \examples{
     library(cisPath)
@@ -42,7 +42,7 @@ formatPINAPPI(input, output)
     outputDir <- file.path(getwd(), "cisPath_test")
     dir.create(outputDir, showWarnings=FALSE, recursive=TRUE)
     
-    # Download PINA PPI for humans only (~96M)
+    # Download PINA PPI (MITAB format) for humans only (~96M)
     destfile <- file.path(outputDir, "Homo_sapiens.txt")
     cat("Downloading...\n")
     download.file("http://cbg.garvan.unsw.edu.au/pina/download/Homo\%20sapiens-20121210.txt", destfile)

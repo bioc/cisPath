@@ -19,7 +19,7 @@ combinePPI(input, output, mappingFile="", dbNames="", maxEdgeValue=-1)
                      Default: no filter.}
 }
 \details{
-  The input files should follow the format as the output files of the method \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, or \code{\link{formatiRefIndex}}. 
+  The input files should follow the format as the output files of the method \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, \code{\link{formatSIFfile}}, or \code{\link{formatiRefIndex}}. 
   See the files \code{STRINGPPI.txt} or \code{PINAPPI.txt} as examples.
   The first four fields contain the Swiss-Prot accession numbers and gene names for two interacting proteins. 
   The \code{PubMedID} field should be stated to be \code{NA} if unavailable. 
@@ -33,11 +33,11 @@ combinePPI(input, output, mappingFile="", dbNames="", maxEdgeValue=-1)
   in the mappingfile will be ignored as well as the intereractions associated to them.
 }
 \seealso{
- \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, \code{\link{formatiRefIndex}}, \code{\link{cisPath}}, \code{\link{getMappingFile}}.
+ \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, \code{\link{formatSIFfile}}, \code{\link{formatiRefIndex}}, \code{\link{cisPath}}, \code{\link{getMappingFile}}.
 }
 \examples{
     library(cisPath)
-    inputFile1 <- system.file("extdata", "PINAPPI.txt", package="cisPath")
+    inputFile1 <- system.file("extdata", "PINA2PPI.txt", package="cisPath")
     inputFile2 <- system.file("extdata", "iRefIndex.txt", package="cisPath")
     inputFile3 <- system.file("extdata", "STRINGPPI.txt", package="cisPath")
     output <- file.path(tempdir(), "allPPI.txt")
