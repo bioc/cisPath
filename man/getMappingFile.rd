@@ -3,7 +3,7 @@
 \alias{getMappingFile,character,character-method}
 \title{Generate the identifier mapping file}
 \description{
-  This method is used to generate the identifier mapping file which is necessary for the method \code{\link{formatSTRINGPPI}}.
+  This method is used to generate the identifier mapping file which is necessary for methods \code{\link{formatSIFfile}} and \code{\link{formatSTRINGPPI}}.
 }
 \usage{
 getMappingFile(sprotFile, output, tremblFile="", taxonId="")
@@ -44,7 +44,7 @@ getMappingFile(sprotFile, output, tremblFile="", taxonId="")
   If you make use of these files, please cite the UniProt database.
 }
 \value{
-  The output file contains identifier mapping information which is necessary for the method \code{\link{formatSTRINGPPI}}.
+  The output file contains identifier mapping information which is necessary for methods \code{\link{formatSIFfile}} and \code{\link{formatSTRINGPPI}}.
   Each line contains both the Ensembl Genomes Protein identifier and the Swiss-Prot accession number for a given protein.
 }
 \references{
@@ -54,6 +54,7 @@ getMappingFile(sprotFile, output, tremblFile="", taxonId="")
 \seealso{
  \code{\link{cisPath}}, 
  \code{\link{formatSTRINGPPI}}, 
+ \code{\link{formatSIFfile}},
  \code{\link{combinePPI}}.
 }
 \examples{

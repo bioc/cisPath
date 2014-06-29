@@ -51,7 +51,7 @@ formatSTRINGPPI(input, mappingFile, taxonId, output, minScore=700)
   
 }
 \seealso{
- \code{\link{cisPath}}, \code{\link{getMappingFile}}, \code{\link{formatPINAPPI}}, \code{\link{formatiRefIndex}}, \code{\link{combinePPI}}.
+ \code{\link{cisPath}}, \code{\link{getMappingFile}}, \code{\link{formatPINAPPI}}, \code{\link{formatSIFfile}}, \code{\link{formatiRefIndex}}, \code{\link{combinePPI}}.
 }
 \examples{
     library(cisPath)

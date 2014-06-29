@@ -93,7 +93,7 @@ cisPath(infoFile, proteinName, outputDir, targetProteins=NULL, swissProtID=FALSE
   
 }
 \seealso{
- \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, \code{\link{formatiRefIndex}}, \code{\link{combinePPI}}, \code{\link{addProteinNames}}, \code{\link{networkView}}, \code{\link{easyEditor}}.
+ \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, \code{\link{formatSIFfile}}, \code{\link{formatiRefIndex}}, \code{\link{combinePPI}}, \code{\link{addProteinNames}}, \code{\link{networkView}}, \code{\link{easyEditor}}.
 }
 \examples{
     # examples
