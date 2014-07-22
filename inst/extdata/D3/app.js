@@ -1,7 +1,7 @@
 // set up SVG for D3
 var localInfo=0;
-var width  = 960,
-    height = 600,
+var width  = 1022,
+    height = 400,
     colors = d3.scale.category10();
 
 var svg = d3.select("#chart")
@@ -206,6 +206,7 @@ function tick() {
 }
 var ctrl_key_flag = 0;
 var shift_key_flag = 0;
+var donotSaveInfo=0;
 function changeStatus()
 {   
 	  var object=document.getElementById("ctrlkey");
@@ -218,7 +219,9 @@ function changeStatus()
         .on('mousedown.drag', null)
         //.on('touchstart.drag', null);
         selected_node = null;
+        donotSaveInfo=1;
         restart();
+        donotSaveInfo=0;
     }
     else
     {
@@ -748,8 +751,7 @@ svg.on('mousedown', mousedown)
 d3.select(window)
   .on('keydown', keydown)
   .on('keyup', keyup);
-restart();
-onBegin();
+window.onload=onBegin; 
 
 function clickFix(){
    for(var i in nodes){
@@ -890,6 +892,7 @@ function onBegin(){
 	 document.getElementById("loadGraphID").addEventListener("click", function(e){loadGraph();}, false);
 	 document.getElementById("DeleteGraphID").addEventListener("click", function(e){deleteGraph();}, false);
 	 document.getElementById("DeleteAllID").addEventListener("click", function(e){deleteAll();}, false);
+	 initializeSiders();
 	 //localStorage.clear();
 	 //if(navigator.userAgent.indexOf("MSIE")>0) { 
 	 if(testLocal()!=1){
@@ -897,8 +900,8 @@ function onBegin(){
    } 
    //showGraph("P04637", 0);
 	 doShowAll();
-	 if(!(ctrl_key_flag)){
-     circle.call(force.drag);
+   if(!(ctrl_key_flag)){
+        circle.call(force.drag);
    }
    testExist();
    restart();
@@ -1074,6 +1077,9 @@ function clickOK2(){
 	 restart();
 }
 function saveInfo(){
+    if(donotSaveInfo==1){
+       return;
+    }
 	 if((document.activeElement)&&(document.activeElement.id=="Submit_id")){
   	  return;
    }
@@ -1253,6 +1259,9 @@ function doShowAll(){
       	 continue;
       }
       var filename=key.substr(13);
+      if(filename=="cisPathHTML"){
+         continue;
+      }
       var time=getTimestamp(key);
       var filedate=new Date(parseInt(time));
       var time_str=filedate.toLocaleString();
@@ -1508,6 +1517,9 @@ function showNetwork(){
   setTimeout(timerFun, 1000);
 }
 function loadExist(){
+  if(loadCisPathHTML()==1){
+     return;
+  }
   var geneid=localStorage.getItem("cisPathgeneid");
   if(geneid==null){
      return;
@@ -1525,6 +1537,20 @@ function loadExist(){
   showGraph(geneid, graph_num);
   delValue("cisPathgeneid");
   delValue("cisPathnumber");
+}
+function loadCisPathHTML(){
+  if(testLocal()==0){
+     return;
+  }
+  graphName = "cisPathValue#"+"cisPathHTML";
+  var graphValue=getValue(graphName);
+  if(!graphValue){
+  	 return 0;
+  }
+  document.getElementById("saveid").value=graphValue;
+  parseText();
+  delValue(graphName);
+  return 1;
 }
 function testExist(){
 	if(testLocal()==1){
@@ -1558,4 +1584,46 @@ function getparastr(strname){
        }
    }
    return "";
+}
+function refreshSize1(event, ui) {
+    width=ui.value;
+    $("#slider0s").text("Width = " + width);
+    force.size([width, height]);
+    document.getElementById("chartfather").style.width=width+2+"px";
+    document.getElementById("chart").style.width=width+2+"px";
+    svg.attr('width', width);
+    restart();
+}
+function refreshSize2(event, ui) {
+    height=ui.value;
+    $("#slider1s").text("Height = " + height);
+    force.size([width, height]);
+    document.getElementById("chartfather").style.height=height+2+"px";
+    document.getElementById("chart").style.height=height+2+"px";
+    svg.attr('height', height);
+    restart();
+}
+function initializeSiders()
+{
+    $("#slider0").slider(
+    {
+        orientation : "horizontal",
+        slide : refreshSize1,
+        max : 2000,
+        min : 500,
+        step : 10,
+        value : width
+    }
+    );
+    
+    $("#slider1").slider(
+    {
+        orientation : "horizontal",
+        slide : refreshSize2,
+        max : 2000,
+        min : 400,
+        step : 10,
+        value : height
+    }
+    );
 }

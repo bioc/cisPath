@@ -53,7 +53,7 @@ To load the \Rpackage{cisPath} package, type {\tt library(cisPath)}.
 Five methods have been included in this package to format the files downloaded from the PINA, iRefIndex, and STRING databases. 
 These methods are {\tt getMappingFile}, {\tt formatSTRINGPPI}, {\tt formatSIFfile}, {\tt formatPINAPPI}, {\tt formatiRefIndex}, and {\tt combinePPI}.
 Four other methods have been also provided that are used to manage, visualize, and edit PPI networks. 
-These methods are {\tt cisPath}, {\tt addProteinNames}, {\tt networkView}, and {\tt easyEditor}.
+These methods are {\tt cisPath}, {\tt networkView}, and {\tt easyEditor}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Format PPI data}
@@ -216,11 +216,9 @@ input of the following codes in R will result in output of all the shortest path
 \begin{center}
 <<example8,echo=TRUE,print=FALSE>>=
   infoFile <- system.file("extdata", "PPI_Info.txt", package="cisPath")
-  outputDir <- file.path(tempdir(), "TP53_example")
-  results <- cisPath(infoFile, "TP53", outputDir, c("MAGI1", "GH1"), 
+  outputDir <- file.path(tempdir(), "TP53_example1")
+  results <- cisPath(infoFile, outputDir, "TP53", c("MAGI1", "GH1"), 
                                                        byStep=TRUE)
-  results["MAGI1"]
-  results["GH1"]
 @
 \end{center}
 \begin{figure}
@@ -247,11 +245,10 @@ In order to avoid inputting invalid target protein names, the unique identifier 
 The Swiss-Prot accession numbers can be sought from the UniProt (\url{http://www.uniprot.org/}) database.
 <<example9,echo=TRUE,print=FALSE>>=
   infoFile <- system.file("extdata", "PPI_Info.txt", package="cisPath")
-  outputDir <- file.path(tempdir(), "TP53_example")
-  results <- cisPath(infoFile, "TP53", outputDir, 
+  outputDir <- file.path(tempdir(), "TP53_example2")
+  results <- cisPath(infoFile, outputDir, "TP53", 
                      targetProteins=c("Q96QZ7", "P01241"), swissProtID=TRUE)
-  results["Q96QZ7"]
-  results["P01241"]
+  results
 @
 
 This method may be run without input of target proteins. 
@@ -259,32 +256,19 @@ If target proteins are not provided, this method will identify the shortest path
 Users can thus query the results with a browser upon finding an interesting ``target'' protein without launching R.
 <<example10,echo=TRUE,print=FALSE, results=hide>>=
   infoFile <- system.file("extdata", "PPI_Info.txt", package="cisPath")
-  outputDir <- file.path(tempdir(), "TP53_example")
-  results <- cisPath(infoFile, "TP53", outputDir)
-  results["GH1"]
-  results["P01241"]
+  outputDir <- file.path(tempdir(), "TP53_example3")
+  results <- cisPath(infoFile, outputDir, "TP53")
+  results
 @
 
-A protein often has several names, and some of these names have perhaps not been included in the input file {\tt PPI\_Info.txt}. 
-We therefore suggest users take a look on the output file {\tt targetIDs.txt} to check whether the input target protein names are valid.
-The parameter {\tt name2IDFile} allows users to add ID mapping information. 
-In this way, users can search for the shortest paths using the protein names with which they are familiar.
-
+This method may be run without input of source protein. 
+If source protein is not provided, this method will open an HTML web page. 
+Users can thus query the results with a browser upon finding an interesting ``source'' protein without launching R.
 <<example11,echo=TRUE,print=FALSE, results=hide>>=
   infoFile <- system.file("extdata", "PPI_Info.txt", package="cisPath")
-  outputDir <- file.path(tempdir(), "TP53_example")
-  name2protFile <- system.file("extdata", "name2prot.txt", package="cisPath")
-  results <- cisPath(infoFile, "P04637", outputDir, name2IDFile=name2protFile)
+  outputDir <- file.path(tempdir(), "cisPathResult")
+  results <- cisPath(infoFile, outputDir)
 @
-\subsection{Example of the addProteinNames method}
-This method allows users to add more ID mapping information even after the shortest paths have been identified. 
-For example, the following codes will add all ID mapping information included in the file {\tt name2prot.txt}.
-\begin{center}
-<<example12,echo=TRUE,print=FALSE>>=
-  name2protFile <- system.file("extdata", "name2prot.txt", package="cisPath")
-  addProteinNames(name2protFile, outputDir)
-@
-\end{center}
 \noindent
 
 \subsection{Example of downloading PPI data from our website}
@@ -292,7 +276,7 @@ The following codes will first download the PPI data that was generated for this
 With combined PPI data from PINA, iRefIndex, and STRING, the output from a single source protein is about {\tt 1.5G} in size.
 Although the output in such cases is large, we strongly suggest users give this method of selecting a source but not a target a try.
 \begin{center}
-<<example13,echo=TRUE,print=FALSE,eval=FALSE>>= 
+<<example12,echo=TRUE,print=FALSE,eval=FALSE>>= 
   outputDir <- "/home/user/TP53"
   # Create the output directory
   dir.create(outputDir, showWarnings = FALSE, recursive = TRUE)
@@ -301,14 +285,10 @@ Although the output in such cases is large, we strongly suggest users give this 
   # Download PPI data
   url <- "http://www.isb.pku.edu.cn/cispath/data/Homo_sapiens_PPI.txt"
   download.file(url, infoFile)
-  results <- cisPath(infoFile, "TP53", outputDir, byStep=TRUE) 
+  results <- cisPath(infoFile, outputDir, "TP53", byStep=TRUE)
   
-  url<-"http://www.isb.pku.edu.cn/cispath/data/Homo_sapiens_PPI.txt"
-  url<-"http://www.isb.pku.edu.cn/cispath/data/Caenorhabditis_elegans_PPI.txt"
-  url<-"http://www.isb.pku.edu.cn/cispath/data/Drosophila_melanogaster_PPI.txt"
-  url<-"http://www.isb.pku.edu.cn/cispath/data/Mus_musculus_PPI.txt"
-  url<-"http://www.isb.pku.edu.cn/cispath/data/Rattus_norvegicus_PPI.txt"
-  url<-"http://www.isb.pku.edu.cn/cispath/data/Saccharomyces_cerevisiae_PPI.txt"
+  outputDir <- "/home/user/cisPathWeb"
+  results <- cisPath(infoFile, outputDir)
 @
 \end{center}
 \noindent
@@ -317,7 +297,7 @@ Although the output in such cases is large, we strongly suggest users give this 
 The output HTML file of this method is a editor for network graphs. 
 Users can draw and edit their own network with this editor.
 \begin{center}
-<<example14,echo=TRUE,print=FALSE>>=
+<<example13,echo=TRUE,print=FALSE>>=
   outputDir <- file.path(tempdir(), "easyEditor")
   easyEditor(outputDir)
 @

@@ -58,7 +58,7 @@ networkView(infoFile, proteinNames, outputDir, swissProtID=FALSE, mainNode=c(1),
   
 }
 \seealso{
- \code{\link{cisPath}}, \code{\link{addProteinNames}}, \code{\link{easyEditor}}.
+ \code{\link{cisPath}}, \code{\link{easyEditor}}.
 }
 \examples{
     library(cisPath)

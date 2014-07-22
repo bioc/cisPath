@@ -1,8 +1,10 @@
 body {
             background-color: #EEFFEE;
-            margin-left:5%;       
-            margin-right:10%; 
-            font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+            width:1024px;
+            margin-left:auto; 
+            margin-right:auto; 
+            font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+            font-size: 16px;
 }
 svg {
   background-color: #FFF;
@@ -115,13 +117,17 @@ text.id {
 	font-size: 16px;
 }
 #chart{
-	width:960px;
-	height:600px;
+	width:1024px;
+	height:400px;
+	background-color: #EEFFEE;
+	border:2px solid gray;
 }
 #chartfather{
-	width:960px;
-	height:600px;
+	width:1024px;
+	height:400px;
 	background-color: #FFFFFF;
+	margin-left:auto; 
+    margin-right:auto; 
 }
 table {
   margin-right:20px;
@@ -191,8 +197,23 @@ td{
 	width:100px;
 }
 #fixButton,#releaseButton,#ctrlkey,#shiftkey,#savesection,#helpsection{
+    float:left;
 	font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
 }
 #Refresh_id, #Submit_id,#graphLoad_id,#graphname_id{
 	font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}
+#slider0, #slider1, #slider0s, #slider1s{
+   font-family: "Times New Roman", Georgia,"Courier New", Messenger, Geneva, Arial, sans-serif;
+   font-size: 15px;
+}
+.hr0{ height:2px;border:none;border-top:5px ridge green; width:100%; clear:both}
+.hr1{ height:2px;border:none;border-top:2px ridge green; width:100%; clear:both}
+.hr2{ height:1px;border:none;border-top:1px dashed #000000; width:100%; clear:both}
+#footerp{
+   font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+   font-size: 15px;
+}
+.validatordiv{
+   float: right;
 }
