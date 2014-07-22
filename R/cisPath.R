@@ -1,35 +1,38 @@
-setMethod(cisPath, c("character","character","character"),
-function(infoFile, proteinName, outputDir, targetProteins=NULL, 
-         swissProtID=FALSE, name2IDFile=NULL,
+setMethod(cisPath, c("character","character"),
+function(infoFile, outputDir, proteinName=NULL, targetProteins=NULL, 
+         swissProtID=FALSE, sprotFile="", tremblFile="",
          nodeColors=c("#1F77B4", "#FF7F0E", "#D62728",
                       "#9467BD", "#8C564B", "#E377C2"),
          leafColor="#2CA02C", byStep=FALSE)
 {   
     if(is.null(outputDir[1])){
        outputDir <- paste(tempdir(),"/","outputFile",sep="")
-    }else{
-       dir.create(outputDir, showWarnings = FALSE, recursive = TRUE)
-       dir.create(paste(outputDir,"/js",sep=""), showWarnings = FALSE, 
-                                                     recursive = TRUE)
-       dir.create(paste(outputDir,"/D3",sep=""), showWarnings = FALSE, 
-                                                     recursive = TRUE)
     }
+    dir.create(outputDir, showWarnings = FALSE, recursive = TRUE)
+    dir.create(paste(outputDir,"/js",sep=""), showWarnings = FALSE, 
+                                                     recursive = TRUE)
+    dir.create(paste(outputDir,"/PPIinfo",sep=""), showWarnings = FALSE, 
+                                                     recursive = TRUE)
+                                                     
     cat("Please wait patiently!\n")
-    htmlFile <- system.file("extdata", "network.html", package="cisPath")
+    htmlFile <- system.file("extdata", "cisPath.html", package="cisPath")
     #cat("htmlFile: ", htmlFile, "\n")
-    htmlFile_out <- paste(outputDir,"/","network.html",sep="")
-    file.copy(htmlFile, htmlFile_out, overwrite = TRUE, copy.mode = TRUE)
+    if(is.null(proteinName[1])){
+       proteinName <- "";
+    }
+    if(proteinName!=""){
+       htmlFile_out1 <- paste(outputDir,"/","cisPath.html",sep="")
+       file.copy(htmlFile, htmlFile_out1, overwrite = TRUE, copy.mode = TRUE)
+    }
+    htmlFile <- system.file("extdata", "cisPathWeb.html", package="cisPath")
+    #cat("htmlFile: ", htmlFile, "\n")
+    htmlFile_out2 <- paste(outputDir,"/","cisPathWeb.html",sep="")
+    file.copy(htmlFile, htmlFile_out2, overwrite = TRUE, copy.mode = TRUE)
     copyHTML(outputDir)
     #############################################################
-    jsFile <- system.file("extdata", "D3/d3.js", package="cisPath")
-    js_out <- paste(outputDir,"/D3/","d3.js",sep="")
-    file.copy(jsFile, js_out, overwrite = TRUE, copy.mode = TRUE)
-    jsFile <- system.file("extdata", "D3/d3.geom.js", package="cisPath")
-    js_out <- paste(outputDir,"/D3/","d3.geom.js",sep="")
-    file.copy(jsFile, js_out, overwrite = TRUE, copy.mode = TRUE)
-    jsFile <- system.file("extdata", "D3/d3.layout.js", package="cisPath")
-    js_out <- paste(outputDir,"/D3/","d3.layout.js",sep="")
-    file.copy(jsFile, js_out, overwrite = TRUE, copy.mode = TRUE)
+    jsFile <- system.file("extdata", "D3", package="cisPath")
+    js_out <- paste(outputDir,sep="")
+    file.copy(jsFile, js_out, overwrite = TRUE, recursive = TRUE, copy.mode = TRUE) 
     ##############################################################
     targetFile <- paste(outputDir,"/","targets.txt",sep="")
     append <- FALSE
@@ -47,36 +50,35 @@ function(infoFile, proteinName, outputDir, targetProteins=NULL,
            append <- TRUE
        }
     }
-    if(is.null(name2IDFile[1])){
-       name2IDFile <- ""
-    }
     byScore <- 1
     if(byStep){
        byScore <- 0
     }
+    nodeColorsStr <- "";
+    for(i in (1:length(nodeColors))){
+        if(nodeColorsStr==""){
+           nodeColorsStr=nodeColors[i];
+        }else{
+           nodeColorsStr=paste(nodeColorsStr, nodeColors[i], sep=",");
+        }
+    }
     kk <- .C(".cisPathC",as.character(infoFile),as.character(proteinName), 
              as.character(outputDir), as.character(targetFile), 
-             as.character(name2IDFile), as.integer(10000), as.integer(byScore))
-    results <- getResults(outputDir)
+             as.character(sprotFile), as.character(tremblFile),
+             as.character(nodeColorsStr), as.character(leafColor),
+             as.integer(byScore))
     cat("Done.\n")
-    name2protFile <- paste(outputDir,"/","js/name2prot.js",sep="");
-    
-    colstring <- "var mainNodeCols=[";
-    for(i in (1:length(nodeColors))){
-        if(i!=1){
-           colstring <- paste(colstring, ",", sep="");
-        }
-        colstring <- paste(colstring, "\"", nodeColors[i], "\"", sep="");
+    if(proteinName==""){
+       htmlFile_out <- paste(outputDir,"/","cisPathWeb.html",sep="")
+    }else{
+       htmlFile_out <- paste(outputDir,"/","cisPath.html",sep="")
     }
-    colstring <- paste(colstring, "];\n", sep="");
-    cat(file=name2protFile, colstring, append=TRUE)
-
-    colstring <- "var leafNodeCol=";
-    colstring <- paste(colstring, "\"", leafColor, "\";\n", sep="");
-    cat(file=name2protFile, colstring, append=TRUE)
-    
     if(interactive()){
        browseURL(htmlFile_out)
+    }
+    results <- htmlFile_out
+    if((proteinName!="")&&(targetFile!="")){
+        results <- getResults(outputDir);
     }
     results
 })

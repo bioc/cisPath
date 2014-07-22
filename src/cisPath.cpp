@@ -26,6 +26,8 @@
 #ifdef INDEP_PROGRAM
 #include <unistd.h>
 #define PRINTFUNCTION printf
+using std::cerr;
+using std::flush;
 #else
 #include <R.h>
 #include <Rinternals.h>
@@ -35,8 +37,6 @@
 #endif
 
 #define INF 1<<20
-using std::cerr;
-using std::flush;
 using std::endl;
 using std::vector;
 using std::map;
@@ -123,6 +123,8 @@ vector<string> hasPath;
 
 bool withPubmed = false;
 bool byScoreFlag = true;
+string nodeColorsStr="\"#1F77B4\",\"#FF7F0E\",\"#D62728\",\"#9467BD\",\"#8C564B\",\"#E377C2\"";
+string leafColorStr="\"#2CA02C\"";
 #ifdef INDEP_PROGRAM
 bool makedir(const char *dir, int mask = 0744);
 #endif
@@ -145,23 +147,23 @@ int outputID = 0;
 #ifdef INDEP_PROGRAM0
 void print_usage()
 {
-    cerr << "cispath <PPIFile> <protein> <outputDir>";
-    cerr << " [-n name2prot.txt] [-t targets.txt]" << endl;
+    //cerr << "cispath <PPIFile> <protein> <outputDir>";
+    //cerr << " [-n name2prot.txt] [-t targets.txt]" << endl;
 
-    cerr <<"----------------------------------------------------------"<<endl;
-    cerr << "  PPIFile: file that contains PPI data for proteins" << endl;
-    cerr << "  protein: protein name or Swiss-Prot accession number";
-    cerr << " for source protein" << endl;
-    cerr << "outputDir: output directory" << endl;
-    cerr <<"----------------------------------------------------------"<<endl;
-    cerr << " optional:" << endl;
-    cerr << "   -n name2prot.txt:";
-    cerr << " additional ID mapping information file" << endl;
-    cerr << "   -t targets.txt: output paths only for proteins";
-    cerr << " listed in this file (default: all)\n";
-    cerr << " (gcc version: " << GCC_VERSION << ")" << endl;
-    cerr<< "----------------------------------------------------------"<<endl;
-    exit(1);
+    //cerr <<"----------------------------------------------------------"<<endl;
+    //cerr << "  PPIFile: file that contains PPI data for proteins" << endl;
+    //cerr << "  protein: protein name or Swiss-Prot accession number";
+    //cerr << " for source protein" << endl;
+    //cerr << "outputDir: output directory" << endl;
+    //cerr <<"----------------------------------------------------------"<<endl;
+    //cerr << " optional:" << endl;
+    //cerr << "   -n name2prot.txt:";
+    //cerr << " additional ID mapping information file" << endl;
+    //cerr << "   -t targets.txt: output paths only for proteins";
+    //cerr << " listed in this file (default: all)\n";
+    //cerr << " (gcc version: " << GCC_VERSION << ")" << endl;
+    //cerr<< "----------------------------------------------------------"<<endl;
+    //exit(1);
 }
 
 string infoFile;
@@ -242,7 +244,7 @@ bool cispath(const char *input, const char *protein, const char *output)
     if(!vTarget)
     {
 #ifdef INDEP_PROGRAM
-        cerr << "These are no valid target protein names!" << endl;
+        //cerr << "These are no valid target protein names!" << endl;
 #else
         PRINTFUNCTION("These are no valid target protein names!\n");
         R_FlushConsole();
@@ -254,8 +256,8 @@ bool cispath(const char *input, const char *protein, const char *output)
     {
         root_prot = name2prot[root_prot];
 #ifdef INDEP_PROGRAM
-        cerr << protein << ": valid gene name" << endl;
-        cerr << "Swiss-Prot number: " << root_prot << endl;
+        //cerr << protein << ": valid gene name" << endl;
+        //cerr << "Swiss-Prot number: " << root_prot << endl;
 #else
         PRINTFUNCTION("%s: valid gene name\n", protein);
         PRINTFUNCTION("Swiss-Prot number: %s\n", root_prot.c_str());
@@ -265,8 +267,8 @@ bool cispath(const char *input, const char *protein, const char *output)
     else
     {
 #ifdef INDEP_PROGRAM
-        cerr << protein << ": can not be found in the name list " << endl;
-        cerr << protein << ": will be treated as a Swiss-Prot number" << endl;
+        //cerr << protein << ": can not be found in the name list " << endl;
+        //cerr << protein << ": will be treated as a Swiss-Prot number" << endl;
 #else
         PRINTFUNCTION("%s: can not be found in the name list\n", protein);
         PRINTFUNCTION("%s: will be treated as a Swiss-Prot number\n", protein);
@@ -476,7 +478,7 @@ bool showPath(string root)
         if(count2 % 100 == 0)
         {
 #ifdef INDEP_PROGRAM
-            cerr << "\routput: " << count2 << flush;
+            //cerr << "\routput: " << count2 << flush;
 #else
             PRINTFUNCTION("\rOutput: %d", count2);
             R_FlushConsole();
@@ -547,8 +549,8 @@ bool detectPath(string root)
     tmp.dist = 0;
     u.push_back(tmp);
 #ifdef INDEP_PROGRAM
-    cerr << "Searching ..." << endl;
-    cerr << flush;
+    //cerr << "Searching ..." << endl;
+    //cerr << flush;
 #else
     PRINTFUNCTION("Searching ...\n");
     R_FlushConsole();
@@ -562,7 +564,7 @@ bool detectPath(string root)
         if(ccc % 1000 == 0)
         {
 #ifdef INDEP_PROGRAM
-            cerr << "\rNumber of processed proteins:" << ccc << flush;
+            //cerr << "\rNumber of processed proteins:" << ccc << flush;
 #else
             PRINTFUNCTION("\rNumber of processed proteins:%d", ccc);
             R_FlushConsole();
@@ -819,11 +821,11 @@ bool processInput(const char *input)
                 nodes.push_back(tokens[1]);
                 nodesExist[tokens[1]] = 1;
             }
-            //cerr<<tokens[0]<<endl;
-            //cerr<<tokens[1]<<endl;
-            //cerr<<tokens[2]<<endl;
-            //cerr<<tokens[3]<<endl;
-            //cerr<<pubmedstr<<endl;
+            ////cerr<<tokens[0]<<endl;
+            ////cerr<<tokens[1]<<endl;
+            ////cerr<<tokens[2]<<endl;
+            ////cerr<<tokens[3]<<endl;
+            ////cerr<<pubmedstr<<endl;
         }
         if(tokens.size() == 6)
         {
@@ -2292,7 +2294,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cerr << "getMappingFile input output OS" << endl;
+        //cerr << "getMappingFile input output OS" << endl;
     }
 }
 #else
@@ -2526,7 +2528,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cerr << "formatSTRINGPPI input mappingFile OX output minScore" << endl;
+        //cerr << "formatSTRINGPPI input mappingFile OX output minScore" << endl;
     }
 }
 #else
@@ -2674,7 +2676,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cerr << "formatSIFfile input mappingFile output" << endl;
+        //cerr << "formatSIFfile input mappingFile output" << endl;
     }
 }
 #else
@@ -2825,7 +2827,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cerr << "formatPINAPPI input output" << endl;
+        //cerr << "formatPINAPPI input output" << endl;
     }
 }
 #else
@@ -2984,7 +2986,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cerr << "formatiRefIndex input output OX" << endl;
+        //cerr << "formatiRefIndex input output OX" << endl;
     }
 }
 #else
@@ -3349,8 +3351,654 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cerr << "combinePPI <input1> [input2...]";
-        cerr << "<output> <mappingFile> <maxEdgeValue>" << endl;
+        //cerr << "combinePPI <input1> [input2...]";
+        //cerr << "<output> <mappingFile> <maxEdgeValue>" << endl;
+    }
+}
+#else
+#endif
+////////////////////////////////////////////////////////////////////////////2014-07-15
+vector<string> split(const string &src, string delimit, string null_subst = "")
+{   
+    vector<string> v;
+    if( src.empty() || delimit.empty() ){
+       return v;
+    }
+    
+    int deli_len = (int)delimit.size();
+    string::size_type index = string::npos, last_search_position = 0;
+    while( (index = src.find(delimit, last_search_position)) != string::npos )
+    {
+        if(index == last_search_position)
+            v.push_back(null_subst);
+        else
+            v.push_back( src.substr(last_search_position, index - last_search_position) );
+        last_search_position = index + deli_len;
+    }
+    string last_one = src.substr(last_search_position);
+    v.push_back( last_one.empty() ? null_subst : last_one );
+    return v;
+}
+////////////////////////////////////////////////////////////////////////////
+HASHMAP<string, string, str_hash1> gene2swiss;
+HASHMAP<string, string, str_hash1> swiss2gene;
+HASHMAP<string, string, str_hash1> swiss2swiss;
+bool replaceGene2swiss(string geneName, string swiss, int replaceflag){
+     if(replaceflag==1){
+        gene2swiss[geneName]=swiss;
+        return 1;
+     }
+     if(gene2swiss.count(geneName)==0){
+        gene2swiss[geneName]=swiss;
+     }
+     return 1;
+}
+bool processUniprot(const char *uniprot_file, int replaceflag){
+     if(string(uniprot_file)==""){
+        return false;
+     }
+     if(string(uniprot_file)=="none"){
+        return false;
+     }
+     ifstream in(uniprot_file);
+     if(!in){
+        PRINTFUNCTION("Can not open %s\n", uniprot_file);
+        return false;
+     }
+     PRINTFUNCTION("uniprot_file: %s\n", uniprot_file);
+     char buffer[1000000 + 1];
+     string swissID="";
+     while(!in.eof()){
+        in.getline(buffer, 1000000);
+        string tmp = buffer;
+        trim(tmp);
+        if(tmp.size() <= 1){
+           continue;
+        }
+        if(tmp[tmp.size() - 1] == '\r'){
+           buffer[tmp.size() - 1] = '\0';
+           tmp = buffer;
+        }
+        if(tmp.substr(0,2)=="//"){
+           swissID="";
+           continue;
+        }
+        if(tmp.substr(0,5)=="AC   "){
+           vector<string> tokens=split(tmp.substr(5), ";");
+           for(int i=0; i < (int)tokens.size(); i++){
+               if(tokens[i].substr(0,1)==" "){
+                  tokens[i]=tokens[i].substr(1);
+               }
+               if(tokens[i]==""){
+                  continue;
+               }
+               if(swissID==""){
+                  swissID=tokens[i];
+               }
+               swiss2swiss[tokens[i]]=swissID;
+           }
+           continue;
+        }
+        string::size_type pos1=tmp.find("GN   Name=",0,10);
+        string::size_type pos2=tmp.find("Synonyms=",0,9);
+        string::size_type pos3=tmp.find("DR   HGNC; HGNC:",0,16);
+        if(pos1!=string::npos){
+           string::size_type end=tmp.find(";",pos1+10, 1);
+           string name=tmp.substr(pos1+10, end-(pos1+10));
+           replaceGene2swiss(name, swissID, replaceflag);
+           swiss2gene[swissID]=name;
+        }
+        if(pos2!=string::npos){
+           if((pos2!=5)&&(pos1==string::npos)){
+               continue;
+           }
+           string::size_type end=tmp.find(";",pos2+9, 1);
+           vector<string> tokens=split(tmp.substr(pos2+9, end-(pos2+9)), ",");
+           for(int i=0; i < (int)tokens.size(); i++){
+               if(tokens[i].substr(0,1)==" "){
+                  tokens[i]=tokens[i].substr(1);
+               }
+               if(tokens[i]==""){
+                  continue;
+               }
+               replaceGene2swiss(tokens[i], swissID, replaceflag);
+           }
+        }
+        if(pos3!=string::npos){
+           string::size_type pos=tmp.find("; ",pos3+16, 2);
+           if(pos!=string::npos){
+              string::size_type end=tmp.find(".", pos+2, 1);
+              if(end!=string::npos){
+                 string name=tmp.substr(pos+2, end-(pos+2));
+                 replaceGene2swiss(name, swissID, replaceflag);
+                 swiss2gene[swissID]=name;
+              }
+           }
+        }
+     }  
+     return 1;
+}
+bool outputSwissInfo(const char *output, const char * fileName, HASHMAP<string, string, str_hash1>& swissMap){
+     string outputFile=string(output)+"/PPIinfo/"+fileName;
+     ofstream OUT(outputFile.c_str());
+     if(!OUT){
+        PRINTFUNCTION("Can not open %s to write\n", outputFile.c_str());
+        return false;
+     }
+     OUT<<"cisPathCallBack({"<<"\n";
+     HASHMAP<string, string, str_hash1>::iterator iter;
+     HASHMAP<string, string, str_hash1>::iterator iter_begin = swissMap.begin();
+     HASHMAP<string, string, str_hash1>::iterator iter_end = swissMap.end();
+     for(iter = iter_begin; iter != iter_end; iter++){
+         if(iter!=iter_begin){
+            OUT<<",\n";
+         }
+         OUT<<"\""<<iter->first<<"\":\""<<iter->second<<"\"";
+     }
+     OUT << "\n})\n";
+     OUT.close();
+     return true;    
+}
+vector<string> swissNums;
+HASHMAP<string, int, str_hash1> swiss2id;
+vector<vector<int> > swiss2PPI;
+HASHMAP<string, int, str_hash1> idid2score;
+HASHMAP<string, string, str_hash1> idid2E1;
+HASHMAP<string, string, str_hash1> idid2E2;
+void pushswiss(string& swiss1, string& swiss2);
+void pushE1(string& swiss1, string& swiss2, string& E1);
+void pushE2(string& swiss1, string& swiss2, string& E2);
+void pushScore(string& swiss1, string& swiss2, string & score);
+bool processWebInput(const char *input, bool addSwiss2Swiss, bool detectPathFlag){
+     swissNums.clear();
+     swiss2id.clear();
+     swiss2PPI.clear();
+     idid2score.clear();
+     idid2E1.clear();
+     idid2E2.clear();
+     ifstream in(input);
+     if(!in){
+        PRINTFUNCTION("Can not open %s\n", input);
+        return false;
+     }
+     char buffer[1000000 + 1];
+     vector<string> tokens;
+     string tmp;
+     map<string, int> maptmp;
+     int lineCount = 0;
+     while(!in.eof()){
+        in.getline(buffer, 1000000);
+        tmp = buffer;
+        trim(tmp);
+        if(tmp.size() <= 1){
+           continue;
+        }
+        //PRINTFUNCTION("\rProcessed %d lines...", lineCount);
+        lineCount++;
+        if(tmp[tmp.size() - 1] == '\r'){
+           buffer[tmp.size() - 1] = '\0';
+           tmp = buffer;
+        }
+        tokens=split(tmp, "\t");
+        /////////////////////////////////////
+        if(tokens.size() == 6){
+            string tmp = "1.000";
+            tokens.push_back(tmp);
+        }
+        if(tokens.size() != 7){
+            PRINTFUNCTION("Invalid file format!\n");
+            PRINTFUNCTION(buffer);
+            return false;
+        }
+        /////////////////////////////////////
+        if(tokens[0]=="uniprotkb"){
+           continue;
+        }
+        if(!addSwiss2Swiss){
+           if(swiss2swiss.count(tokens[0])!=0){
+              tokens[0]=swiss2swiss[tokens[0]];
+           }
+           if(swiss2swiss.count(tokens[1])!=0){
+              tokens[1]=swiss2swiss[tokens[1]];
+           }
+        }else{
+           swiss2swiss[tokens[0]]=tokens[0];
+           swiss2swiss[tokens[1]]=tokens[1];
+           swiss2gene[tokens[0]]=tokens[2];
+           swiss2gene[tokens[1]]=tokens[3];
+           gene2swiss[tokens[2]]=tokens[0];
+           gene2swiss[tokens[3]]=tokens[1];
+        }
+        //////////////////////////////////////
+        if(swiss2id.count(tokens[0])==0){
+           swissNums.push_back(tokens[0]);
+           swiss2id[tokens[0]]=(int)(swissNums.size()-1);
+           vector<int> vtmp;
+           swiss2PPI.push_back(vtmp);
+        }
+        if(swiss2id.count(tokens[1])==0){
+           swissNums.push_back(tokens[1]);
+           swiss2id[tokens[1]]=(int)(swissNums.size()-1);
+           vector<int> vtmp;
+           swiss2PPI.push_back(vtmp);
+        }
+        pushswiss(tokens[0], tokens[1]);
+        pushswiss(tokens[1], tokens[0]);
+        pushE1(tokens[0], tokens[1], tokens[4]);
+        pushE1(tokens[1], tokens[0], tokens[4]);
+        pushE2(tokens[0], tokens[1], tokens[5]);
+        pushE2(tokens[1], tokens[0], tokens[5]);
+        pushScore(tokens[0], tokens[1], tokens[6]);
+        pushScore(tokens[1], tokens[0], tokens[6]);
+        /////////////////////////////////////////
+        if(!detectPathFlag){
+           continue;
+        }
+        if(edge.count(tokens[0]) == 0){
+           edge[tokens[0]] = maptmp;
+        }
+        if(edge.count(tokens[1]) == 0){
+           edge[tokens[1]] = maptmp;
+        }
+        if(byScoreFlag){
+           int score = (int)(atof(tokens[6].c_str()) * 1000 + 0.01);
+           if(score < 1000){
+              score = 1000;
+           }
+           int wassign=0;
+           if(edge.count(tokens[0])==0){
+              wassign=1;
+           }else{
+              if(edge[tokens[0]].count(tokens[1])==0){
+                 wassign=1;
+              }else{
+                 if(edge[tokens[0]][tokens[1]] > score){
+                	wassign=1;
+                 }
+              }
+           }
+           if(wassign==1){
+              edge[tokens[0]][tokens[1]] = score;
+              edge[tokens[1]][tokens[0]] = score;
+           }
+        }else{
+           edge[tokens[0]][tokens[1]] = 1;
+           edge[tokens[1]][tokens[0]] = 1;
+        }
+        if(nodesExist.count(tokens[0]) == 0){
+           nodes.push_back(tokens[0]);
+           nodesExist[tokens[0]] = 1;
+        }
+        if(nodesExist.count(tokens[1]) == 0){
+           nodes.push_back(tokens[1]);
+           nodesExist[tokens[1]] = 1;
+        }
+        ////////////////////////////////////////////////
+     }
+     name2prot=gene2swiss;
+     prot2real=swiss2gene;
+     PRINTFUNCTION("\rProcessed %d lines...\n", lineCount);
+     return true;
+}
+bool getUniqNums(vector<int>& nums, int id1, string& result1, string& result2){
+     sort(nums.begin(), nums.end());
+     vector<int>::iterator end_unique =  unique(nums.begin(), nums.end()); 
+     nums.erase(end_unique, nums.end());
+     result1="[";
+     result2="[";
+     for(int i=0; i<(int)nums.size();i++){
+         string key=int2str(id1)+"&"+int2str(nums[i]);
+         if(i!=(int)nums.size()-1){
+            result1+=int2str(nums[i])+",";
+            result2+=double2string(double(idid2score[key])/1000)+",";
+         }else{
+            result1+=int2str(nums[i])+"]";
+            result2+=double2string(double(idid2score[key])/1000)+"]";
+         }
+     }
+     return true;
+}
+string getUniqE(string Evidence){
+     vector<string> tmp=split(Evidence, ", ");
+     string result="";
+     HASHMAP<string, int, str_hash1> evidenceE;
+     for(int i=0; i<(int)tmp.size();i++){
+         if(evidenceE.count(tmp[i])!=0){
+            continue;
+         }
+         evidenceE[tmp[i]]=1;
+         if(result==""){
+            result=tmp[i];
+         }else{
+            result=result+","+tmp[i];
+         }
+     }
+     return result;
+}
+string getJsonForEachGeneE1(int id){
+     string resultStr="\"Evidence1\": {\n";
+     vector<int> nums=swiss2PPI[id];
+     for(int i=0; i<(int)nums.size();i++){
+         string key=int2str(id)+"&"+int2str(nums[i]);
+         if(idid2E1.count(key)==0){
+            //std::cout<<key<<"\n";
+            continue;
+         }
+         string E1=getUniqE(idid2E1[key]);
+         resultStr=resultStr+"\""+swissNums[nums[i]]+"\": ";
+         resultStr=resultStr+"\""+E1+"\"";
+         if(i==(int)nums.size()-1){
+            resultStr=resultStr+"\n},\n";
+         }else{
+            resultStr=resultStr+",\n";
+         }
+     }
+     return resultStr;
+}
+string getJsonForEachGeneE2(int id){
+     string resultStr="\"Evidence2\": {\n";
+     vector<int> nums=swiss2PPI[id];
+     for(int i=0; i<(int)nums.size();i++){
+         string key=int2str(id)+"&"+int2str(nums[i]);
+         if(idid2E2.count(key)==0){
+            //std::cout<<key<<"\n";
+            continue;
+         }
+         string E2=getUniqE(idid2E2[key]);
+         resultStr=resultStr+"\""+swissNums[nums[i]]+"\": ";
+         resultStr=resultStr+"\""+E2+"\"";
+         if(i==(int)nums.size()-1){
+            resultStr=resultStr+"\n}\n";
+         }else{
+            resultStr=resultStr+",\n";
+         }
+     }
+     return resultStr;
+}
+string getJsonForEachGene(int id){
+     string resultStr="cisPathCallBack({\n";
+     resultStr=resultStr+getJsonForEachGeneE1(id)+getJsonForEachGeneE2(id)+"})\n";
+     return resultStr;
+}
+bool outputWebPPI(const char *output){
+     string outputFile=string(output)+"/PPIinfo/"+"PPI.js";
+     ofstream OUT(outputFile.c_str());
+     if(!OUT){
+        PRINTFUNCTION("Can not open %s to write\n", outputFile.c_str());
+        return false;
+     }
+     OUT<<"cisPathCallBack({"<<"\n";
+     OUT<<"\"swissNums\": [\n";
+     for(int i=0; i<(int)swissNums.size();i++){
+         OUT<<"\""<<swissNums[i]<<"\"";
+         if(i!=(int)swissNums.size()-1){
+            OUT<<",\n";
+         }else{
+            OUT<<"\n],\n";
+         }
+     }
+     OUT<<"\"PPI\": [\n";
+     string scoreResult="\"Scores\": [\n";
+     for(int i=0; i<(int)swissNums.size();i++){
+         string result1;
+         string result2;
+         getUniqNums(swiss2PPI[i], i, result1, result2);
+         OUT<<result1;
+         scoreResult+=result2;
+         if(i==(int)swissNums.size()-1){
+            OUT<<"\n";
+            scoreResult+="\n";
+         }else{
+            OUT<<",\n";
+            scoreResult+=",\n";
+         }
+     }
+     OUT<<"],\n";
+     OUT<<scoreResult;
+     OUT<<"]\n";
+     OUT<<"})\n";
+     OUT.close();
+     for(int i=0; i<(int)swissNums.size();i++){
+         outputFile=string(output)+"/PPIinfo/"+swissNums[i]+".js";
+         ofstream OUT(outputFile.c_str());
+         if(!OUT){
+             PRINTFUNCTION("Can not open %s to write\n", outputFile.c_str());
+             return false;
+         }
+         OUT<<getJsonForEachGene(i);
+         OUT.close();
+     }
+     swissNums.clear();
+     swiss2id.clear();
+     swiss2PPI.clear();
+     idid2score.clear();
+     idid2E1.clear();
+     idid2E2.clear();
+     return true;
+}
+void getPathWeb(string& target);
+bool showPathWeb(string& root, string outputDir);
+bool cispathWeb(const char *input, const char *protein, const char *output, const char * uniprot_sprot_file, const char *uniprot_trembl_file){
+     gene2swiss.clear();
+     swiss2gene.clear();
+     swiss2swiss.clear();
+     PRINTFUNCTION("input file: %s\n", input);
+     PRINTFUNCTION("source protein: %s\n", protein);
+     PRINTFUNCTION("output directory: %s\n", output);
+     if((string(uniprot_sprot_file)!="")&&(string(uniprot_sprot_file)=="none")){
+       PRINTFUNCTION("uniprot_sprot_file: %s\n", uniprot_sprot_file);
+     }
+     if((string(uniprot_trembl_file)!="")&&(string(uniprot_trembl_file)=="none")){
+       PRINTFUNCTION("uniprot_trembl_file: %s\n", uniprot_trembl_file);
+     }
+     PRINTFUNCTION("Processing input file...\n");
+#ifdef INDEP_PROGRAM
+     makedir((string(output) + "/PPIinfo").c_str());
+     makedir((string(output) + "/js").c_str());
+#else
+     R_FlushConsole();
+#endif
+     processUniprot(uniprot_sprot_file, 1);
+     processUniprot(uniprot_trembl_file, 0);
+     bool addSwiss2Swiss=false;
+     if((string(uniprot_sprot_file)=="")||(string(uniprot_sprot_file)=="none")){
+         addSwiss2Swiss=true;
+     }
+     bool detectPathFlag=true;
+     if((string(protein)=="")||(string(protein)=="none")){
+          detectPathFlag=false;
+     }
+     if(!processWebInput(input, addSwiss2Swiss, detectPathFlag)){
+        return false;
+     }
+     outputSwissInfo(output, "gene2swiss.js", gene2swiss);
+     outputSwissInfo(output, "swiss2gene.js", swiss2gene);
+     outputSwissInfo(output, "swiss2swiss.js", swiss2swiss);
+     outputWebPPI(output);
+     gene2swiss.clear();
+     swiss2gene.clear();
+     swiss2swiss.clear();
+     if((string(protein)=="")||(string(protein)=="none")){
+         return true;
+     }
+     //////////////////////////////////////////
+     bool vTarget = getTargets(output);
+     if(!vTarget){
+#ifdef INDEP_PROGRAM
+        //cerr << "These are no valid target protein names!" << endl;
+#else
+        PRINTFUNCTION("These are no valid target protein names!\n");
+        R_FlushConsole();
+#endif
+        return false;
+    }
+     string root_prot = protein;
+     if(name2prot.find(root_prot) != name2prot.end()){
+        root_prot = name2prot[root_prot];
+#ifdef INDEP_PROGRAM
+        //cerr << protein << ": valid gene name" << endl;
+        //cerr << "Swiss-Prot number: " << root_prot << endl;
+#else
+        PRINTFUNCTION("%s: valid gene name\n", protein);
+        PRINTFUNCTION("Swiss-Prot number: %s\n", root_prot.c_str());
+        R_FlushConsole();
+#endif
+     }
+     else{
+#ifdef INDEP_PROGRAM
+        //cerr << protein << ": can not be found in the name list " << endl;
+        //cerr << protein << ": will be treated as a Swiss-Prot number" << endl;
+#else
+        PRINTFUNCTION("%s: can not be found in the name list\n", protein);
+        PRINTFUNCTION("%s: will be treated as a Swiss-Prot number\n", protein);
+        R_FlushConsole();
+#endif
+     }
+     root = root_prot;
+     detectPath(root_prot);
+     showPathWeb(root_prot, output);
+     //////////////////////////////////////////
+     return true;
+}
+////////////////////////////////
+void pushswiss(string& swiss1, string& swiss2){
+     int id1=swiss2id[swiss1];
+     int id2=swiss2id[swiss2];
+     swiss2PPI[id1].push_back(id2);
+}
+void pushE1(string& swiss1, string& swiss2, string& E1){
+     string key=int2str(swiss2id[swiss1])+"&"+int2str(swiss2id[swiss2]);
+     if(idid2E1.count(key)){
+        idid2E1[key]="";
+     }
+     if(idid2E1[key]==""){
+        idid2E1[key]=E1;
+     }else{
+        idid2E1[key]=idid2E1[key]+", "+E1;
+     }
+}
+void pushE2(string& swiss1, string& swiss2, string& E2){
+     string key=int2str(swiss2id[swiss1])+"&"+int2str(swiss2id[swiss2]);
+     if(idid2E2.count(key)){
+        idid2E2[key]="";
+     }
+     if(idid2E2[key]==""){
+        idid2E2[key]=E2;
+     }else{
+        idid2E2[key]=idid2E2[key]+", "+E2;
+     }
+}
+void pushScore(string& swiss1, string& swiss2, string & score){
+     string key=int2str(swiss2id[swiss1])+"&"+int2str(swiss2id[swiss2]);
+     int scoreInt=(int)(atof(score.c_str()) * 1000 + 0.01);
+     if(idid2score.count(key)==0){
+        idid2score[key]=scoreInt;
+     }else{
+        if(idid2score[key]>scoreInt){
+           idid2score[key]=scoreInt;
+        }
+     }
+}
+////////////////////////////////
+bool printPathWeb(){
+    string path="";
+    for(int i=0; i<(int)onePath.size(); i++){
+        if(path!=""){
+           path=onePath[i]+"#"+path;
+        }else{
+           path=onePath[i];
+        }
+    }
+    OUTJS1<<"\""<<path<<"\",\n";
+    return true;
+}
+////////////////////////////////
+void getPathWeb(string& target){
+    onePath.push_back(target);
+    if(target == root){
+        printPathWeb();
+        onePath.pop_back();
+        return;
+    }
+    if(outputPath == 0){
+        onePath.pop_back();
+        return;
+    }
+    string info = prev[target];
+    vector<string> tokens = string_tokenize(info, "#", false);
+    for(int i = 0; i < (int)tokens.size(); i++){
+        getPathWeb(tokens[i]);
+    }
+    onePath.pop_back();
+}
+bool showPathWeb(string& root, string outputDir){
+    string jsFile = outputDir + "/js/results.js";
+    OUTJSALL.open(jsFile.c_str(), ios::out);
+    if(!OUTJSALL){
+        PRINTFUNCTION("Can not open file %s!", jsFile.c_str());
+        return false;
+    }
+    OUTJSALL<<"cisPathCallBack({"<<"\n";
+    OUTJSALL<<"\"root\":"<<"\""<<root<<"\",\n";
+    int byScoreFlagtmp=0;
+    if(byScoreFlag){
+       byScoreFlagtmp=1;
+    }
+    OUTJSALL<<"\"byscore\":"<<"\""<<byScoreFlagtmp<<"\",\n";
+    OUTJSALL<<"\"nodeColors\":"<<"\""<<nodeColorsStr<<"\",\n";
+    OUTJSALL<<"\"leafColor\":"<<"\""<<leafColorStr<<"\",\n";
+    OUTJSALL<<"\"targets\":"<<"[\n";
+    int count2=0;
+    for(int i = 0; i < (int)hasPath.size(); i++){
+        if((targetFile != "") && (targets.count(hasPath[i]) == 0)){
+            continue; //2012-12-04
+        }
+        if(i != 0){
+            OUTJSALL << ",\n";
+        }
+        OUTJSALL << "\"" << hasPath[i] << "\"";
+        onePath.clear();
+        string jsFile = outputDir + "/js/" + hasPath[i] + "_path.js";
+        OUTJS1.open(jsFile.c_str(), ios::out);
+        if(!OUTJS1){
+            PRINTFUNCTION("Can not open file %s!\n", jsFile.c_str());
+            return false;
+        }
+        OUTJS1<<"cisPathCallBack({"<<"\n";
+        OUTJS1<<"paths:[\n";
+        getPathWeb(hasPath[i]);
+        OUTJS1<<"\"\"\n]";
+        OUTJS1 << "\n})\n";
+        OUTJS1.close();
+        if(count2 % 100 == 0){
+#ifdef INDEP_PROGRAM
+            //cerr << "\routput: " << count2 << flush;
+#else
+            PRINTFUNCTION("\rOutput: %d", count2);
+            R_FlushConsole();
+#endif
+        }
+        count2++;
+    }
+    OUTJSALL << "\n]";
+    OUTJSALL << "\n})\n";
+    PRINTFUNCTION("\rOutput: %d\n", count2);
+    count2 = 0;
+    OUTJSALL.close();
+#ifdef INDEP_PROGRAM
+#else
+    R_FlushConsole();
+#endif
+    return true;
+}
+////////////////////////////////
+#ifdef INDEP_PROGRAM8
+int main(int argc, char *argv[]){
+    if(argc == 6){
+        cispathWeb(argv[1], argv[2], argv[3], argv[4], argv[5]);
+    }
+    else{
+        //cerr << "cispathWeb input sourceGene outputDir uniprot_sprot_file uniprot_trembl_file" << endl;
     }
 }
 #else
@@ -3360,12 +4008,12 @@ int main(int argc, char *argv[])
 #else
 extern "C" {
     int cisPathC(char **input, char **protein, char **output,
-                 char **targetsFile, char **name2protFile,
-                 int *maxPathCount, int *byScore)
+                 char **targetsFile, char **uniprot_sprot_file, char **uniprot_trembl_file,
+                 char **nodeColors, char **leafColor, int *byScore)
     {
-        n2pFile = name2protFile[0];
         targetFile = targetsFile[0];
-        maxNum = maxPathCount[0];
+        nodeColorsStr=nodeColors[0];
+        leafColorStr=leafColor[0];
         if(byScore[0] >= 1)
         {
             byScoreFlag = true;
@@ -3374,7 +4022,7 @@ extern "C" {
         {
             byScoreFlag = false;
         }
-        cispath(input[0], protein[0], output[0]);
+        cispathWeb(input[0], protein[0], output[0], uniprot_sprot_file[0], uniprot_trembl_file[0]);
         /////////////////////////////
         clearInfo();
         return 1;
@@ -3434,7 +4082,7 @@ extern "C" {
 
 extern "C" {
     static R_NativePrimitiveArgType cisPathC_t[] =
-    {STRSXP, STRSXP, STRSXP, STRSXP, STRSXP, INTSXP, INTSXP};
+    {STRSXP, STRSXP, STRSXP, STRSXP, STRSXP, STRSXP, STRSXP, STRSXP, INTSXP};
     static R_NativePrimitiveArgType addInfoC_t[] = {STRSXP, STRSXP};
     static R_NativePrimitiveArgType viewGraphC_t[] =
     {STRSXP, STRSXP, STRSXP, INTSXP, STRSXP};
@@ -3452,7 +4100,7 @@ extern "C" {
     {STRSXP, STRSXP, INTSXP, STRSXP, STRSXP, REALSXP};
     R_CMethodDef cMethods[] =
     {
-        {".cisPathC", (DL_FUNC) &cisPathC, 7, cisPathC_t},
+        {".cisPathC", (DL_FUNC) &cisPathC, 9, cisPathC_t},
         {".addInfoC", (DL_FUNC) &addInfoC, 2, addInfoC_t},
         {".viewGraphC", (DL_FUNC) &viewGraphC, 5, viewGraphC_t},
         {".getMappingFileC", (DL_FUNC) &getMappingFileC, 4, getMappingFileC_t},

@@ -1,23 +1,24 @@
 \name{cisPath}
 \alias{cisPath}
-\alias{cisPath,character,character,character-method}
+\alias{cisPath,character,character-method}
 \title{Visualization of the shortest paths of functional interaction between proteins}
 \description{
   This method is used to identify and visualize the shortest functional paths between proteins in the protein--protein interaction (PPI) network.
 }
 \usage{
-cisPath(infoFile, proteinName, outputDir, targetProteins=NULL, swissProtID=FALSE, name2IDFile=NULL, 
-        nodeColors=c("#1F77B4", "#FF7F0E", "#D62728","#9467BD","#8C564B","#E377C2"), leafColor="#2CA02C", byStep=FALSE)
-\S4method{cisPath}{character,character,character}(infoFile, proteinName, outputDir, targetProteins=NULL, swissProtID=FALSE, name2IDFile=NULL, 
-        nodeColors=c("#1F77B4", "#FF7F0E", "#D62728","#9467BD","#8C564B","#E377C2"), leafColor="#2CA02C", byStep=FALSE)
+cisPath(infoFile, outputDir, proteinName=NULL, targetProteins=NULL, swissProtID=FALSE, sprotFile="", tremblFile="", 
+        nodeColors=c("#1F77B4", "#FF7F0E", "#D62728", "#9467BD", "#8C564B", "#E377C2"), leafColor="#2CA02C", byStep=FALSE)
+\S4method{cisPath}{character,character}(infoFile, outputDir, proteinName=NULL, targetProteins=NULL, swissProtID=FALSE, sprotFile="", tremblFile="",  
+        nodeColors=c("#1F77B4", "#FF7F0E", "#D62728", "#9467BD", "#8C564B", "#E377C2"), leafColor="#2CA02C", byStep=FALSE)
 }
 \arguments{
  \item{infoFile}{File that contains PPI data (character(1)). \cr Please see the file \code{PPI_Info.txt} as an example.}
- \item{proteinName}{Gene name or Swiss-Prot accession number of the source protein (character(1)).}
  \item{outputDir}{Output directory (character(1)).}
+ \item{proteinName}{Gene name or Swiss-Prot accession number of the source protein (character(1)). \cr If \code{null}, identify the shortest functional paths in the web page.}
  \item{targetProteins}{Gene names or Swiss-Prot accession numbers of the target proteins (character vector). \cr If \code{null}, treat all other proteins as potential targets.}
  \item{swissProtID}{A logical value. If \code{targetProteins} contains Swiss-Prot accession numbers, set as \code{TRUE}. \cr If \code{targetProteins} contains gene names, set as \code{FALSE}.}
- \item{name2IDFile}{File contains ID Mapping information (character(1)).  \cr Please see the file \code{name2prot.txt} as an example.}
+ \item{sprotFile}{Input: File downloaded from the UniProt database (UniProtKB/Swiss-Prot) (character(1)).}
+ \item{tremblFile}{Input: File downloaded from the UniProt database (UniProtKB/TrEMBL) (character(1)).}
  \item{nodeColors}{Represents colors for main nodes in the graph. If there are fewer values than main nodes, it will be recycled in the standard manner. \cr
             Form: "#RRGGBB", each of the pairs RR, GG, BB consist of two hexadecimal digits giving a value in the range 00 to FF.}
  \item{leafColor}{Represents color for leaf nodes in the graph. (character(1)) \cr
@@ -62,9 +63,28 @@ cisPath(infoFile, proteinName, outputDir, targetProteins=NULL, swissProtID=FALSE
   A protein often has several names, and some of these names have perhaps not been included in the input file \code{infoFile}.
   We therefore suggest users take a look at the output file \code{targetIDs.txt} to check whether the input protein names are valid.
   In order to avoid inputting invalid target protein names, the unique identifier Swiss-Prot accession numbers may alternatively be used as input. 
-  The Swiss-Prot accession numbers can be sought in the UniProt (\url{http://www.uniprot.org/}) database.
-  The parameter \code{name2IDFile} allows users to add ID mapping information. 
-  In this way, users can search for the shortest paths using the protein names with which they are familiar.
+  The Swiss-Prot accession numbers can be sought in the UniProt (\url{http://www.uniprot.org/}) database. We strongly suggest users provide 
+  the files from downloaded from the UniProt database (\code{sprotFile} and \code{tremblFile}).
+  
+  All species: 
+  \url{ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz}  \cr
+  \url{ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz}  \cr
+  Taxonomic divisions: 
+  \url{ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/} 
+
+  uniprot_sprot_archaea.dat.gz and uniprot_trembl_archaea.dat.gz contain all archaea entries. \cr
+  uniprot_sprot_bacteria.dat.gz and uniprot_trembl_bacteria.dat.gz contain all bacteria entries. \cr
+  uniprot_sprot_fungi.dat.gz and uniprot_trembl_fungi.dat.gz contain all fungi entries. \cr
+  uniprot_sprot_human.dat.gz and uniprot_trembl_human.dat.gz contain all human entries. \cr
+  uniprot_sprot_invertebrates.dat.gz and uniprot_trembl_invertebrates.dat.gz contain all invertebrate entries. \cr
+  uniprot_sprot_mammals.dat.gz and uniprot_trembl_mammals.dat.gz contain all mammalian entries except human and rodent entries. \cr
+  uniprot_sprot_plants.dat.gz and uniprot_trembl_plants.dat.gz contain all plant entries. \cr
+  uniprot_sprot_rodents.dat.gz and uniprot_trembl_rodents.dat.gz contain all rodent entries. \cr
+  uniprot_sprot_vertebrates.dat.gz and uniprot_trembl_vertebrates.dat.gz contain all vertebrate entries except mammals. \cr
+  uniprot_sprot_viruses.dat.gz and uniprot_trembl_viruses.dat.gz contain all eukaryotic entries except those from vertebrates, fungi and plants. \cr
+  We suggest you take a look at the README file before you download these files.  \cr \cr
+  
+  If you make use of these files, please cite the UniProt database.
 }
 \value{
   A list will be returned, and each element will contain the shortest paths from the source protein to a target protein. \cr
@@ -73,8 +93,6 @@ cisPath(infoFile, proteinName, outputDir, targetProteins=NULL, swissProtID=FALSE
   Users can search for the paths easily using a browser.
   The file \code{validInputProteins.txt} contains the proteins that are valid as input to the HTML file.
   Please take a look at the output file \code{targetIDs.txt} to check whether the input protein names to this method are valid. \cr
-  
-  With combined PPI data from PINA and STRING, the output from a single source protein is about \code{1.2G} in size.
 }
 \references{
   Cowley, M.J. and et al. (2012) PINA v2.0: mining interactome modules. \emph{Nucleic Acids Res}, \bold{40}, D862-865. 
@@ -93,29 +111,30 @@ cisPath(infoFile, proteinName, outputDir, targetProteins=NULL, swissProtID=FALSE
   
 }
 \seealso{
- \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, \code{\link{formatSIFfile}}, \code{\link{formatiRefIndex}}, \code{\link{combinePPI}}, \code{\link{addProteinNames}}, \code{\link{networkView}}, \code{\link{easyEditor}}.
+ \code{\link{formatSTRINGPPI}}, \code{\link{formatPINAPPI}}, \code{\link{formatSIFfile}}, \code{\link{formatiRefIndex}}, \code{\link{combinePPI}}, \code{\link{networkView}}, \code{\link{easyEditor}}.
 }
 \examples{
     # examples
     infoFile <- system.file("extdata", "PPI_Info.txt", package="cisPath")
-    outputDir <- file.path(tempdir(), "TP53_example")
     
     # source protein: TP53
-    # Identify the shortest functional paths from TP53 to all other relevant proteins 
-    results <- cisPath(infoFile, "TP53", outputDir, byStep=TRUE)
-    results["GH1"]
-    results["P01241"]
+    # Identify the shortest functional paths from TP53 to all other relevant proteins
+    outputDir <- file.path(tempdir(), "TP53_example1")
+    results <- cisPath(infoFile, outputDir, "TP53", byStep=TRUE)
     
     # Identify the shortest paths from TP53 to proteins MAGI1 and GH1
-    results <- cisPath(infoFile, "TP53", outputDir, targetProteins=c("MAGI1", "GH1"), byStep=TRUE)
+    outputDir <- file.path(tempdir(), "TP53_example2")
+    results <- cisPath(infoFile, outputDir, "TP53", targetProteins=c("MAGI1", "GH1"), byStep=TRUE)
     results
     
     # Identify the shortest paths from TP53 to proteins Q96QZ7 and P01241 (with the Swiss-Prot accession numbers)
-    results <- cisPath(infoFile, "TP53", outputDir, targetProteins=c("Q96QZ7", "P01241"), swissProtID=TRUE, byStep=TRUE)
+    #outputDir <- file.path(tempdir(), "TP53_example3")
+    #results <- cisPath(infoFile, outputDir, "TP53", targetProteins=c("Q96QZ7", "P01241"), swissProtID=TRUE, byStep=FALSE)
     
-    name2protFile <- system.file("extdata", "name2prot.txt", package="cisPath")
-    results <- cisPath(infoFile, "P04637", outputDir, name2IDFile=name2protFile, byStep=TRUE)
-    
+    # Identify the shortest functional paths in the web page
+    #outputDir <- file.path(tempdir(), "cisPath_example")
+    #results <- cisPath(infoFile, outputDir)
+
 \dontrun{
     # example of downloading PPI data from our website
     
@@ -135,7 +154,9 @@ cisPath(infoFile, proteinName, outputDir, targetProteins=NULL, swissProtID=FALSE
     download.file("http://www.isb.pku.edu.cn/cispath/data/Rattus_norvegicus_PPI.txt", infoFile)
     download.file("http://www.isb.pku.edu.cn/cispath/data/Saccharomyces_cerevisiae_PPI.txt", infoFile)
     
-    results <- cisPath(infoFile, "TP53", outputDir)
+    results <- cisPath(infoFile, outputDir, "TP53")
+    outputDir <- file.path(getwd(), "cisPathWeb")
+    results <- cisPath(infoFile, outputDir)
     }
 }
 \keyword{methods}

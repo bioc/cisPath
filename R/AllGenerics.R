@@ -1,15 +1,11 @@
 setGeneric("cisPath",
-           function(infoFile, proteinName, outputDir, targetProteins=NULL, 
-                    swissProtID=FALSE, name2IDFile=NULL,
-                    nodeColors=c("#1F77B4", "#FF7F0E", "#D62728",
-                           "#9467BD", "#8C564B", "#E377C2"),
-                    leafColor="#2CA02C", byStep=FALSE)
-                    standardGeneric("cisPath"), 
-                    signature=c("infoFile", "proteinName", "outputDir"))
-setGeneric("addProteinNames",
-           function(name2IDFile, outputDir) 
-                    standardGeneric("addProteinNames"), 
-                    signature=c("name2IDFile", "outputDir"))
+           function(infoFile, outputDir, proteinName=NULL, targetProteins=NULL, 
+           swissProtID=FALSE, sprotFile="", tremblFile="",
+           nodeColors=c("#1F77B4", "#FF7F0E", "#D62728",
+                      "#9467BD", "#8C564B", "#E377C2"),
+           leafColor="#2CA02C", byStep=FALSE)
+           standardGeneric("cisPath"), 
+           signature=c("infoFile", "outputDir"))
 setGeneric("networkView",
            function(infoFile, proteinNames, outputDir, swissProtID=FALSE, 
                     mainNode=c(1), 

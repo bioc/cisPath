@@ -1,0 +1,318 @@
+body {
+ background-color: #C0E0D0;
+ width:1024px;
+ margin-left:auto; 
+ margin-right:auto; 
+ font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+ font-size: 16px;
+}
+svg {
+  background-color: #EEFFEE;
+  cursor: default;
+}
+
+svg:not(.active):not(.ctrl) {
+  cursor: default;
+}
+
+path.link {
+  cursor: default;
+}
+
+svg:not(.active):not(.ctrl) path.link {
+  cursor: pointer;
+}
+
+path.link.selected {
+}
+
+path.link.dragline {
+}
+
+path.link.hidden {
+}
+
+circle.node {
+  cursor: pointer;
+}
+
+circle.node.selected {
+}
+
+text {
+  font: 12px Arial,Georgia,"Courier New","Times New Roman",Messenger,Geneva,sans-serif;
+}
+
+text.id {
+  font-weight: bold;
+}
+#pro_name_id,#source_id,#target_id{
+	font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+  font-size: 16px;
+  color: #6666EE;
+	width: 98px;
+}
+#source_td, #target_td{
+	width: 100px;
+}
+#red1,#red2,#red3,#red4{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+  font-size: 16px;
+  font-weight: bold;
+  color: #FF0000;
+	width: 22px;
+	border:2px #FF0000 solid;
+}
+#green1,#green2,#green3,#green4{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+  font-size: 16px;
+  font-weight: bold;
+  color: #00FF00;
+	width: 22px;
+	border:2px #00FF00 solid;
+}
+#blue1,#blue2,#blue3,#blue4{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+  font-size: 16px;
+  font-weight: bold;
+  color: #0000FF;
+	width: 22px;
+	border:2px #0000FF solid;
+}
+#pro_ok_id,#p_del_id{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+	width: 56px;
+}
+#del_id{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+	width: 60px;
+}
+#edge_ok_id,#del_id{
+	width: 53px;
+}
+#pro_size1_id,#pro_size2_id,#pro_size1_id2,#pro_size2_id2,#pro_size1_id3,#pro_size2_id3{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+	width: 28px;
+	font-size: 16px;
+}
+#edgesize1_id,#edgesize2_id{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+	width: 28px;
+	font-size: 16px;
+}
+#txt_pos_id1,#txt_pos_id2,#txt_pos_id3,#txt_pos_id4{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+	width: 28px;
+	font-size: 16px;
+}
+#arrow1_id,#arrow2_id,#arrow3_id,#dotted1_id,#dotted2_id,#dotted3_id{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+	width: 36px;
+	font-size: 16px;
+}
+#curve1_id,#curve2_id,#curve3_id{
+	font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+	width: 36px;
+	font-size: 16px;
+}
+#chart{
+	width:1024px;
+	height:400px;
+	background-color: #EEFFEE;
+	border:2px solid gray;
+}
+#chartfather{
+	width:1024px;
+	height:400px;
+	background-color: #FFFFFF;
+	margin-left:auto; 
+    margin-right:auto; 
+}
+table {
+  margin-right:20px;
+  margin-bottom:10px;
+  border:2px solid gray;
+  caption-side:top;
+  border-spacing:0px;
+  border-collapse: collapse;
+}
+th{
+  background-color: #e6e6e6;
+  padding: 5px;
+  border:2px solid gray;
+  font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}
+td{
+  padding: 5px;
+  border:2px solid gray;
+  font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+  text-align:center; 
+}
+#saveid{
+	font-family: "Times New Roman", Georgia,"Courier New", Messenger, Geneva, Arial, sans-serif;
+	font-size: 16px;
+}
+.pbuttton {
+  width:100px;
+}
+#help_div,#save_div,#cookie_div{
+  font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+	font-size: 16px;
+}
+.keyboard{
+	background-color: #000000;
+	font-size: 10px;
+	color: #FFFFFF;
+	width:35px;
+	height:35px;
+	font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+	font-style: italic;
+}
+#keyboard_table td{
+	text-align:left;
+}
+#graphLoad_id{
+	width:105px;
+}
+#graphname_id{
+	width:100px;
+}
+#loadGraphID, #DeleteGraphID, #saveGraphID, #DeleteAllID{
+	font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+	width:100px;
+}
+#cookie_table td{
+	padding: 1px;
+	border:0px solid gray;
+}
+#cookie_table{
+	padding: 1px;
+	border:0px solid gray;
+}
+#source_name_id{
+	font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+	font-size: 16px;
+	color: #0000FF;
+	width:100px;
+}
+#fixButton,#releaseButton,#ctrlkey,#shiftkey,#savesection,#helpsection, #easyEditorId{
+	font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+	float: left;
+	width:120px;
+	margin-right: 8px;
+}
+#Refresh_id, #Submit_id,#graphLoad_id,#graphname_id{
+	font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}
+a{
+	color: #0000FF;
+}
+#detectPathExp,#detectPath{
+   font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+   width:100px;
+}
+#geneListText{
+   width:1020px;
+}
+#geneListTextButton{
+   float: right;
+   font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}
+#geneListTextButtonExp{
+   font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+   float: right;
+}
+#geneListText{
+   font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}
+.hr0{ height:2px;border:none;border-top:5px ridge green; width:100%; clear:both}
+.hr1{ height:2px;border:none;border-top:2px ridge green; width:100%; clear:both}
+.hr2{ height:1px;border:none;border-top:1px dashed #000000; width:100%; clear:both}
+#slider0, #slider1, #slider0s, #slider1s{
+ font-family: "Times New Roman", Georgia,"Courier New", Messenger, Geneva, Arial, sans-serif;
+ font-size: 15px;
+}
+.validInput{
+   font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+   color: #0000FF;
+   font-weight:900;
+   
+}
+.invalidInput{
+   font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+   color: #000000;
+   font-weight:600;
+}
+#sourcePtxt, #targetPtxt{
+   width:120px;
+}
+#byStepSpan{
+   font-size: 15px;
+}
+#result6waitp{
+   color: #FF0000;
+}
+.tdleft{
+   font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+   text-align:left;
+}
+.tdcenter{
+   font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+   text-align:center;
+}
+#allShortestPaths a{
+   color: #0000FF;
+}
+.detailButton{
+   font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+   width:80px;
+}
+#table_id3{
+   font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+   width:100%;
+}
+#footerp{
+   font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+   font-size: 15px;
+}
+.validatordiv{
+   float: right;
+}
+#closeList{
+   float: right;
+   clear: right;
+   width: 20px;
+}
+#spanLink0, #spanLink1{
+  color: #0000FF;
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}
+.rowSelected{
+  background-color: #9999FF;
+}
+.rowNotSelected{
+}
+.spanlinkClass{
+  color: #0000FF;
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}
+.spanInput{
+  width: 100px; 
+}
+.inputTable{
+  border: 0px solid gray;
+  margin-bottom:0px;
+}
+.inputTable td{
+  border: 0px solid gray;
+  padding: 2px;
+  font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}
+#sourcetd,#targettd{
+  width: 160px;
+  text-align:left;
+}

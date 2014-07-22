@@ -2,16 +2,20 @@
 <html>
   <head>
   	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
-    <title>Protein-protein interaction network</title>
+    <title>cisPath network view</title>
+    <link rel="icon" href="./D3/images/cisPath.png" type="image/x-icon">
+    <link rel="stylesheet" href="./D3/jquery-ui.css">
     <script type="text/javascript" src="D3/d3.js"></script>
     <script type="text/javascript" src="D3/d3.geom.js"></script>
     <script type="text/javascript" src="D3/d3.layout.js"></script>
     <style type="text/css">
-    	  body {
+    	 body{
             background-color: #EEFFEE;
-            margin-left:5%;       
-            margin-right:10%; 
-            font-family: "Trebuchet MS", Verdana, Helvetica, Arial,sans-serif !important;
+            width:1024px;
+            margin-left:auto; 
+            margin-right:auto; 
+            font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+            font-size: 16px;
         }
         text {
           font: 12px Arial,Georgia,"Courier New","Times New Roman",Messenger,Geneva,sans-serif;
@@ -130,20 +134,12 @@
   </head>
   <body>
   	<div class="testDiv">
-  		 <p class="guide2" id=cispathintro>cisPath result (Network View)</p>
+  		 <h2>Network View</h2>
   		 <p class="guide2"></p>
   		 </div>
     <div id="chartfather">
     <div id="chart"></div>
     </div>
-    <div class="guide" id="tourguide"><h1><br></h1><h1><br></h1>
-        Tour guide <br><br>
-       &bull; Try clicking on a node. <br>
-       &bull; Try dragging a node with the mouse. <br>
-       &bull; Gestures can be used for touch screen users. <br>
-       &bull; Use Ctrl (&#8984;) and '+' or '-' to zoom in and out. <br>
-       &bull; The links between the main nodes are highlighted.
-       </div>
       <div><p id="fixButtonDiv">
       	   <input type="button" value="Release graph" id='fixButton' onclick="clickFix(this);">
       	   <input type="button" value="Edit graph" id='easyEditorId' onclick="openEditor();">&nbsp;&nbsp;&nbsp;

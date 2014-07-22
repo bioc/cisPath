@@ -20,15 +20,9 @@ function(infoFile, proteinNames, outputDir, swissProtID=FALSE, mainNode=c(1),
     file.copy(htmlFile, htmlFile_out, overwrite = TRUE, copy.mode = TRUE)
     copyHTML(outputDir)
     #############################################################
-    jsFile <- system.file("extdata", "D3/d3.js", package="cisPath")
-    js_out <- paste(outputDir,"/D3/","d3.js",sep="")
-    file.copy(jsFile, js_out, overwrite = TRUE, copy.mode = TRUE)
-    jsFile <- system.file("extdata", "D3/d3.geom.js", package="cisPath")
-    js_out <- paste(outputDir,"/D3/","d3.geom.js",sep="")
-    file.copy(jsFile, js_out, overwrite = TRUE, copy.mode = TRUE)
-    jsFile <- system.file("extdata", "D3/d3.layout.js", package="cisPath")
-    js_out <- paste(outputDir,"/D3/","d3.layout.js",sep="")
-    file.copy(jsFile, js_out, overwrite = TRUE, copy.mode = TRUE)
+    jsFile <- system.file("extdata", "D3", package="cisPath")
+    js_out <- paste(outputDir,sep="")
+    file.copy(jsFile, js_out, overwrite = TRUE, recursive = TRUE, copy.mode = TRUE) 
     ##############################################################
     proteinFile <- paste(outputDir,"/","proteins.txt",sep="")
     len <- length(proteinNames)
