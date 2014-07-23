@@ -128,12 +128,12 @@ cisPath(infoFile, outputDir, proteinName=NULL, targetProteins=NULL, swissProtID=
     results
     
     # Identify the shortest paths from TP53 to proteins Q96QZ7 and P01241 (with the Swiss-Prot accession numbers)
-    #outputDir <- file.path(tempdir(), "TP53_example3")
-    #results <- cisPath(infoFile, outputDir, "TP53", targetProteins=c("Q96QZ7", "P01241"), swissProtID=TRUE, byStep=FALSE)
+    outputDir <- file.path(tempdir(), "TP53_example3")
+    results <- cisPath(infoFile, outputDir, "TP53", targetProteins=c("Q96QZ7", "P01241"), swissProtID=TRUE, byStep=FALSE)
     
     # Identify the shortest functional paths in the web page
-    #outputDir <- file.path(tempdir(), "cisPath_example")
-    #results <- cisPath(infoFile, outputDir)
+    outputDir <- file.path(tempdir(), "cisPath_example")
+    results <- cisPath(infoFile, outputDir)
 
 \dontrun{
     # example of downloading PPI data from our website

@@ -316,3 +316,9 @@ a{
   width: 160px;
   text-align:left;
 }
+#selectid0, #selectid1{
+  font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}
+.selectClass{
+  font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+}

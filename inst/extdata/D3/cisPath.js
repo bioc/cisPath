@@ -957,7 +957,8 @@ function onBegin(){
 	 checkLeftNode();
 	 document.getElementById('listgenesDiv').style.display="none";
 	 document.getElementById("byStepid0").checked=true;
-     document.getElementById("byStepid1").checked=false;
+   document.getElementById("byStepid1").checked=false;
+   document.getElementById("table_id3").style.display="none";
      initCol0();
      initCol1();
 	 /////////////////////////////
@@ -2388,15 +2389,20 @@ function checkValid(Name){
 }
 var input1Valid=0;
 var input2Valid=0;
-function entersearch(){
+function entersearch(event){
+	  checkValid1();
+	  checkValid2()
 	  if(input1Valid==0){
 	  	 return;
 	  }
 	  if(input2Valid==0){
 	  	 return;
 	  }
-    var event = window.event || arguments.callee.caller.arguments[0];
-    if(event.keyCode == 13){
+    var eventTmp = event ||window.event || arguments.callee.caller.arguments[0];
+    if(!eventTmp){
+    	 return;
+    }
+    if(eventTmp.keyCode == 13){
     	 ShowShortestPath();
     }
 }
@@ -2408,12 +2414,12 @@ function checkValid1(){
        input1Valid=1;
        if(input2Valid==1){
           document.getElementById("detectPath").disabled=false;
-          entersearch();
        }
        return 1;
     }else{
        inputBox.className="invalidInput";
        document.getElementById("detectPath").disabled=true;
+       input1Valid=0;
        return 0;
     }
 }
@@ -2425,12 +2431,12 @@ function checkValid2(){
        input2Valid=1;
        if(input1Valid==1){
           document.getElementById("detectPath").disabled=false;
-          entersearch();
        }
        return 1;
     }else{
        inputBox.className="invalidInput";
        document.getElementById("detectPath").disabled=true;
+       input2Valid=0;
        return 0;
     }
 }
@@ -2980,6 +2986,7 @@ function processJS(json){
 	if((validTargets.length<=20)&&(validTargets.length!=0)){
 	   var select=document.createElement("select");
 	   select.id="targetSelectId";
+	   select.className="selectClass";
 	   for(x in validTargets){
 	       if(validTargets[x]==rootSwiss){
 	          continue;
