@@ -8,20 +8,20 @@
     <link rel="stylesheet" href="./D3/jquery-ui.css">
     <script type="text/JavaScript" src="./D3/jquery-1.11.0.js"></script>
     <script type="text/JavaScript" src="./D3/jquery.jsonp-2.4.0.min.js"></script>
-    <script src="./D3/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/JavaScript" src="./D3/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/JavaScript" src="./D3/jquery-ui.js"></script>
   </head>
   <body>
   <h2>Protein-protein interaction Network</h2>
-  <img id="result1wait" src='./D3/wait1.gif' alt='Loading...' >
+  <p><img id="result1wait" src='./D3/wait1.gif' alt='Loading...' ></p>
   <p id="result1waitp"></p>
   <div id="inputarea">
   <hr class="hr0">
   <h3>Identification of shortest paths between proteins</h3>
   <p>
-  Source Protein: <input type="text" name="sourceP" id='sourcePtxt' class='invalidInput' onchange="checkValid1()" onkeyup="checkValid1()"> 
+  Source Protein: <input type="text" name="sourceP" id='sourcePtxt' class='invalidInput' onchange="checkValid1()" onkeyup="entersearch(event)"> 
   <input type="button" id='detectPathExp' value='Example' onclick="ShowShortestPathExp();"><br>
-  Target Protein: <input type="text" name="targetP" id='targetPtxt' class='invalidInput' onchange="checkValid2()" onkeyup="checkValid2()">
+  Target Protein: <input type="text" name="targetP" id='targetPtxt' class='invalidInput' onchange="checkValid2()" onkeyup="entersearch(event)">
   <input type="button" id='detectPath' value='Submit' onclick="ShowShortestPath();">
   <br>
   <hr class="hr2">
@@ -34,10 +34,11 @@
   <input type="checkbox" id="showleafid" value="Show leaf nodes " onClick="checkLeftNode();generateNetwork()"> Show leaf nodes that can interact with at least two main proteins <br>
   <input type="checkbox" id="showleafid2" value="Show leaf nodes" onClick="generateNetwork()"> Show interactions between leaf nodes <br>
   <span>&nbsp;&nbsp;&nbsp;</span>main node colors: <select id="selectid0">
+  	<option value ="">&nbsp;</option>
   </select><br>
   <span>&nbsp;&nbsp;&nbsp;</span>leaf node colors: <select id="selectid1">
+  	<option value ="">&nbsp;</option>
   </select>
-  </p>
   <p id="result6waitp"><img id="result6wait" src='./D3/wait1.gif' alt='Loading...'><br>Please wait for several minutes! Do not close this page.</p>
   <table id="allShortestPaths">
      <tr><td></td></tr>
@@ -142,6 +143,7 @@
    	</tr>
    </table>
   <table id="table_id3">
+  	<tr><td></td></tr>
   </table>
   <p id="table_id3P"></p>
   </div>
