@@ -2516,6 +2516,7 @@ function ShowShortestPath(){
     document.getElementById("allShortestPaths").style.display="none";
     document.getElementById("allShortestPathsP").style.display="none";
     if(1){
+    	 document.getElementById("result6wait").style.display="";
        var swiss2=getSwiss(document.getElementById("targetPtxt").value);
        if(!swiss2validTargets.hasOwnProperty(swiss2)){
           alert(document.getElementById("targetPtxt").value+" is not in the valid target protein list!");
