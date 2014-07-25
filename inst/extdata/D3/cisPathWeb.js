@@ -959,6 +959,7 @@ function onBegin(){
 	 document.getElementById("byStepid0").checked=true;
    document.getElementById("byStepid1").checked=false;
    document.getElementById("table_id3").style.display="none";
+   disableInput();
      initCol0();
      initCol1();
 	 /////////////////////////////
@@ -2107,6 +2108,7 @@ function processPPIFile(){
 	}
     document.getElementById("result1wait").style.display="none";
     document.getElementById("result1waitp").style.display="none";
+    enableInput();
 }
 function addGeneListExp(){
 	  var exampleTxt="DMD,IFT80,CDH3,CAPN3,CNBP,NAGA,DCN,DAG1,GSN,KRT3,LAMA2\nMYH7,RLBP1,TIMP3,FLNA,EMD,OPN1MW,RPGR,SGCA,GUCA1A\n";
@@ -2929,4 +2931,14 @@ function changeMainNodeCol1(index){
        select.style.color="#000000";
     }
     generateNetwork();
+}
+function disableInput(){
+	document.getElementById("sourcePtxt").disabled=true;
+	document.getElementById("targetPtxt").disabled=true;
+	document.getElementById("detectPathExp").disabled=true;
+}
+function enableInput(){
+	document.getElementById("sourcePtxt").disabled=false;
+	document.getElementById("targetPtxt").disabled=false;
+	document.getElementById("detectPathExp").disabled=false;
 }
