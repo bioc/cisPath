@@ -959,6 +959,7 @@ function onBegin(){
 	 document.getElementById("byStepid0").checked=true;
    document.getElementById("byStepid1").checked=false;
    document.getElementById("table_id3").style.display="none";
+   disableInput();
      initCol0();
      initCol1();
 	 /////////////////////////////
@@ -3003,6 +3004,7 @@ function processJS(json){
 	   	  alert("No valid target protein!");
 	   	  document.getElementById("result1wait").style.display="none";
         document.getElementById("result1waitp").style.display="none";
+        enableInput();
     	  return;
 	   }
 	   select[0].selected=true;
@@ -3032,6 +3034,7 @@ function processJS(json){
   }
   document.getElementById("result1wait").style.display="none";
   document.getElementById("result1waitp").style.display="none";
+  enableInput();
 }
 var url2retry8={};
 function getCisPathJS(){
@@ -3137,4 +3140,14 @@ function getPathsForTargetProteinRetry(urltry){
         getPathsForTargetProteinRetry(this.url);
     }
    });
+}
+function disableInput(){
+	document.getElementById("sourcePtxt").disabled=true;
+	document.getElementById("targetPtxt").disabled=true;
+	document.getElementById("detectPathExp").disabled=true;
+}
+function enableInput(){
+	document.getElementById("sourcePtxt").disabled=false;
+	document.getElementById("targetPtxt").disabled=false;
+	document.getElementById("detectPathExp").disabled=false;
 }
