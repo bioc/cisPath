@@ -2115,6 +2115,9 @@ function addGeneListExp(){
 	  exampleTxt=exampleTxt+"Q16585, Q13956, Q15149, Q99456, Q15582, Q86U42, Q6NZI2, O95461";
 	  if(1){
 	     exampleTxt="TP53, DNAJB6 NPM1 MAPK3 PSME3 CSNK2B GH1 BAI1 TFAP2A  CDH1 SFN TP53BP2 MAGI1";
+	     document.getElementById("showleafid").checked=false;
+       document.getElementById("showleafid2").checked=false;
+       document.getElementById("showleafid2").disabled=true;
 	  }
 	  document.getElementById("geneListText").value=exampleTxt;
 	  addGeneList();
