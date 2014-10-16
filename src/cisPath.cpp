@@ -2963,6 +2963,11 @@ bool formatiRefIndex(string input, string output, string OX)
                     }
                 }
             }
+            vector<string> tmpv;
+            tmpv = string_tokenize(tokens[0], "-");
+            tokens[0]= tmpv[0];
+            tmpv = string_tokenize(tokens[1], "-");
+            tokens[1]= tmpv[0];
             OUT << tokens[0] << "\t" << tokens[1] << "\t";
             OUT << tokens[2] << "\t" << tokens[3];
             OUT << "\t" << pubmedstr << "\tiRefIndex\t1.000" << "\n";

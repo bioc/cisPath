@@ -387,7 +387,7 @@ function restart() {
     .style('stroke', function(d) {if((d.source==selected_node)||(d.target==selected_node)){return d.col;};return d.col;})
     .style('stroke-dasharray', function(d) { return drawLine(d); })
     .style('fill', function(d) { return (d === selected_link) ? 'none':'none'; })
-    .style('stroke-opacity', function(d) {if(!selected_node){return 1};if((d.source==selected_node)||(d.target==selected_node)){return 1;};return 0.1;});
+    .style('stroke-opacity', function(d) {if(!selected_node){if (d.size>=4){ return 1} else {return 0.3}};if((d.source==selected_node)||(d.target==selected_node)){return 1;};return 0.1;});
 
   // add new links
   path.enter().append('svg:path')
@@ -399,6 +399,7 @@ function restart() {
     .style("stroke-width", function(d) { return d.size; })
     .style('stroke-dasharray', function(d) { return drawLine(d); })
     .style('fill', function(d) { return (d === selected_link) ? 'none':'none'; })
+    .style('stroke-opacity', function(d) {if(!selected_node){if (d.size>=4){ return 1} else {return 0.3}};if((d.source==selected_node)||(d.target==selected_node)){return 1;};return 0.1;})
     .on('mousedown', function(d) {
       //if((d3.event.ctrlKey||d3.event.metaKey||ctrl_key_flag)) return;
       // select link
