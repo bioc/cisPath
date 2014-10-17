@@ -4,13 +4,16 @@
   	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
     <title>cisPath network view</title>
     <link rel="icon" href="./D3/images/cisPath.png" type="image/x-icon">
+    <link rel="stylesheet" href="./D3/jquery-ui.css">
     <script type="text/javascript" src="D3/d3.js"></script>
     <script type="text/javascript" src="D3/d3.geom.js"></script>
     <script type="text/javascript" src="D3/d3.layout.js"></script>
+    <script type="text/JavaScript" src="./D3/jquery-1.11.0.js"></script>
+    <script type="text/JavaScript" src="./D3/jquery-ui.js"></script>
     <style type="text/css">
     	 body{
             background-color: #EEFFEE;
-            width:1024px;
+            width:968px;
             margin-left:auto; 
             margin-right:auto; 
             font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
@@ -36,12 +39,12 @@
            stroke-opacity: .6;*/
         } 
         table {
-          margin-right:20px;
+          margin-top:10px;
           margin-bottom:10px;
           border:2px solid gray;
           caption-side:top;
           border-spacing:0px;
-          width:960px;
+          width:968px;
           border-collapse: collapse;
         }
         th{
@@ -57,7 +60,7 @@
           text-align: left;
         }
         #table_id {
-            width: 960px;
+            width: 965px;
             border-collapse: collapse;
             clear: left;
         }
@@ -67,14 +70,15 @@
             clear: left;
         }
         #chart {
-            float: left;
             width:960px;
             height:500px;
+            border:2px solid gray;
         }
         #chartfather {
-            float: left;
             width:960px;
             height:500px;
+            margin-left:auto; 
+            margin-right:auto; 
         }
         .guide {
             color: #000000;
@@ -119,15 +123,21 @@
             font-family: Arial, "Times New Roman", Georgia, "Courier New", Messenger, Geneva, Arial, sans-serif;
         }
         #fixButton, #easyEditorId, #showleafid{
+        	  float: left;
         	  font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
             font-size: 16px;
             width: 120px;
+            margin-right: 8px;
         }
         #fixButtonDiv{
-        	  clear:left;
+        	  clear:both;
         }
         circle.node {
            cursor: pointer;
+        }
+        #slider0, #slider1, #slider0s, #slider1s{
+           font-family: "Times New Roman", Georgia,"Courier New", Messenger, Geneva, Arial, sans-serif;
+           font-size: 15px;
         }
     </style>
   </head>
@@ -137,14 +147,17 @@
   		 <p class="guide2"></p>
   		 </div>
     <div id="chartfather">
-    <div id="chart"></div>
+    <p id="chart"></p>
     </div>
       <div><p id="fixButtonDiv">
+      	   </p>
       	   <input type="button" value="Release graph" id='fixButton' onclick="clickFix(this);">
       	   <input type="button" value="Edit graph" id='easyEditorId' onclick="openEditor();">
       	   <input type="button" value="Hide leaves" id='showleafid' onclick="checkLeftNode();">
+      	   <div style="width:160px; float: left; margin-left: 16px; text-align:center"><div id="slider0"></div><span id="slider0s">Width = 960</span></div>
+           <div style="width:160px; float: left; margin-left: 16px; text-align:center"><div id="slider1"></div><span id="slider1s">Height = 500</span></div>
       	   &nbsp;&nbsp;&nbsp;
-           <span id="proteinIntroP"><br></span></p></div>
+           <span id="proteinIntroP"><br><br></span></div>
       <div id="table_id"></div>
       <div><p class="guide2">
       </p>
@@ -245,6 +258,7 @@
         	  if(obj == null){
         	  	 return;
         	  }
+        	  return;
         	  while(obj.lastChild != null){
         	  	    obj.removeChild(obj.lastChild);
         	  }
@@ -519,7 +533,7 @@
            d3.selectAll("line.link").remove();
            d3.selectAll("circle").remove();
            d3.selectAll("g").remove();
-           var w = 960,
+           var w = 960-2,
            h = 500,
            fill = d3.scale.category10();
            //json.nodes[0].fixed=1;
@@ -548,14 +562,18 @@
               	  if(d.value > 10){
               	  	 d3.select(this).style("stroke-width", Math.sqrt(d.value)+2);
               	  }else{
-              	  	 d3.select(this).style("stroke-width", Math.sqrt(d.value)+2);
+              	  	 if(whetherShowleave){
+              	  	    d3.select(this).style("stroke-width", Math.sqrt(d.value)+2);
+              	  	 }
                   }
                 })
               .on("mouseout", function(d){
               	  if(d.value > 10){
               	  	 d3.select(this).style("stroke-width", Math.sqrt(d.value));
               	  }else{
-                     d3.select(this).style("stroke-width", Math.sqrt(d.value));
+              	  	 if(whetherShowleave){
+                        d3.select(this).style("stroke-width", Math.sqrt(d.value));
+                     }
                   }
                });
 
@@ -722,8 +740,50 @@
            //processJson(jsonTmp);
     	  };
         /////////////// 2012-12-21
+        var width  = 960;
+        var height = 500;
+        initializeSiders();
         loadJS();
-        //document.getElementById('pro_id').value="";        
+        //document.getElementById('pro_id').value=""; 
+        function refreshSize1(event, ui) {
+           width=ui.value;
+           $("#slider0s").text("Width = " + width);
+           force.size([width, height]);
+           document.getElementById("chartfather").style.width=width+2+"px";
+           document.getElementById("chart").style.width=width+2+"px";
+           vis.attr('width', width);
+         }
+         function refreshSize2(event, ui) {
+            height=ui.value;
+            $("#slider1s").text("Height = " + height);
+            force.size([width, height]);
+            document.getElementById("chartfather").style.height=height+2+"px";
+            document.getElementById("chart").style.height=height+2+"px";
+            vis.attr('height', height);
+         }
+         function initializeSiders(){
+           $("#slider0").slider(
+           {
+            orientation : "horizontal",
+            slide : refreshSize1,
+            max : 2000,
+            min : 500,
+            step : 10,
+            value : width
+           }
+           );
+    
+           $("#slider1").slider(
+           {
+            orientation : "horizontal",
+            slide : refreshSize2,
+            max : 2000,
+            min : 400,
+            step : 10,
+            value : height
+           }
+         );
+        }       
     </script>
   </body>
 </html>

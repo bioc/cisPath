@@ -196,6 +196,7 @@ td{
 	width:100px;
 }
 #fixButton,#releaseButton,#ctrlkey,#shiftkey,#savesection,#helpsection, #easyEditorId{
+	font-size: 14px;
 	font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
 	float: left;
 	width:120px;
@@ -208,6 +209,7 @@ a{
 	color: #0000FF;
 }
 #detectPathExp,#detectPath{
+	 font-size: 14px;
    font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
    width:100px;
 }
@@ -244,6 +246,7 @@ a{
    font-weight:600;
 }
 #sourcePtxt, #targetPtxt{
+	 font-size: 14px;
    width:120px;
 }
 #byStepSpan{
@@ -317,6 +320,7 @@ a{
   text-align:left;
 }
 #selectid0, #selectid1{
+	font-size: 14px;
   font-family: "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
 }
 .selectClass{
