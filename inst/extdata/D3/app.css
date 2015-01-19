@@ -197,8 +197,9 @@ td{
 	width:100px;
 }
 #fixButton,#releaseButton,#ctrlkey,#shiftkey,#savesection,#helpsection{
-    float:left;
+  float:left;
 	font-family: Georgia,"Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
+  height:22px;
 }
 #Refresh_id, #Submit_id,#graphLoad_id,#graphname_id{
 	font-family: Georgia, "Courier New", "Times New Roman", Messenger, Geneva, Arial, sans-serif;
