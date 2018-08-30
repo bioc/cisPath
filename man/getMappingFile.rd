@@ -64,8 +64,9 @@ getMappingFile(sprotFile, output, tremblFile="", taxonId="")
     getMappingFile(sprotFile, output, taxonId="9606")
     
 \dontrun{
-    source("http://bioconductor.org/biocLite.R")
-    biocLite("R.utils")
+    if (!requireNamespace("BiocManager", quietly=TRUE))
+        install.packages("BiocManager")
+    BiocManager::install("R.utils")
     library(R.utils)
     
     outputDir <- file.path(getwd(), "cisPath_test")

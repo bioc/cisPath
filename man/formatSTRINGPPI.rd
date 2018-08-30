@@ -67,8 +67,9 @@ formatSTRINGPPI(input, mappingFile, taxonId, output, minScore=700)
     formatSTRINGPPI(fileFromSTRING, mappingFile, "9606", output, 700)
     
 \dontrun{
-    source("http://bioconductor.org/biocLite.R")
-    biocLite("R.utils")
+    if (!requireNamespace("BiocManager", quietly=TRUE))
+        install.packages("BiocManager")
+    BiocManager::install("R.utils")
     library(R.utils)
     
     outputDir <- file.path(getwd(), "cisPath_test")
